@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import bcrypt from 'bcryptjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,13 +32,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
     }
 
+    const rawPassword = password && password.trim() ? password.trim() : Math.random().toString(36).slice(-10);
+    const hashedPassword = await bcrypt.hash(rawPassword, 10);
+
     const user = await db.user.create({
       data: {
         name,
-        email,
-        password: password || 'admin123',
+        email: email.toLowerCase().trim(),
+        password: hashedPassword,
         role: role || 'ADMIN',
         status: 'ACTIVE',
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        status: true,
+        createdAt: true,
       },
     });
 

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -44,13 +45,26 @@ async function main() {
   }
 
   // 3. Seed Users
+  const defaultAdminEmail = process.env.ADMIN_EMAIL || 'lukhiparam904@gmail.com';
+  const defaultAdminPassword = process.env.ADMIN_PASSWORD || 'AdminPassword123!';
+  const hashedPassword = await bcrypt.hash(defaultAdminPassword, 10);
+
+  // Clean up legacy demo admin if present
+  await prisma.user.deleteMany({
+    where: { email: { in: ['admin@techpulse.com', 'admin'] } }
+  }).catch(() => {});
+
   await prisma.user.upsert({
-    where: { email: 'admin@techpulse.com' },
-    update: {},
+    where: { email: defaultAdminEmail },
+    update: {
+      password: hashedPassword,
+      status: 'ACTIVE',
+      role: 'ADMIN',
+    },
     create: {
-      name: 'System Administrator',
-      email: 'admin@techpulse.com',
-      password: 'admin', // Simple hash or string for initial seed
+      name: 'Param Lukhi',
+      email: defaultAdminEmail,
+      password: hashedPassword,
       role: 'ADMIN',
       status: 'ACTIVE',
     },

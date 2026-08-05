@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock, User, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -20,17 +20,17 @@ export default function AdminLoginPage() {
       const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
       if (res.ok && data.success) {
         router.push('/admin/dashboard');
       } else {
-        setError(data.error || 'Invalid credentials');
+        setError(data.error || 'Invalid email or password.');
       }
     } catch (err) {
-      setError('Connection error. Please try again.');
+      setError('Invalid email or password.');
     } finally {
       setLoading(false);
     }
@@ -58,16 +58,18 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-300 mb-1">Username / Email</label>
+            <label className="block text-xs font-bold text-neutral-300 mb-1">Email Address</label>
             <div className="relative">
               <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="lukhiparam904@gmail.com"
                 required
+                autoComplete="email"
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white text-sm outline-none focus:border-brand-500"
               />
-              <User className="w-4 h-4 text-neutral-500 absolute left-3 top-3.5" />
+              <Mail className="w-4 h-4 text-neutral-500 absolute left-3 top-3.5" />
             </div>
           </div>
 
@@ -79,6 +81,7 @@ export default function AdminLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="current-password"
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white text-sm outline-none focus:border-brand-500"
               />
               <Lock className="w-4 h-4 text-neutral-500 absolute left-3 top-3.5" />
