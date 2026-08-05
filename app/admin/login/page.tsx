@@ -51,12 +51,12 @@ export default function AdminLoginPage() {
         </div>
 
         {error && (
-          <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs p-3 rounded-xl text-center">
+          <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs p-3 rounded-xl text-center font-medium">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4" autoComplete="off">
           <div>
             <label className="block text-xs font-bold text-neutral-300 mb-1">Email Address</label>
             <div className="relative">
@@ -64,9 +64,10 @@ export default function AdminLoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="lukhiparam904@gmail.com"
+                placeholder="Enter admin email"
                 required
-                autoComplete="email"
+                autoComplete="off"
+                name="admin_email_input"
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white text-sm outline-none focus:border-brand-500"
               />
               <Mail className="w-4 h-4 text-neutral-500 absolute left-3 top-3.5" />
@@ -80,8 +81,10 @@ export default function AdminLoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter admin password"
                 required
-                autoComplete="current-password"
+                autoComplete="new-password"
+                name="admin_password_input"
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-neutral-900 border border-neutral-700 text-white text-sm outline-none focus:border-brand-500"
               />
               <Lock className="w-4 h-4 text-neutral-500 absolute left-3 top-3.5" />
@@ -91,7 +94,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-brand-600 hover:bg-brand-500 font-bold text-sm text-white transition-all flex items-center justify-center gap-2 shadow-lg"
+            className="w-full py-3.5 rounded-xl bg-brand-600 hover:bg-brand-500 font-bold text-sm text-white transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
           >
             {loading ? 'Authenticating...' : 'Sign In to Dashboard'}
             <ArrowRight className="w-4 h-4" />
