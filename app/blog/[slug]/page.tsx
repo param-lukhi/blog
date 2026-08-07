@@ -14,6 +14,7 @@ import CommentsSection from '@/components/CommentsSection';
 import { formatDate, estimateReadTime, safeJsonParse } from '@/lib/utils';
 import { Clock, ShieldCheck, Tag, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { generateReviewSchema } from '@/lib/seo';
+import { parseMarkdownToHtml } from '@/lib/markdown';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const blog = await db.blog.findUnique({
@@ -257,8 +258,8 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
 
         {/* Hands-on Blog Content */}
         <section 
-          className="prose dark:prose-invert max-w-none my-10 font-sans"
-          dangerouslySetInnerHTML={{ __html: blog.content }}
+          className="prose dark:prose-invert max-w-none my-10 font-sans leading-relaxed text-neutral-800 dark:text-neutral-200"
+          dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(blog.content) }}
         />
 
         {/* Conclusion / Final Verdict Box */}
