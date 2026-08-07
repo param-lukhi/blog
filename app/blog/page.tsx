@@ -4,7 +4,8 @@ import { db } from '@/lib/db';
 import BlogCard from '@/components/BlogCard';
 import { BookOpen, Sparkles } from 'lucide-react';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata = {
   title: 'All Product Reviews & Tech Guides - TechPulse',

@@ -7,7 +7,8 @@ import CategoryCard from '@/components/CategoryCard';
 import FaqAccordion from '@/components/FaqAccordion';
 import { Sparkles, ArrowRight, ShieldCheck, Zap, Award, Flame, Scale, Star, CheckCircle2, MessageSquare } from 'lucide-react';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 async function getData() {
   const categories = await db.category.findMany({ take: 16, orderBy: { name: 'asc' } });

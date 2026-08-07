@@ -4,6 +4,8 @@ import { db } from '@/lib/db';
 import ProductCard from '@/components/ProductCard';
 import { Package } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Best Tested Products & Amazon Price Reviews - TechPulse',
   description: 'Browse all expert-tested tech products, smartphones, laptops, audio gear, and appliances.',

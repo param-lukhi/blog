@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 import ProductCard from '@/components/ProductCard';
 import { Flame } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Today\'s Best Amazon Deals & Price Drops - TechPulse',
   description: 'Handpicked Amazon tech deals, price drops, and discounts updated daily.',

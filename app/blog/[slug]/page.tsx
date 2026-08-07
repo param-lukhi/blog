@@ -57,10 +57,24 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
     take: 4,
   });
 
-  const specifications = safeJsonParse<Record<string, string>>(blog.specifications, {});
-  const features = safeJsonParse<string[]>(blog.features, []);
-  const pros = safeJsonParse<string[]>(blog.pros, []);
-  const cons = safeJsonParse<string[]>(blog.cons, []);
+  const linkedProduct = blog.product;
+
+  const specifications = safeJsonParse<Record<string, string>>(
+    blog.specifications && blog.specifications !== '{}' ? blog.specifications : (linkedProduct?.specifications || '{}'),
+    {}
+  );
+  const features = safeJsonParse<string[]>(
+    blog.features && blog.features !== '[]' ? blog.features : (linkedProduct?.features || '[]'),
+    []
+  );
+  const pros = safeJsonParse<string[]>(
+    blog.pros && blog.pros !== '[]' ? blog.pros : (linkedProduct?.pros || '[]'),
+    []
+  );
+  const cons = safeJsonParse<string[]>(
+    blog.cons && blog.cons !== '[]' ? blog.cons : (linkedProduct?.cons || '[]'),
+    []
+  );
   const faqs = safeJsonParse<{ question: string; answer: string }[]>(blog.faqs, []);
   const tags = safeJsonParse<string[]>(blog.tags, []);
 
