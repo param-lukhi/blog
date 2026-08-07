@@ -37,7 +37,11 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
 
   const images = safeJsonParse<string[]>(product.images, []);
   const mainImage = images[0] || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80';
-  const specifications = safeJsonParse<Record<string, string>>(product.specifications, {});
+  const rawSpecs = safeJsonParse<Record<string, string>>(product.specifications, {});
+  const ratingScores = rawSpecs._ratingScores ? safeJsonParse(rawSpecs._ratingScores, null) || rawSpecs._ratingScores : null;
+  const specifications = { ...rawSpecs };
+  delete specifications._ratingScores;
+
   const features = safeJsonParse<string[]>(product.features, []);
   const pros = safeJsonParse<string[]>(product.pros, []);
   const cons = safeJsonParse<string[]>(product.cons, []);
@@ -149,7 +153,7 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
       </div>
 
       {/* Review Benchmarks */}
-      <ReviewScores />
+      <ReviewScores scoresData={ratingScores} />
 
       {/* Price History */}
       <PriceHistoryChart currentPrice={product.price} />

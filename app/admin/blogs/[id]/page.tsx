@@ -49,6 +49,14 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
   const [cons, setCons] = useState<string[]>([]);
   const [faqs, setFaqs] = useState<{ question: string; answer: string }[]>([]);
   const [specs, setSpecs] = useState<{ key: string; value: string }[]>([]);
+  const [ratingsState, setRatingsState] = useState<{ label: string; score: string }[]>([
+    { label: 'Performance Score', score: '9.6' },
+    { label: 'Display Score', score: '9.4' },
+    { label: 'Camera / Audio', score: '9.8' },
+    { label: 'Battery Score', score: '9.1' },
+    { label: 'Gaming Performance', score: '9.5' },
+    { label: 'AI & Value Rating', score: '9.2' },
+  ]);
 
   useEffect(() => {
     fetch('/api/categories')
@@ -93,8 +101,18 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
           const fList = safeJsonParse<{ question: string; answer: string }[]>(blog.faqs, []);
           setFaqs(fList);
 
-          const sObj = safeJsonParse<Record<string, string>>(blog.specifications, {});
-          const sArr = Object.entries(sObj).map(([k, v]) => ({ key: k, value: v }));
+          const sObj = safeJsonParse<Record<string, any>>(blog.specifications, {});
+          if (sObj._ratingScores) {
+            const rObj = typeof sObj._ratingScores === 'string'
+              ? safeJsonParse<Record<string, number | string>>(sObj._ratingScores, {})
+              : sObj._ratingScores;
+            const rArr = Object.entries(rObj).map(([label, val]) => ({ label, score: String(val) }));
+            if (rArr.length > 0) setRatingsState(rArr);
+          }
+
+          const sArr = Object.entries(sObj)
+            .filter(([k]) => k !== '_ratingScores')
+            .map(([k, v]) => ({ key: k, value: String(v) }));
           setSpecs(sArr);
         }
         setLoading(false);
@@ -156,10 +174,18 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const specObj: Record<string, string> = {};
+    const specObj: Record<string, any> = {};
     specs.forEach((s) => {
-      if (s.key.trim()) specObj[s.key.trim()] = s.value.trim();
+      if (s.key.trim() && !s.key.startsWith('_')) specObj[s.key.trim()] = s.value.trim();
     });
+
+    const ratingScoresObj: Record<string, number> = {};
+    ratingsState.forEach((r) => {
+      if (r.label.trim()) {
+        ratingScoresObj[r.label.trim()] = parseFloat(r.score) || 9.0;
+      }
+    });
+    specObj._ratingScores = JSON.stringify(ratingScoresObj);
 
     const tags = tagsStr.split(',').map((t) => t.trim()).filter(Boolean);
 
@@ -344,6 +370,61 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
           <div className="space-y-2">
             <label className="block text-xs font-bold text-neutral-700">Detailed Article Content (Rich Editor) *</label>
             <RichTextEditor value={content} onChange={setContent} />
+          </div>
+
+          {/* Benchmark & Editor Review Scores (0 to 10 Ratings) */}
+          <div className="bg-amber-50/60 border border-amber-200 p-6 rounded-2xl shadow-soft space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-extrabold text-amber-950 text-sm flex items-center gap-1.5">
+                <span>⭐ Benchmark & Editor Review Scores (0 to 10 Ratings)</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setRatingsState([...ratingsState, { label: '', score: '9.0' }])}
+                className="text-xs text-amber-800 font-bold flex items-center gap-1"
+              >
+                + Add Score Category
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {ratingsState.map((r, idx) => (
+                <div key={idx} className="flex gap-2 items-center bg-white p-2 rounded-xl border border-amber-200">
+                  <input
+                    type="text"
+                    placeholder="Category (e.g. Performance Score)"
+                    value={r.label}
+                    onChange={(e) => {
+                      const copy = [...ratingsState];
+                      copy[idx].label = e.target.value;
+                      setRatingsState(copy);
+                    }}
+                    className="w-2/3 px-2.5 py-1 rounded-lg border border-neutral-300 text-xs font-bold"
+                  />
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="10"
+                    placeholder="9.5"
+                    value={r.score}
+                    onChange={(e) => {
+                      const copy = [...ratingsState];
+                      copy[idx].score = e.target.value;
+                      setRatingsState(copy);
+                    }}
+                    className="w-1/3 px-2.5 py-1 rounded-lg border border-neutral-300 text-xs font-extrabold text-brand-600"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setRatingsState(ratingsState.filter((_, i) => i !== idx))}
+                    className="text-rose-500 hover:text-rose-700 p-1"
+                  >
+                    <Trash className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Specifications key-value editor */}

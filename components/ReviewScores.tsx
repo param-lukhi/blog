@@ -1,28 +1,90 @@
 'use client';
 
 import React from 'react';
-import { Star, Zap, Monitor, Camera, Battery, Gamepad2, Cpu } from 'lucide-react';
+import { Star, Zap, Monitor, Camera, Battery, Gamepad2, Cpu, Award, Sparkles, ShieldCheck } from 'lucide-react';
+import { safeJsonParse } from '@/lib/utils';
 
 interface ScoreItem {
   label: string;
   score: number; // 0 to 10
-  icon: React.ReactNode;
-  color: string;
+  icon?: React.ReactNode;
+  color?: string;
 }
 
-export default function ReviewScores() {
-  const scores: ScoreItem[] = [
-    { label: 'Performance Score', score: 9.6, icon: <Zap className="w-4 h-4" />, color: 'bg-emerald-500' },
-    { label: 'Display Score', score: 9.4, icon: <Monitor className="w-4 h-4" />, color: 'bg-blue-500' },
-    { label: 'Camera Score', score: 9.8, icon: <Camera className="w-4 h-4" />, color: 'bg-purple-500' },
-    { label: 'Battery Score', score: 9.1, icon: <Battery className="w-4 h-4" />, color: 'bg-amber-500' },
-    { label: 'Gaming Score', score: 9.5, icon: <Gamepad2 className="w-4 h-4" />, color: 'bg-indigo-500' },
-    { label: 'AI Features Rating', score: 9.2, icon: <Cpu className="w-4 h-4" />, color: 'bg-rose-500' },
-  ];
+interface ReviewScoresProps {
+  scoresData?: string | Record<string, number | string> | ScoreItem[];
+}
+
+const DEFAULT_SCORES: ScoreItem[] = [
+  { label: 'Performance Score', score: 9.6, icon: <Zap className="w-4 h-4" />, color: 'bg-emerald-500' },
+  { label: 'Display Score', score: 9.4, icon: <Monitor className="w-4 h-4" />, color: 'bg-blue-500' },
+  { label: 'Camera / Audio', score: 9.8, icon: <Camera className="w-4 h-4" />, color: 'bg-purple-500' },
+  { label: 'Battery Score', score: 9.1, icon: <Battery className="w-4 h-4" />, color: 'bg-amber-500' },
+  { label: 'Gaming Performance', score: 9.5, icon: <Gamepad2 className="w-4 h-4" />, color: 'bg-indigo-500' },
+  { label: 'AI & Value Rating', score: 9.2, icon: <Cpu className="w-4 h-4" />, color: 'bg-rose-500' },
+];
+
+const COLOR_PALETTE = [
+  'bg-emerald-500',
+  'bg-blue-500',
+  'bg-purple-500',
+  'bg-amber-500',
+  'bg-indigo-500',
+  'bg-rose-500',
+  'bg-teal-500',
+  'bg-cyan-500',
+];
+
+const ICON_MAP: Record<string, React.ReactNode> = {
+  performance: <Zap className="w-4 h-4" />,
+  display: <Monitor className="w-4 h-4" />,
+  camera: <Camera className="w-4 h-4" />,
+  battery: <Battery className="w-4 h-4" />,
+  gaming: <Gamepad2 className="w-4 h-4" />,
+  ai: <Cpu className="w-4 h-4" />,
+  value: <Award className="w-4 h-4" />,
+  design: <Sparkles className="w-4 h-4" />,
+};
+
+export default function ReviewScores({ scoresData }: ReviewScoresProps) {
+  let parsedScores: ScoreItem[] = [];
+
+  if (scoresData) {
+    if (typeof scoresData === 'string') {
+      const obj = safeJsonParse<Record<string, number | string>>(scoresData, {});
+      parsedScores = Object.entries(obj).map(([label, val], idx) => ({
+        label,
+        score: Math.min(10, Math.max(0, parseFloat(String(val)) || 9.0)),
+        color: COLOR_PALETTE[idx % COLOR_PALETTE.length],
+      }));
+    } else if (Array.isArray(scoresData)) {
+      parsedScores = scoresData.map((item, idx) => ({
+        ...item,
+        score: Math.min(10, Math.max(0, Number(item.score) || 9.0)),
+        color: item.color || COLOR_PALETTE[idx % COLOR_PALETTE.length],
+      }));
+    } else if (typeof scoresData === 'object') {
+      parsedScores = Object.entries(scoresData).map(([label, val], idx) => ({
+        label,
+        score: Math.min(10, Math.max(0, parseFloat(String(val)) || 9.0)),
+        color: COLOR_PALETTE[idx % COLOR_PALETTE.length],
+      }));
+    }
+  }
+
+  const finalScores = parsedScores.length > 0 ? parsedScores : DEFAULT_SCORES;
 
   const overallScore = (
-    scores.reduce((acc, s) => acc + s.score, 0) / scores.length
+    finalScores.reduce((acc, s) => acc + s.score, 0) / (finalScores.length || 1)
   ).toFixed(1);
+
+  const getIconForLabel = (label: string) => {
+    const l = label.toLowerCase();
+    for (const key of Object.keys(ICON_MAP)) {
+      if (l.includes(key)) return ICON_MAP[key];
+    }
+    return <Award className="w-4 h-4" />;
+  };
 
   return (
     <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 sm:p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm my-8 space-y-6">
@@ -50,12 +112,12 @@ export default function ReviewScores() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {scores.map((s, i) => (
+        {finalScores.map((s, i) => (
           <div key={i} className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200/60 dark:border-neutral-700/60 space-y-2">
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2 text-xs font-bold text-neutral-700 dark:text-neutral-300">
                 <span className="p-1.5 rounded-lg bg-white dark:bg-neutral-800 shadow-xs text-brand-600 dark:text-brand-400">
-                  {s.icon}
+                  {s.icon || getIconForLabel(s.label)}
                 </span>
                 {s.label}
               </span>
@@ -63,7 +125,7 @@ export default function ReviewScores() {
             </div>
             <div className="w-full h-2 rounded-full bg-neutral-200 dark:bg-neutral-700 overflow-hidden">
               <div
-                className={`h-full rounded-full ${s.color} transition-all duration-500`}
+                className={`h-full rounded-full ${s.color || COLOR_PALETTE[i % COLOR_PALETTE.length]} transition-all duration-500`}
                 style={{ width: `${(s.score / 10) * 100}%` }}
               />
             </div>
@@ -73,3 +135,4 @@ export default function ReviewScores() {
     </div>
   );
 }
+

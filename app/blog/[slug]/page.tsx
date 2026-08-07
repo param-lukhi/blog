@@ -60,10 +60,17 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
 
   const linkedProduct = blog.product;
 
-  const specifications = safeJsonParse<Record<string, string>>(
-    blog.specifications && blog.specifications !== '{}' ? blog.specifications : (linkedProduct?.specifications || '{}'),
-    {}
-  );
+  const rawBlogSpecs = safeJsonParse<Record<string, string>>(blog.specifications, {});
+  const rawProdSpecs = linkedProduct ? safeJsonParse<Record<string, string>>(linkedProduct.specifications, {}) : {};
+
+  const ratingScores = rawBlogSpecs._ratingScores
+    ? safeJsonParse(rawBlogSpecs._ratingScores, null) || rawBlogSpecs._ratingScores
+    : (rawProdSpecs._ratingScores ? safeJsonParse(rawProdSpecs._ratingScores, null) || rawProdSpecs._ratingScores : null);
+
+  const rawMergedSpecs = { ...rawProdSpecs, ...rawBlogSpecs };
+  const specifications = { ...rawMergedSpecs };
+  delete specifications._ratingScores;
+
   const features = safeJsonParse<string[]>(
     blog.features && blog.features !== '[]' ? blog.features : (linkedProduct?.features || '[]'),
     []
@@ -229,7 +236,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
         </div>
 
         {/* TechPulse Test Bench Scores */}
-        <ReviewScores />
+        <ReviewScores scoresData={ratingScores} />
 
         {/* Amazon Price History Chart */}
         <PriceHistoryChart currentPrice={blog.product?.price || '$1,199'} />

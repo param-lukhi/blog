@@ -68,6 +68,16 @@ export default function AdminProductsPage() {
     'Slightly premium price tag',
   ]);
 
+  // Review Scores State (0 to 10 ratings)
+  const [ratingsState, setRatingsState] = useState<{ label: string; score: string }[]>([
+    { label: 'Performance Score', score: '9.6' },
+    { label: 'Display Score', score: '9.4' },
+    { label: 'Camera / Audio', score: '9.8' },
+    { label: 'Battery Score', score: '9.1' },
+    { label: 'Gaming Performance', score: '9.5' },
+    { label: 'AI & Value Rating', score: '9.2' },
+  ]);
+
   // Active Modal Tab (General Details, Images, Specs & Features, 20-Country Stores)
   const [modalTab, setModalTab] = useState<'general' | 'images' | 'details' | 'marketplaces'>('general');
 
@@ -128,6 +138,14 @@ export default function AdminProductsPage() {
     ]);
     setProsList(['Superior audio clarity', 'Ergonomic light design']);
     setConsList(['Premium pricing']);
+    setRatingsState([
+      { label: 'Performance Score', score: '9.6' },
+      { label: 'Display Score', score: '9.4' },
+      { label: 'Camera / Audio', score: '9.8' },
+      { label: 'Battery Score', score: '9.1' },
+      { label: 'Gaming Performance', score: '9.5' },
+      { label: 'AI & Value Rating', score: '9.2' },
+    ]);
 
     const initial: Record<string, MarketplaceEntry> = {};
     MARKETPLACE_LIST.forEach((m) => {
@@ -155,10 +173,30 @@ export default function AdminProductsPage() {
     setImagesList(parsedImages.length > 0 ? parsedImages : ['https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80']);
     setImageUrlInput('');
 
-    // Parse Specs
-    const parsedSpecsObj = safeJsonParse<Record<string, string>>(product.specifications, {});
-    const parsedSpecsArr = Object.entries(parsedSpecsObj).map(([k, v]) => ({ key: k, value: v }));
-    setSpecsList(parsedSpecsArr.length > 0 ? parsedSpecsArr : [{ key: 'Warranty', value: '1 Year Warranty' }]);
+    // Parse Specs & Rating Scores
+    const parsedSpecsObj = safeJsonParse<Record<string, any>>(product.specifications, {});
+    
+    if (parsedSpecsObj._ratingScores) {
+      const rObj = typeof parsedSpecsObj._ratingScores === 'string'
+        ? safeJsonParse<Record<string, number | string>>(parsedSpecsObj._ratingScores, {})
+        : parsedSpecsObj._ratingScores;
+      const rArr = Object.entries(rObj).map(([label, val]) => ({ label, score: String(val) }));
+      if (rArr.length > 0) setRatingsState(rArr);
+    } else {
+      setRatingsState([
+        { label: 'Performance Score', score: '9.6' },
+        { label: 'Display Score', score: '9.4' },
+        { label: 'Camera / Audio', score: '9.8' },
+        { label: 'Battery Score', score: '9.1' },
+        { label: 'Gaming Performance', score: '9.5' },
+        { label: 'AI & Value Rating', score: '9.2' },
+      ]);
+    }
+
+    const cleanSpecsArr = Object.entries(parsedSpecsObj)
+      .filter(([k]) => k !== '_ratingScores')
+      .map(([k, v]) => ({ key: k, value: String(v) }));
+    setSpecsList(cleanSpecsArr.length > 0 ? cleanSpecsArr : [{ key: 'Warranty', value: '1 Year Warranty' }]);
 
     // Parse Features
     const parsedFeat = safeJsonParse<string[]>(product.features, []);
@@ -272,10 +310,18 @@ export default function AdminProductsPage() {
       }
     });
 
-    const specObj: Record<string, string> = {};
+    const specObj: Record<string, any> = {};
     specsList.forEach((s) => {
-      if (s.key.trim()) specObj[s.key.trim()] = s.value.trim();
+      if (s.key.trim() && !s.key.startsWith('_')) specObj[s.key.trim()] = s.value.trim();
     });
+
+    const ratingScoresObj: Record<string, number> = {};
+    ratingsState.forEach((r) => {
+      if (r.label.trim()) {
+        ratingScoresObj[r.label.trim()] = parseFloat(r.score) || 9.0;
+      }
+    });
+    specObj._ratingScores = JSON.stringify(ratingScoresObj);
 
     const finalImages = imagesList.length > 0 ? imagesList : ['https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80'];
 
@@ -725,6 +771,64 @@ export default function AdminProductsPage() {
                         </button>
                       </div>
                     ))}
+                  </div>
+
+                  {/* Benchmark & Editor Review Scores Editor (0 to 10 Ratings) */}
+                  <div className="bg-amber-50/50 dark:bg-amber-950/20 p-4 rounded-2xl border border-amber-200 dark:border-amber-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                        <h3 className="font-extrabold text-neutral-900 dark:text-white text-xs">
+                          Performance Breakdown & Benchmark Ratings (0 to 10 Scores)
+                        </h3>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setRatingsState([...ratingsState, { label: '', score: '9.0' }])}
+                        className="text-amber-700 dark:text-amber-400 font-bold flex items-center gap-1 text-xs"
+                      >
+                        + Add Rating Category
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {ratingsState.map((r, idx) => (
+                        <div key={idx} className="flex gap-2 items-center bg-white dark:bg-neutral-900 p-2 rounded-xl border border-amber-200/70 dark:border-amber-800/70">
+                          <input
+                            type="text"
+                            placeholder="Score Label (e.g. Performance Score)"
+                            value={r.label}
+                            onChange={(e) => {
+                              const copy = [...ratingsState];
+                              copy[idx].label = e.target.value;
+                              setRatingsState(copy);
+                            }}
+                            className="w-2/3 px-2.5 py-1 rounded-lg border border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800 text-xs font-bold"
+                          />
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="0"
+                            max="10"
+                            placeholder="9.5"
+                            value={r.score}
+                            onChange={(e) => {
+                              const copy = [...ratingsState];
+                              copy[idx].score = e.target.value;
+                              setRatingsState(copy);
+                            }}
+                            className="w-1/3 px-2.5 py-1 rounded-lg border border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800 text-xs font-extrabold text-brand-600"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setRatingsState(ratingsState.filter((_, i) => i !== idx))}
+                            className="text-rose-500 hover:text-rose-700 p-1"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Bullet Features */}
