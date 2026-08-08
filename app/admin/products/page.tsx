@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { ShoppingBag, Plus, Edit3, Trash2, Globe, ExternalLink, Sparkles, Check, RefreshCw, AlertCircle, Upload, Image as ImageIcon, Star, Layers, CheckCircle, XCircle } from 'lucide-react';
+import { ShoppingBag, Plus, Edit3, Trash2, Globe, ExternalLink, Sparkles, Check, RefreshCw, AlertCircle, Upload, Image as ImageIcon, Star, Layers, CheckCircle, XCircle, TrendingDown } from 'lucide-react';
 import { MARKETPLACE_LIST, generateRegionalAffiliateUrls, MarketplaceEntry } from '@/lib/location';
 import { safeJsonParse } from '@/lib/utils';
 
@@ -78,6 +78,12 @@ export default function AdminProductsPage() {
     { label: 'AI & Value Rating', score: '9.2' },
   ]);
 
+  const [priceHistoryState, setPriceHistoryState] = useState<{ date: string; price: string }[]>([
+    { date: 'May 2026', price: '$1,299' },
+    { date: 'Jun 2026', price: '$1,249' },
+    { date: 'Jul 2026', price: '$1,199' },
+  ]);
+
   // Active Modal Tab (General Details, Images, Specs & Features, 20-Country Stores)
   const [modalTab, setModalTab] = useState<'general' | 'images' | 'details' | 'marketplaces'>('general');
 
@@ -146,6 +152,11 @@ export default function AdminProductsPage() {
       { label: 'Gaming Performance', score: '9.5' },
       { label: 'AI & Value Rating', score: '9.2' },
     ]);
+    setPriceHistoryState([
+      { date: 'May 2026', price: '$1,299' },
+      { date: 'Jun 2026', price: '$1,249' },
+      { date: 'Jul 2026', price: '$1,199' },
+    ]);
 
     const initial: Record<string, MarketplaceEntry> = {};
     MARKETPLACE_LIST.forEach((m) => {
@@ -193,8 +204,21 @@ export default function AdminProductsPage() {
       ]);
     }
 
+    if (parsedSpecsObj._priceHistory) {
+      const pArr = typeof parsedSpecsObj._priceHistory === 'string'
+        ? safeJsonParse<{ date: string; price: string }[]>(parsedSpecsObj._priceHistory, [])
+        : parsedSpecsObj._priceHistory;
+      if (Array.isArray(pArr) && pArr.length > 0) setPriceHistoryState(pArr);
+    } else {
+      setPriceHistoryState([
+        { date: 'May 2026', price: '$1,299' },
+        { date: 'Jun 2026', price: '$1,249' },
+        { date: 'Jul 2026', price: '$1,199' },
+      ]);
+    }
+
     const cleanSpecsArr = Object.entries(parsedSpecsObj)
-      .filter(([k]) => k !== '_ratingScores')
+      .filter(([k]) => k !== '_ratingScores' && k !== '_priceHistory')
       .map(([k, v]) => ({ key: k, value: String(v) }));
     setSpecsList(cleanSpecsArr.length > 0 ? cleanSpecsArr : [{ key: 'Warranty', value: '1 Year Warranty' }]);
 
@@ -322,6 +346,11 @@ export default function AdminProductsPage() {
       }
     });
     specObj._ratingScores = JSON.stringify(ratingScoresObj);
+
+    const priceHistoryArr = priceHistoryState.filter((p) => p.date.trim() && p.price.trim());
+    if (priceHistoryArr.length > 0) {
+      specObj._priceHistory = JSON.stringify(priceHistoryArr);
+    }
 
     const finalImages = imagesList.length > 0 ? imagesList : ['https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80'];
 
@@ -822,6 +851,61 @@ export default function AdminProductsPage() {
                           <button
                             type="button"
                             onClick={() => setRatingsState(ratingsState.filter((_, i) => i !== idx))}
+                            className="text-rose-500 hover:text-rose-700 p-1"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Amazon Price History Tracker Editor */}
+                  <div className="bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-4 rounded-2xl space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <TrendingDown className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <h3 className="font-extrabold text-neutral-900 dark:text-white text-xs">
+                          Amazon Historical Price Trend (Price History Points)
+                        </h3>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setPriceHistoryState([...priceHistoryState, { date: '', price: '' }])}
+                        className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1 text-xs"
+                      >
+                        + Add Price Point
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {priceHistoryState.map((ph, idx) => (
+                        <div key={idx} className="flex gap-2 items-center bg-white dark:bg-neutral-900 p-2 rounded-xl border border-emerald-200/70 dark:border-emerald-800/70">
+                          <input
+                            type="text"
+                            placeholder="Date (e.g. May 2026)"
+                            value={ph.date}
+                            onChange={(e) => {
+                              const copy = [...priceHistoryState];
+                              copy[idx].date = e.target.value;
+                              setPriceHistoryState(copy);
+                            }}
+                            className="w-1/2 px-2.5 py-1 rounded-lg border border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800 text-xs font-bold"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Price (e.g. $1,299 / ₹76,990)"
+                            value={ph.price}
+                            onChange={(e) => {
+                              const copy = [...priceHistoryState];
+                              copy[idx].price = e.target.value;
+                              setPriceHistoryState(copy);
+                            }}
+                            className="w-1/2 px-2.5 py-1 rounded-lg border border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800 text-xs font-extrabold text-emerald-600 dark:text-emerald-400"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setPriceHistoryState(priceHistoryState.filter((_, i) => i !== idx))}
                             className="text-rose-500 hover:text-rose-700 p-1"
                           >
                             <Trash2 className="w-3.5 h-3.5" />

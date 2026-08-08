@@ -67,9 +67,14 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
     ? safeJsonParse(rawBlogSpecs._ratingScores, null) || rawBlogSpecs._ratingScores
     : (rawProdSpecs._ratingScores ? safeJsonParse(rawProdSpecs._ratingScores, null) || rawProdSpecs._ratingScores : null);
 
+  const priceHistoryData = rawBlogSpecs._priceHistory
+    ? safeJsonParse(rawBlogSpecs._priceHistory, null) || rawBlogSpecs._priceHistory
+    : (rawProdSpecs._priceHistory ? safeJsonParse(rawProdSpecs._priceHistory, null) || rawProdSpecs._priceHistory : null);
+
   const rawMergedSpecs = { ...rawProdSpecs, ...rawBlogSpecs };
   const specifications = { ...rawMergedSpecs };
   delete specifications._ratingScores;
+  delete specifications._priceHistory;
 
   const features = safeJsonParse<string[]>(
     blog.features && blog.features !== '[]' ? blog.features : (linkedProduct?.features || '[]'),
@@ -236,10 +241,10 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
         </div>
 
         {/* TechPulse Test Bench Scores */}
-        <ReviewScores scoresData={ratingScores} />
+        <ReviewScores scoresData={ratingScores || undefined} />
 
         {/* Amazon Price History Chart */}
-        <PriceHistoryChart currentPrice={blog.product?.price || '$1,199'} />
+        <PriceHistoryChart currentPrice={blog.product?.price || '$1,199'} historyData={priceHistoryData || undefined} />
 
         {/* Key Specifications Table */}
         {Object.keys(specifications).length > 0 && (

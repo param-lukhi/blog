@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import RichTextEditor from '@/components/RichTextEditor';
 import { safeJsonParse, slugify } from '@/lib/utils';
-import { Save, ArrowLeft, Plus, Trash, Zap, ExternalLink, ShoppingBag, Sparkles, Upload } from 'lucide-react';
+import { Save, ArrowLeft, Plus, Trash, Zap, ExternalLink, ShoppingBag, Sparkles, Upload, TrendingDown } from 'lucide-react';
 
 interface ProductItem {
   id: string;
@@ -56,6 +56,11 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
     { label: 'Battery Score', score: '9.1' },
     { label: 'Gaming Performance', score: '9.5' },
     { label: 'AI & Value Rating', score: '9.2' },
+  ]);
+  const [priceHistoryState, setPriceHistoryState] = useState<{ date: string; price: string }[]>([
+    { date: 'May 2026', price: '$1,299' },
+    { date: 'Jun 2026', price: '$1,249' },
+    { date: 'Jul 2026', price: '$1,199' },
   ]);
 
   useEffect(() => {
@@ -110,8 +115,15 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
             if (rArr.length > 0) setRatingsState(rArr);
           }
 
+          if (sObj._priceHistory) {
+            const pArr = typeof sObj._priceHistory === 'string'
+              ? safeJsonParse<{ date: string; price: string }[]>(sObj._priceHistory, [])
+              : sObj._priceHistory;
+            if (Array.isArray(pArr) && pArr.length > 0) setPriceHistoryState(pArr);
+          }
+
           const sArr = Object.entries(sObj)
-            .filter(([k]) => k !== '_ratingScores')
+            .filter(([k]) => k !== '_ratingScores' && k !== '_priceHistory')
             .map(([k, v]) => ({ key: k, value: String(v) }));
           setSpecs(sArr);
         }
@@ -186,6 +198,11 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
       }
     });
     specObj._ratingScores = JSON.stringify(ratingScoresObj);
+
+    const priceHistoryArr = priceHistoryState.filter((p) => p.date.trim() && p.price.trim());
+    if (priceHistoryArr.length > 0) {
+      specObj._priceHistory = JSON.stringify(priceHistoryArr);
+    }
 
     const tags = tagsStr.split(',').map((t) => t.trim()).filter(Boolean);
 
@@ -418,6 +435,59 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
                   <button
                     type="button"
                     onClick={() => setRatingsState(ratingsState.filter((_, i) => i !== idx))}
+                    className="text-rose-500 hover:text-rose-700 p-1"
+                  >
+                    <Trash className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Amazon Price History Tracker Editor */}
+          <div className="bg-emerald-50/60 border border-emerald-200 p-6 rounded-2xl shadow-soft space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-extrabold text-emerald-950 text-sm flex items-center gap-1.5">
+                <TrendingDown className="w-4 h-4 text-emerald-600" />
+                <span>📈 Amazon Historical Price Trend (Price History Points)</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setPriceHistoryState([...priceHistoryState, { date: '', price: '' }])}
+                className="text-xs text-emerald-800 font-bold flex items-center gap-1"
+              >
+                + Add Price Point
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {priceHistoryState.map((ph, idx) => (
+                <div key={idx} className="flex gap-2 items-center bg-white p-2.5 rounded-xl border border-emerald-200">
+                  <input
+                    type="text"
+                    placeholder="Date (e.g. May 2026)"
+                    value={ph.date}
+                    onChange={(e) => {
+                      const copy = [...priceHistoryState];
+                      copy[idx].date = e.target.value;
+                      setPriceHistoryState(copy);
+                    }}
+                    className="w-1/2 px-2.5 py-1 rounded-lg border border-neutral-300 text-xs font-bold"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Price (e.g. $1,299 / ₹76,990)"
+                    value={ph.price}
+                    onChange={(e) => {
+                      const copy = [...priceHistoryState];
+                      copy[idx].price = e.target.value;
+                      setPriceHistoryState(copy);
+                    }}
+                    className="w-1/2 px-2.5 py-1 rounded-lg border border-neutral-300 text-xs font-extrabold text-emerald-700"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setPriceHistoryState(priceHistoryState.filter((_, i) => i !== idx))}
                     className="text-rose-500 hover:text-rose-700 p-1"
                   >
                     <Trash className="w-3.5 h-3.5" />
