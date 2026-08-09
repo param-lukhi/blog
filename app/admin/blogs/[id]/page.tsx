@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import RichTextEditor from '@/components/RichTextEditor';
 import { safeJsonParse, slugify } from '@/lib/utils';
-import { Save, ArrowLeft, Plus, Trash, Zap, ExternalLink, ShoppingBag, Sparkles, Upload, TrendingDown } from 'lucide-react';
+import { Save, ArrowLeft, Plus, Trash, Zap, ExternalLink, ShoppingBag, Sparkles, Upload, TrendingDown, Star, RefreshCw } from 'lucide-react';
 
 interface ProductItem {
   id: string;
@@ -62,6 +62,46 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
     { date: 'Jun 2026', price: '$1,249' },
     { date: 'Jul 2026', price: '$1,199' },
   ]);
+
+  const loadRatingPreset = (preset: 'laptop' | 'phone' | 'audio' | 'tv' | 'reset') => {
+    if (preset === 'laptop' || preset === 'reset') {
+      setRatingsState([
+        { label: 'Performance Score', score: '9.6' },
+        { label: 'Display Score', score: '9.4' },
+        { label: 'Camera / Audio', score: '9.8' },
+        { label: 'Battery Score', score: '9.1' },
+        { label: 'Gaming Performance', score: '9.5' },
+        { label: 'AI & Value Rating', score: '9.2' },
+      ]);
+    } else if (preset === 'phone') {
+      setRatingsState([
+        { label: 'Camera Quality', score: '9.7' },
+        { label: 'Display & Touch', score: '9.5' },
+        { label: 'Battery & Charging', score: '9.2' },
+        { label: 'Processing Power', score: '9.6' },
+        { label: 'Build & Ergonomics', score: '9.4' },
+        { label: 'Price & Value', score: '9.1' },
+      ]);
+    } else if (preset === 'audio') {
+      setRatingsState([
+        { label: 'Sound Quality & Bass', score: '9.8' },
+        { label: 'Noise Cancellation (ANC)', score: '9.6' },
+        { label: 'Comfort & Fit', score: '9.4' },
+        { label: 'Battery Life', score: '9.5' },
+        { label: 'Build Quality', score: '9.3' },
+        { label: 'Value for Money', score: '9.2' },
+      ]);
+    } else if (preset === 'tv') {
+      setRatingsState([
+        { label: 'Picture Quality & Contrast', score: '9.6' },
+        { label: 'HDR & Brightness', score: '9.5' },
+        { label: 'Sound System', score: '8.8' },
+        { label: 'Gaming & Refresh Rate', score: '9.4' },
+        { label: 'Smart TV OS', score: '9.0' },
+        { label: 'Price & Value', score: '9.2' },
+      ]);
+    }
+  };
 
   useEffect(() => {
     fetch('/api/categories')
@@ -390,58 +430,157 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
           </div>
 
           {/* Benchmark & Editor Review Scores (0 to 10 Ratings) */}
-          <div className="bg-amber-50/60 border border-amber-200 p-6 rounded-2xl shadow-soft space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-extrabold text-amber-950 text-sm flex items-center gap-1.5">
-                <span>⭐ Benchmark & Editor Review Scores (0 to 10 Ratings)</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setRatingsState([...ratingsState, { label: '', score: '9.0' }])}
-                className="text-xs text-amber-800 font-bold flex items-center gap-1"
-              >
-                + Add Score Category
-              </button>
+          <div className="bg-amber-50/70 border border-amber-200/80 p-6 rounded-2xl shadow-soft space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-amber-200/80">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                  <h3 className="font-extrabold text-amber-950 text-sm">
+                    Performance Breakdown & Benchmark Ratings
+                  </h3>
+                </div>
+                <p className="text-xs text-amber-900/70 mt-0.5">
+                  Set scores (0.0 to 10.0) to display the visual ratings breakdown card on the blog post.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-amber-300 shadow-xs shrink-0">
+                <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                <div>
+                  <div className="text-base font-black text-amber-700 leading-none">
+                    {(
+                      ratingsState.reduce((acc, r) => acc + (parseFloat(r.score) || 0), 0) / (ratingsState.length || 1)
+                    ).toFixed(1)} <span className="text-[10px] text-neutral-400">/ 10</span>
+                  </div>
+                  <div className="text-[9px] font-extrabold text-neutral-400 uppercase tracking-wider">
+                    Overall Score
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Quick Presets & Sync */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] font-bold text-amber-900">Presets:</span>
+              <button
+                type="button"
+                onClick={() => loadRatingPreset('laptop')}
+                className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200 text-[11px] font-bold transition-colors"
+              >
+                💻 Laptop/PC
+              </button>
+              <button
+                type="button"
+                onClick={() => loadRatingPreset('phone')}
+                className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200 text-[11px] font-bold transition-colors"
+              >
+                📱 Smartphone
+              </button>
+              <button
+                type="button"
+                onClick={() => loadRatingPreset('audio')}
+                className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200 text-[11px] font-bold transition-colors"
+              >
+                🎧 Audio/Headphones
+              </button>
+              <button
+                type="button"
+                onClick={() => loadRatingPreset('tv')}
+                className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200 text-[11px] font-bold transition-colors"
+              >
+                📺 TV/Display
+              </button>
+
+              {productId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const prod = productsList.find((p) => p.id === productId);
+                    if (prod && prod.specifications) {
+                      const pSpecs = safeJsonParse<Record<string, any>>(prod.specifications, {});
+                      if (pSpecs._ratingScores) {
+                        const rObj = typeof pSpecs._ratingScores === 'string'
+                          ? safeJsonParse<Record<string, number | string>>(pSpecs._ratingScores, {})
+                          : pSpecs._ratingScores;
+                        const rArr = Object.entries(rObj).map(([label, val]) => ({ label, score: String(val) }));
+                        if (rArr.length > 0) setRatingsState(rArr);
+                      }
+                    }
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-brand-100 text-brand-800 hover:bg-brand-200 text-[11px] font-bold flex items-center gap-1 transition-colors"
+                >
+                  <RefreshCw className="w-3 h-3" /> Sync from Product
+                </button>
+              )}
+            </div>
+
+            {/* Ratings List */}
+            <div className="space-y-3 pt-1">
               {ratingsState.map((r, idx) => (
-                <div key={idx} className="flex gap-2 items-center bg-white p-2 rounded-xl border border-amber-200">
+                <div
+                  key={idx}
+                  className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-white p-3 rounded-xl border border-amber-200 shadow-xs"
+                >
                   <input
                     type="text"
-                    placeholder="Category (e.g. Performance Score)"
+                    placeholder="Category Label (e.g. Performance Score)"
                     value={r.label}
                     onChange={(e) => {
                       const copy = [...ratingsState];
                       copy[idx].label = e.target.value;
                       setRatingsState(copy);
                     }}
-                    className="w-2/3 px-2.5 py-1 rounded-lg border border-neutral-300 text-xs font-bold"
+                    className="w-full sm:w-1/2 px-3 py-1.5 rounded-lg border border-neutral-300 text-xs font-bold"
                   />
-                  <input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="10"
-                    placeholder="9.5"
-                    value={r.score}
-                    onChange={(e) => {
-                      const copy = [...ratingsState];
-                      copy[idx].score = e.target.value;
-                      setRatingsState(copy);
-                    }}
-                    className="w-1/3 px-2.5 py-1 rounded-lg border border-neutral-300 text-xs font-extrabold text-brand-600"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setRatingsState(ratingsState.filter((_, i) => i !== idx))}
-                    className="text-rose-500 hover:text-rose-700 p-1"
-                  >
-                    <Trash className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-3 w-full sm:w-1/2">
+                    <input
+                      type="range"
+                      min="0"
+                      max="10"
+                      step="0.1"
+                      value={r.score || '9.0'}
+                      onChange={(e) => {
+                        const copy = [...ratingsState];
+                        copy[idx].score = e.target.value;
+                        setRatingsState(copy);
+                      }}
+                      className="w-full accent-amber-500 cursor-pointer"
+                    />
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      max="10"
+                      placeholder="9.5"
+                      value={r.score}
+                      onChange={(e) => {
+                        const copy = [...ratingsState];
+                        copy[idx].score = e.target.value;
+                        setRatingsState(copy);
+                      }}
+                      className="w-16 px-2 py-1 rounded-lg border border-neutral-300 text-xs font-extrabold text-amber-600 text-center shrink-0"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setRatingsState(ratingsState.filter((_, i) => i !== idx))}
+                      className="text-rose-500 hover:text-rose-700 p-1 shrink-0"
+                      title="Delete Rating"
+                    >
+                      <Trash className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
+
+            <button
+              type="button"
+              onClick={() => setRatingsState([...ratingsState, { label: '', score: '9.0' }])}
+              className="w-full py-2.5 rounded-xl border-2 border-dashed border-amber-300 text-amber-800 font-bold hover:bg-amber-100/50 text-xs flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add New Rating Category</span>
+            </button>
           </div>
 
           {/* Amazon Price History Tracker Editor */}

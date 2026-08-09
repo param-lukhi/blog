@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Star, Zap, Monitor, Camera, Battery, Gamepad2, Cpu, Award, Sparkles, ShieldCheck } from 'lucide-react';
+import { Star, Zap, Monitor, Camera, Battery, Gamepad2, Cpu, Award, Sparkles, ShieldCheck, Volume2, Gauge, Heart } from 'lucide-react';
 import { safeJsonParse } from '@/lib/utils';
 
 interface ScoreItem {
@@ -37,13 +37,21 @@ const COLOR_PALETTE = [
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   performance: <Zap className="w-4 h-4" />,
+  speed: <Gauge className="w-4 h-4" />,
   display: <Monitor className="w-4 h-4" />,
+  screen: <Monitor className="w-4 h-4" />,
   camera: <Camera className="w-4 h-4" />,
+  audio: <Volume2 className="w-4 h-4" />,
+  sound: <Volume2 className="w-4 h-4" />,
+  noise: <Volume2 className="w-4 h-4" />,
   battery: <Battery className="w-4 h-4" />,
   gaming: <Gamepad2 className="w-4 h-4" />,
   ai: <Cpu className="w-4 h-4" />,
   value: <Award className="w-4 h-4" />,
+  price: <Award className="w-4 h-4" />,
   design: <Sparkles className="w-4 h-4" />,
+  build: <ShieldCheck className="w-4 h-4" />,
+  comfort: <Heart className="w-4 h-4" />,
 };
 
 export default function ReviewScores({ scoresData }: ReviewScoresProps) {

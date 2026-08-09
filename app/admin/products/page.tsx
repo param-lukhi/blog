@@ -84,8 +84,48 @@ export default function AdminProductsPage() {
     { date: 'Jul 2026', price: '$1,199' },
   ]);
 
-  // Active Modal Tab (General Details, Images, Specs & Features, 20-Country Stores)
-  const [modalTab, setModalTab] = useState<'general' | 'images' | 'details' | 'marketplaces'>('general');
+  // Active Modal Tab (General, Images, Ratings, Specs & Features, 20-Country Stores)
+  const [modalTab, setModalTab] = useState<'general' | 'images' | 'ratings' | 'details' | 'marketplaces'>('general');
+
+  const loadRatingPreset = (preset: 'laptop' | 'phone' | 'audio' | 'tv' | 'reset') => {
+    if (preset === 'laptop' || preset === 'reset') {
+      setRatingsState([
+        { label: 'Performance Score', score: '9.6' },
+        { label: 'Display Score', score: '9.4' },
+        { label: 'Camera / Audio', score: '9.8' },
+        { label: 'Battery Score', score: '9.1' },
+        { label: 'Gaming Performance', score: '9.5' },
+        { label: 'AI & Value Rating', score: '9.2' },
+      ]);
+    } else if (preset === 'phone') {
+      setRatingsState([
+        { label: 'Camera Quality', score: '9.7' },
+        { label: 'Display & Touch', score: '9.5' },
+        { label: 'Battery & Charging', score: '9.2' },
+        { label: 'Processing Power', score: '9.6' },
+        { label: 'Build & Ergonomics', score: '9.4' },
+        { label: 'Price & Value', score: '9.1' },
+      ]);
+    } else if (preset === 'audio') {
+      setRatingsState([
+        { label: 'Sound Quality & Bass', score: '9.8' },
+        { label: 'Noise Cancellation (ANC)', score: '9.6' },
+        { label: 'Comfort & Fit', score: '9.4' },
+        { label: 'Battery Life', score: '9.5' },
+        { label: 'Build Quality', score: '9.3' },
+        { label: 'Value for Money', score: '9.2' },
+      ]);
+    } else if (preset === 'tv') {
+      setRatingsState([
+        { label: 'Picture Quality & Contrast', score: '9.6' },
+        { label: 'HDR & Brightness', score: '9.5' },
+        { label: 'Sound System', score: '8.8' },
+        { label: 'Gaming & Refresh Rate', score: '9.4' },
+        { label: 'Smart TV OS', score: '9.0' },
+        { label: 'Price & Value', score: '9.2' },
+      ]);
+    }
+  };
 
   // Marketplace Prices & Links State
   const [marketplacesData, setMarketplacesData] = useState<Record<string, MarketplaceEntry>>({});
@@ -491,6 +531,19 @@ export default function AdminProductsPage() {
 
               <button
                 type="button"
+                onClick={() => setModalTab('ratings')}
+                className={`px-4 py-2 rounded-t-xl transition-colors shrink-0 flex items-center gap-1.5 ${
+                  modalTab === 'ratings'
+                    ? 'bg-amber-500 text-white'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+                <span>3. ⭐ Ratings & Scores ({ratingsState.length})</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setModalTab('details')}
                 className={`px-4 py-2 rounded-t-xl transition-colors shrink-0 flex items-center gap-1.5 ${
                   modalTab === 'details'
@@ -499,7 +552,7 @@ export default function AdminProductsPage() {
                 }`}
               >
                 <Layers className="w-3.5 h-3.5" />
-                <span>3. Specs, Features & Pros/Cons</span>
+                <span>4. Specs & Pros/Cons</span>
               </button>
 
               <button
@@ -512,7 +565,7 @@ export default function AdminProductsPage() {
                 }`}
               >
                 <Globe className="w-3.5 h-3.5" />
-                <span>4. 20-Country Stores</span>
+                <span>5. 20-Country Stores</span>
               </button>
             </div>
 
@@ -749,7 +802,150 @@ export default function AdminProductsPage() {
                 </div>
               )}
 
-              {/* TAB 3: SPECS, FEATURES & PROS/CONS */}
+              {/* TAB 3: BENCHMARK RATINGS & EDITOR SCORES */}
+              {modalTab === 'ratings' && (
+                <div className="space-y-6">
+                  <div className="bg-amber-50/70 dark:bg-amber-950/30 p-6 rounded-2xl border border-amber-200 dark:border-amber-800/80 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-amber-200/80 dark:border-amber-800/80">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                          <h3 className="font-extrabold text-neutral-900 dark:text-white text-sm">
+                            Performance Breakdown & Benchmark Ratings
+                          </h3>
+                        </div>
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                          Edit ratings from 0.0 to 10.0. These scores build the visual benchmark ratings card on the product page.
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 bg-white dark:bg-neutral-900 px-4 py-2 rounded-xl border border-amber-300 dark:border-amber-800 shadow-xs shrink-0">
+                        <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                        <div>
+                          <div className="text-base font-black text-amber-600 dark:text-amber-400 leading-none">
+                            {(
+                              ratingsState.reduce((acc, r) => acc + (parseFloat(r.score) || 0), 0) / (ratingsState.length || 1)
+                            ).toFixed(1)} <span className="text-[10px] text-neutral-400">/ 10</span>
+                          </div>
+                          <div className="text-[9px] font-extrabold text-neutral-400 uppercase tracking-wider">
+                            Overall Score
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Quick Presets */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[11px] font-bold text-neutral-600 dark:text-neutral-400">Quick Presets:</span>
+                      <button
+                        type="button"
+                        onClick={() => loadRatingPreset('laptop')}
+                        className="px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 hover:bg-amber-200 text-[11px] font-bold transition-colors"
+                      >
+                        💻 Laptop/PC
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => loadRatingPreset('phone')}
+                        className="px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 hover:bg-amber-200 text-[11px] font-bold transition-colors"
+                      >
+                        📱 Smartphone
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => loadRatingPreset('audio')}
+                        className="px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 hover:bg-amber-200 text-[11px] font-bold transition-colors"
+                      >
+                        🎧 Audio/Headphones
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => loadRatingPreset('tv')}
+                        className="px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 hover:bg-amber-200 text-[11px] font-bold transition-colors"
+                      >
+                        📺 TV/Display
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => loadRatingPreset('reset')}
+                        className="px-2.5 py-1 rounded-lg bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-300 text-[11px] font-bold transition-colors"
+                      >
+                        🔄 Default Preset
+                      </button>
+                    </div>
+
+                    {/* Ratings List */}
+                    <div className="space-y-3 pt-2">
+                      {ratingsState.map((r, idx) => (
+                        <div
+                          key={idx}
+                          className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-white dark:bg-neutral-900 p-3 rounded-xl border border-amber-200/80 dark:border-amber-800/80 shadow-xs"
+                        >
+                          <input
+                            type="text"
+                            placeholder="Category Label (e.g. Performance Score)"
+                            value={r.label}
+                            onChange={(e) => {
+                              const copy = [...ratingsState];
+                              copy[idx].label = e.target.value;
+                              setRatingsState(copy);
+                            }}
+                            className="w-full sm:w-1/2 px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800 text-xs font-bold"
+                          />
+                          <div className="flex items-center gap-3 w-full sm:w-1/2">
+                            <input
+                              type="range"
+                              min="0"
+                              max="10"
+                              step="0.1"
+                              value={r.score || '9.0'}
+                              onChange={(e) => {
+                                const copy = [...ratingsState];
+                                copy[idx].score = e.target.value;
+                                setRatingsState(copy);
+                              }}
+                              className="w-full accent-amber-500 cursor-pointer"
+                            />
+                            <input
+                              type="number"
+                              step="0.1"
+                              min="0"
+                              max="10"
+                              placeholder="9.5"
+                              value={r.score}
+                              onChange={(e) => {
+                                const copy = [...ratingsState];
+                                copy[idx].score = e.target.value;
+                                setRatingsState(copy);
+                              }}
+                              className="w-16 px-2 py-1 rounded-lg border border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800 text-xs font-extrabold text-amber-600 text-center shrink-0"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setRatingsState(ratingsState.filter((_, i) => i !== idx))}
+                              className="text-rose-500 hover:text-rose-700 p-1 shrink-0"
+                              title="Delete Rating"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setRatingsState([...ratingsState, { label: '', score: '9.0' }])}
+                      className="w-full py-2.5 rounded-xl border-2 border-dashed border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-400 font-bold hover:bg-amber-100/50 dark:hover:bg-amber-950/40 text-xs flex items-center justify-center gap-1.5 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Add New Rating Category</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 4: SPECS, FEATURES & PROS/CONS */}
               {modalTab === 'details' && (
                 <div className="space-y-6">
                   {/* Specifications key-value editor */}
