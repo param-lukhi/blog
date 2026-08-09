@@ -203,18 +203,23 @@ export default function Header() {
 
           {/* Right Action Icons & Selectors */}
           <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
-            {/* Country Selector */}
-            <CountrySelector />
+            {/* Country Selector - Desktop / Tablet */}
+            <div className="hidden sm:block">
+              <CountrySelector />
+            </div>
 
-            {/* Notification Bell */}
-            <NotificationBell />
+            {/* Notification Bell - Desktop / Tablet */}
+            <div className="hidden sm:block">
+              <NotificationBell />
+            </div>
 
-            {/* Wishlist Button */}
-            <WishlistButton />
+            {/* Wishlist Button - Desktop / Tablet */}
+            <div className="hidden sm:block">
+              <WishlistButton />
+            </div>
 
             {/* Dark Mode Toggle */}
             <ThemeToggle />
-
 
             {/* Mobile menu hamburger toggle */}
             <button
@@ -236,6 +241,16 @@ export default function Header() {
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-4 pt-3 pb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
+          
+          {/* Mobile Country & Quick Actions Bar */}
+          <div className="flex items-center justify-between pb-3 border-b border-neutral-100 dark:border-neutral-800 sm:hidden">
+            <CountrySelector />
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              <WishlistButton />
+            </div>
+          </div>
+
           <div className="space-y-1">
             <Link
               href="/"
