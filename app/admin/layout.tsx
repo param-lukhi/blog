@@ -15,7 +15,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex min-h-screen bg-neutral-100 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans">
+    <div className="flex min-h-screen bg-neutral-100 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans relative">
+      {!isSidebarCollapsed && (
+        <div
+          onClick={() => setIsSidebarCollapsed(true)}
+          className="fixed inset-0 bg-black/50 z-40 md:hidden animate-in fade-in duration-150"
+        />
+      )}
       <AdminSidebar
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -25,7 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           isSidebarCollapsed={isSidebarCollapsed}
           onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>

@@ -123,17 +123,17 @@ export default async function HomePage() {
           </div>
 
           {/* Trust Badges */}
-          <div className="pt-10 border-t border-neutral-800/80 grid grid-cols-2 md:grid-cols-3 gap-4 text-xs text-neutral-400">
+          <div className="pt-10 border-t border-neutral-800/80 grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-4 text-xs text-neutral-400">
             <div className="flex items-center justify-center gap-2">
-              <Award className="w-4 h-4 text-brand-400" />
+              <Award className="w-4 h-4 text-brand-400 shrink-0" />
               <span>Hands-on Lab Benchmarks</span>
             </div>
             <div className="flex items-center justify-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>No Sponsored Bias</span>
             </div>
-            <div className="hidden md:flex items-center justify-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-400" />
+            <div className="flex items-center justify-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
               <span>Daily Amazon Price Tracker</span>
             </div>
           </div>

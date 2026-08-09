@@ -120,64 +120,66 @@ export default function ComparisonsPage() {
 
         {/* Comparison Table */}
         {p1 && p2 ? (
-          <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden divide-y divide-neutral-200 dark:divide-neutral-800">
-            
-            {/* Header row with images */}
-            <div className="grid grid-cols-3 p-6 bg-neutral-50/50 dark:bg-neutral-800/30 items-center text-center">
-              <div className="text-left font-extrabold text-sm text-neutral-400 uppercase">Product Details</div>
-              <div className="space-y-3 px-2">
-                <div className="h-32 flex items-center justify-center">
-                  <img
-                    src={parseJson(p1.images, [''])[0]}
-                    alt={p1.name}
-                    className="max-h-full max-w-full object-contain"
-                  />
-                </div>
-                <h3 className="font-extrabold text-sm text-neutral-900 dark:text-white line-clamp-2">{p1.name}</h3>
-                <RegionalPrice basePrice={p1.price} amazonUrl={p1.amazonUrl} marketplaces={p1.marketplaces} className="font-extrabold text-base" />
-                <AmazonButton url={p1.affiliateUrl || p1.amazonUrl} price={p1.price} size="sm" />
-              </div>
-              <div className="space-y-3 px-2">
-                <div className="h-32 flex items-center justify-center">
-                  <img
-                    src={parseJson(p2.images, [''])[0]}
-                    alt={p2.name}
-                    className="max-h-full max-w-full object-contain"
-                  />
-                </div>
-                <h3 className="font-extrabold text-sm text-neutral-900 dark:text-white line-clamp-2">{p2.name}</h3>
-                <RegionalPrice basePrice={p2.price} amazonUrl={p2.amazonUrl} marketplaces={p2.marketplaces} className="font-extrabold text-base" />
-                <AmazonButton url={p2.affiliateUrl || p2.amazonUrl} price={p2.price} size="sm" />
-              </div>
-            </div>
-
-            {/* Pros */}
-            <div className="grid grid-cols-3 p-6 items-start gap-4">
-              <div className="font-bold text-sm text-neutral-700 dark:text-neutral-300">Key Advantages</div>
-              <div className="space-y-1 text-xs">
-                {p1Pros.map((pro: string, i: number) => (
-                  <div key={i} className="flex items-start gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
-                    <Check className="w-4 h-4 shrink-0 mt-0.5" /> <span>{pro}</span>
+          <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-x-auto">
+            <div className="min-w-[550px] sm:min-w-0 divide-y divide-neutral-200 dark:divide-neutral-800">
+              
+              {/* Header row with images */}
+              <div className="grid grid-cols-3 p-4 sm:p-6 bg-neutral-50/50 dark:bg-neutral-800/30 items-center text-center">
+                <div className="text-left font-extrabold text-xs sm:text-sm text-neutral-400 uppercase">Product Details</div>
+                <div className="space-y-3 px-2">
+                  <div className="h-28 sm:h-32 flex items-center justify-center">
+                    <img
+                      src={parseJson(p1.images, [''])[0]}
+                      alt={p1.name}
+                      className="max-h-full max-w-full object-contain"
+                    />
                   </div>
-                ))}
-              </div>
-              <div className="space-y-1 text-xs">
-                {p2Pros.map((pro: string, i: number) => (
-                  <div key={i} className="flex items-start gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
-                    <Check className="w-4 h-4 shrink-0 mt-0.5" /> <span>{pro}</span>
+                  <h3 className="font-extrabold text-xs sm:text-sm text-neutral-900 dark:text-white line-clamp-2">{p1.name}</h3>
+                  <RegionalPrice basePrice={p1.price} amazonUrl={p1.amazonUrl} marketplaces={p1.marketplaces} className="font-extrabold text-sm sm:text-base" />
+                  <AmazonButton url={p1.affiliateUrl || p1.amazonUrl} price={p1.price} size="sm" />
+                </div>
+                <div className="space-y-3 px-2">
+                  <div className="h-28 sm:h-32 flex items-center justify-center">
+                    <img
+                      src={parseJson(p2.images, [''])[0]}
+                      alt={p2.name}
+                      className="max-h-full max-w-full object-contain"
+                    />
                   </div>
-                ))}
+                  <h3 className="font-extrabold text-xs sm:text-sm text-neutral-900 dark:text-white line-clamp-2">{p2.name}</h3>
+                  <RegionalPrice basePrice={p2.price} amazonUrl={p2.amazonUrl} marketplaces={p2.marketplaces} className="font-extrabold text-sm sm:text-base" />
+                  <AmazonButton url={p2.affiliateUrl || p2.amazonUrl} price={p2.price} size="sm" />
+                </div>
               </div>
-            </div>
 
-            {/* Specifications breakdown */}
-            {allSpecKeys.map((key) => (
-              <div key={key} className="grid grid-cols-3 p-4 items-center text-xs gap-4">
-                <div className="font-bold text-neutral-500 dark:text-neutral-400">{key}</div>
-                <div className="font-semibold text-neutral-900 dark:text-white">{p1Specs[key] || 'N/A'}</div>
-                <div className="font-semibold text-neutral-900 dark:text-white">{p2Specs[key] || 'N/A'}</div>
+              {/* Pros */}
+              <div className="grid grid-cols-3 p-4 sm:p-6 items-start gap-3 sm:gap-4">
+                <div className="font-bold text-xs sm:text-sm text-neutral-700 dark:text-neutral-300">Key Advantages</div>
+                <div className="space-y-1 text-xs">
+                  {p1Pros.map((pro: string, i: number) => (
+                    <div key={i} className="flex items-start gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+                      <Check className="w-4 h-4 shrink-0 mt-0.5" /> <span>{pro}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-1 text-xs">
+                  {p2Pros.map((pro: string, i: number) => (
+                    <div key={i} className="flex items-start gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+                      <Check className="w-4 h-4 shrink-0 mt-0.5" /> <span>{pro}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
+
+              {/* Specifications breakdown */}
+              {allSpecKeys.map((key) => (
+                <div key={key} className="grid grid-cols-3 p-3 sm:p-4 items-center text-xs gap-3 sm:gap-4">
+                  <div className="font-bold text-neutral-500 dark:text-neutral-400 break-words">{key}</div>
+                  <div className="font-semibold text-neutral-900 dark:text-white break-words">{p1Specs[key] || 'N/A'}</div>
+                  <div className="font-semibold text-neutral-900 dark:text-white break-words">{p2Specs[key] || 'N/A'}</div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : null}
       </div>

@@ -254,9 +254,9 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               {Object.entries(specifications).map(([key, val]) => (
-                <div key={key} className="bg-neutral-50 dark:bg-neutral-800/40 p-3 rounded-xl border border-neutral-200/60 dark:border-neutral-700/60 flex justify-between gap-4">
-                  <span className="text-neutral-500 dark:text-neutral-400 font-medium">{key}:</span>
-                  <span className="font-bold text-neutral-900 dark:text-white text-right">{val}</span>
+                <div key={key} className="bg-neutral-50 dark:bg-neutral-800/40 p-3 rounded-xl border border-neutral-200/60 dark:border-neutral-700/60 flex justify-between gap-3 min-w-0">
+                  <span className="text-neutral-500 dark:text-neutral-400 font-medium shrink-0">{key}:</span>
+                  <span className="font-bold text-neutral-900 dark:text-white text-right min-w-0 break-words">{val}</span>
                 </div>
               ))}
             </div>

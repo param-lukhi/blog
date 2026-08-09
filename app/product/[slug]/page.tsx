@@ -166,9 +166,9 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
           <h2 className="text-2xl font-extrabold text-neutral-900 dark:text-white mb-6">Technical Specifications</h2>
           <div className="bg-neutral-50 dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200/80 dark:border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             {Object.entries(specifications).map(([k, v]) => (
-              <div key={k} className="bg-white dark:bg-neutral-800/40 p-3 rounded-xl border border-neutral-200/60 dark:border-neutral-700/60 flex justify-between gap-4">
-                <span className="text-neutral-500 dark:text-neutral-400 font-medium">{k}</span>
-                <span className="font-bold text-neutral-900 dark:text-white text-right">{v}</span>
+              <div key={k} className="bg-white dark:bg-neutral-800/40 p-3 rounded-xl border border-neutral-200/60 dark:border-neutral-700/60 flex justify-between gap-3 min-w-0">
+                <span className="text-neutral-500 dark:text-neutral-400 font-medium shrink-0">{k}</span>
+                <span className="font-bold text-neutral-900 dark:text-white text-right min-w-0 break-words">{v}</span>
               </div>
             ))}
           </div>

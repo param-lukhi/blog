@@ -70,15 +70,15 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800 shadow-xs transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-2 sm:gap-4">
           
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white font-extrabold text-lg shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white font-extrabold text-base sm:text-lg shadow-sm group-hover:scale-105 transition-transform">
               {siteName.charAt(0)}
             </div>
-            <span className="font-extrabold text-xl text-neutral-900 dark:text-white tracking-tight font-sans">
+            <span className="font-extrabold text-lg sm:text-xl text-neutral-900 dark:text-white tracking-tight font-sans truncate max-w-[130px] xs:max-w-none">
               {siteName}
             </span>
           </Link>
@@ -202,7 +202,7 @@ export default function Header() {
           </nav>
 
           {/* Right Action Icons & Selectors */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
             {/* Country Selector */}
             <CountrySelector />
 

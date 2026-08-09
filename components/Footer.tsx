@@ -64,7 +64,7 @@ export default function Footer() {
                   <span>Subscribed! You will receive weekly tech deals.</span>
                 </div>
               ) : (
-                <form onSubmit={handleSubscribe} className="flex gap-2 max-w-sm">
+                <form onSubmit={handleSubscribe} className="flex flex-col xs:flex-row gap-2 max-w-sm">
                   <input
                     type="email"
                     required
@@ -75,7 +75,7 @@ export default function Footer() {
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shrink-0 transition-colors flex items-center gap-1 shadow-sm"
+                    className="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shrink-0 transition-colors flex items-center justify-center gap-1 shadow-sm"
                   >
                     <span>Subscribe</span>
                     <Send className="w-3 h-3" />

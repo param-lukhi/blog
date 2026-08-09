@@ -105,8 +105,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Footer / Regional Price & Buy Button */}
-        <div className="pt-4 mt-auto border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between gap-2">
-          <div className="flex items-baseline">
+        <div className="pt-4 mt-auto border-t border-neutral-100 dark:border-neutral-800 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-baseline min-w-0">
             <RegionalPrice
               basePrice={product.price}
               amazonUrl={product.amazonUrl}

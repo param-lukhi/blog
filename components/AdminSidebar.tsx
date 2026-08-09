@@ -72,7 +72,9 @@ export default function AdminSidebar({ isCollapsed = false, onToggleCollapse }: 
   return (
     <aside
       className={`bg-neutral-900 dark:bg-neutral-950 text-neutral-300 min-h-screen p-3 flex flex-col justify-between shrink-0 border-r border-neutral-800 transition-all duration-300 select-none ${
-        isCollapsed ? 'w-20' : 'w-64'
+        isCollapsed
+          ? 'hidden md:flex md:w-20'
+          : 'fixed md:relative inset-y-0 left-0 z-50 w-64 shadow-2xl md:shadow-none'
       }`}
     >
       <div>

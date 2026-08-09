@@ -184,8 +184,8 @@ export default function AdminDealsPage() {
       {loading ? (
         <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 border border-neutral-200 dark:border-neutral-800 animate-pulse h-40" />
       ) : deals.length > 0 ? (
-        <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200/80 dark:border-neutral-800 overflow-hidden shadow-soft">
-          <table className="w-full text-left text-xs border-collapse">
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200/80 dark:border-neutral-800 overflow-x-auto shadow-soft">
+          <table className="w-full text-left text-xs border-collapse min-w-[600px]">
             <thead>
               <tr className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800 font-bold text-neutral-500 uppercase tracking-wider">
                 <th className="p-4">Deal Title</th>
