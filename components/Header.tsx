@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, Menu, X, Sparkles, Shield } from 'lucide-react';
-import CountrySelector from './CountrySelector';
 import SearchBar from './SearchBar';
 import ThemeToggle from './ThemeToggle';
 import WishlistButton from './WishlistButton';
@@ -203,11 +202,6 @@ export default function Header() {
 
           {/* Right Action Icons & Selectors */}
           <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
-            {/* Country Selector - Desktop / Tablet */}
-            <div className="hidden sm:block">
-              <CountrySelector align="right" />
-            </div>
-
             {/* Notification Bell - Desktop / Tablet */}
             <div className="hidden sm:block">
               <NotificationBell />
@@ -242,9 +236,8 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-4 pt-3 pb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
           
-          {/* Mobile Country & Quick Actions Bar */}
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-100 dark:border-neutral-800 sm:hidden">
-            <CountrySelector align="left" />
+          {/* Mobile Quick Actions Bar */}
+          <div className="flex items-center justify-end pb-3 border-b border-neutral-100 dark:border-neutral-800 sm:hidden">
             <div className="flex items-center gap-2">
               <NotificationBell />
               <WishlistButton />

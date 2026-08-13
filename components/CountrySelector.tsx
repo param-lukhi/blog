@@ -61,8 +61,7 @@ export default function CountrySelector({ align = 'auto' }: CountrySelectorProps
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100/90 dark:bg-neutral-800/90 hover:bg-neutral-200/90 dark:hover:bg-neutral-700/90 text-neutral-800 dark:text-neutral-200 text-xs font-bold transition-all border border-neutral-200/80 dark:border-neutral-700/80 shadow-xs hover:shadow-md backdrop-blur-xs"
         title="Change Amazon Region & Currency"
       >
-        <span className="text-sm leading-none">{currentMarket.flag}</span>
-        <span>{currentMarket.symbol}</span>
+        <span className="text-xs font-extrabold">{currentMarket.symbol}</span>
         <span className="text-[10px] text-neutral-500 dark:text-neutral-400 font-extrabold uppercase tracking-wide">{currentMarket.code}</span>
         <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 dark:text-neutral-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-brand-600 dark:text-brand-400' : ''}`} />
       </button>
