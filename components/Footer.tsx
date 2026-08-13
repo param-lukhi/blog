@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import CountrySelector from './CountrySelector';
 import { ShieldCheck, Mail, Send, CheckCircle2, Twitter, Facebook, Instagram, Youtube } from 'lucide-react';
 
 export default function Footer() {
@@ -170,13 +169,10 @@ export default function Footer() {
           <strong className="text-white font-bold">Amazon Affiliate Disclosure:</strong> TechPulse is a participant in the Amazon Services LLC Associates Program and regional Amazon affiliate programs worldwide. As an Amazon Associate, we earn from qualifying purchases. Product prices, availability, and promotions are accurate as of the date/time indicated and are subject to change.
         </div>
 
-        {/* Bottom Bar: Country Selector & Copyright */}
+        {/* Bottom Bar: Copyright */}
         <div className="pt-6 border-t border-neutral-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
           <div>
             © {new Date().getFullYear()} TechPulse Reviews. All rights reserved.
-          </div>
-          <div className="flex items-center gap-4">
-            <CountrySelector />
           </div>
         </div>
       </div>
