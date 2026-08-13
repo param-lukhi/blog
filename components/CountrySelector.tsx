@@ -4,7 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { MARKETPLACE_LIST, getMarketplaceByCode, detectBrowserCountry } from '@/lib/location';
 import { Globe, ChevronDown, Check, Search } from 'lucide-react';
 
-export default function CountrySelector() {
+interface CountrySelectorProps {
+  align?: 'left' | 'right' | 'auto';
+}
+
+export default function CountrySelector({ align = 'auto' }: CountrySelectorProps) {
   const [selectedCountry, setSelectedCountry] = useState<string>('US');
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -48,6 +52,8 @@ export default function CountrySelector() {
       m.domain.toLowerCase().includes(search.toLowerCase())
   );
 
+  const alignmentClass = align === 'left' ? 'left-0' : align === 'right' ? 'right-0' : 'left-0 sm:left-auto sm:right-0';
+
   return (
     <div className="relative">
       <button
@@ -62,7 +68,7 @@ export default function CountrySelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-70 bg-white/95 dark:bg-neutral-900/95 rounded-2xl shadow-soft-xl dark:shadow-2xl border border-neutral-200/90 dark:border-neutral-800 py-2.5 z-50 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150">
+        <div className={`absolute top-full ${alignmentClass} mt-2 w-70 max-w-[calc(100vw-2.5rem)] bg-white/95 dark:bg-neutral-900/95 rounded-2xl shadow-soft-xl dark:shadow-2xl border border-neutral-200/90 dark:border-neutral-800 py-2.5 z-50 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150`}>
           <div className="px-3.5 py-2 text-[10px] font-extrabold uppercase tracking-wider text-neutral-400 dark:text-neutral-400 border-b border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between">
             <span>20 Amazon Marketplaces</span>
             <Globe className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
