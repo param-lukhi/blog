@@ -131,12 +131,12 @@ export default function SearchBar() {
           }}
           onKeyDown={handleKeyDown}
           aria-label="Search site content"
-          className="w-full bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60 focus:bg-white dark:focus:bg-neutral-900 text-neutral-900 dark:text-white text-sm rounded-full pl-10 pr-9 py-2 border border-transparent focus:border-brand-500 outline-none transition-all placeholder:text-neutral-400 dark:placeholder:text-neutral-500 shadow-inner"
+          className="w-full bg-neutral-100/90 dark:bg-neutral-800/90 hover:bg-neutral-200/70 dark:hover:bg-neutral-700/70 focus:bg-white dark:focus:bg-neutral-900 text-neutral-900 dark:text-white text-sm rounded-full pl-10 pr-9 py-2 border border-neutral-200/50 dark:border-neutral-700/50 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all placeholder:text-neutral-400 dark:placeholder:text-neutral-500 shadow-xs"
         />
-        <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 pointer-events-none" />
+        <Search className="w-4 h-4 text-neutral-400 dark:text-neutral-400 absolute left-3.5 pointer-events-none" />
 
         {isLoading ? (
-          <Loader2 className="w-4 h-4 text-brand-600 animate-spin absolute right-3" />
+          <Loader2 className="w-4 h-4 text-brand-600 dark:text-brand-400 animate-spin absolute right-3" />
         ) : query ? (
           <button
             type="button"
@@ -153,7 +153,7 @@ export default function SearchBar() {
 
       {/* Instant Suggestions & Recent Searches Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800 py-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150 overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 dark:bg-neutral-900/95 rounded-2xl shadow-soft-xl border border-neutral-200/80 dark:border-neutral-800 py-2.5 z-50 backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-150 overflow-hidden">
           {query.trim().length < 2 ? (
             /* Recent Searches */
             recentSearches.length > 0 ? (

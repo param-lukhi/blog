@@ -89,33 +89,36 @@ export default async function HomePage() {
     <div className="space-y-16 pb-16 bg-white dark:bg-neutral-950">
       
       {/* 1. Hero Section */}
-      <section className="relative overflow-hidden bg-neutral-900 text-white py-20 px-4 sm:px-6 lg:px-8">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]" />
+      <section className="relative overflow-hidden bg-gradient-to-b from-neutral-950 via-neutral-900 to-neutral-950 text-white py-24 px-4 sm:px-6 lg:px-8 border-b border-neutral-800/80">
+        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:24px_24px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-brand-600/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-12 right-1/4 w-80 h-80 bg-amazon-orange/10 rounded-full blur-3xl pointer-events-none" />
+
         <div className="max-w-4xl mx-auto text-center relative z-10 space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/20 border border-brand-500/30 text-brand-300 text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5 text-brand-400" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/15 border border-brand-500/30 text-brand-300 text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-inner">
+            <Sparkles className="w-3.5 h-3.5 text-brand-400 animate-pulse" />
             <span>Independent & Unbiased Testing</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
             {heroTitle}
           </h1>
 
-          <p className="text-base sm:text-lg text-neutral-300 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-neutral-300 max-w-2xl mx-auto leading-relaxed font-normal">
             {heroSubtitle}
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="#latest-reviews"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm transition-all shadow-lg hover:shadow-brand-500/25 active:scale-95"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-brand-600 via-brand-500 to-brand-600 hover:from-brand-500 hover:to-brand-400 text-white font-extrabold text-sm transition-all shadow-lg shadow-brand-600/30 hover:shadow-brand-500/50 active:scale-95"
             >
               {heroButtonText}
             </Link>
 
             <Link
               href="/deals"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-200 font-semibold text-sm border border-neutral-700 transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-neutral-900/90 hover:bg-neutral-800/90 text-neutral-100 font-semibold text-sm border border-neutral-700/80 shadow-md backdrop-blur-xs transition-all flex items-center justify-center gap-2 hover:border-amber-500/40"
             >
               <Zap className="w-4 h-4 text-amber-400" />
               <span>Today&apos;s Amazon Deals</span>

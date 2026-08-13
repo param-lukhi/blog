@@ -35,18 +35,22 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-neutral-900 text-neutral-400 text-sm border-t border-neutral-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer className="bg-neutral-950 text-neutral-400 text-sm border-t border-neutral-800/80 relative overflow-hidden">
+      {/* Background ambient lighting */}
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-brand-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-amazon-orange/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           
           {/* Col 1: Brand & Newsletter */}
           <div className="space-y-4 lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-brand-600 flex items-center justify-center text-white font-extrabold text-base shadow-sm">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 via-brand-600 to-brand-700 flex items-center justify-center text-white font-extrabold text-lg shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform duration-300">
                 T
               </div>
               <span className="text-xl font-extrabold text-white tracking-tight">
-                TechPulse
+                Tech<span className="text-brand-500">Pulse</span>
               </span>
             </Link>
             <p className="text-neutral-400 text-xs leading-relaxed max-w-sm">
@@ -71,11 +75,11 @@ export default function Footer() {
                     placeholder="Enter your email..."
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-neutral-800 border border-neutral-700 text-white text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-brand-500 transition-colors"
+                    className="w-full bg-neutral-900 border border-neutral-800 text-white text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all placeholder-neutral-500"
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shrink-0 transition-colors flex items-center justify-center gap-1 shadow-sm"
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold text-xs shrink-0 transition-all flex items-center justify-center gap-1 shadow-md shadow-brand-600/20"
                   >
                     <span>Subscribe</span>
                     <Send className="w-3 h-3" />
@@ -85,17 +89,17 @@ export default function Footer() {
             </div>
 
             {/* Social Icons */}
-            <div className="flex items-center gap-3 pt-2">
-              <a href="#" className="p-2 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors">
+            <div className="flex items-center gap-2.5 pt-2">
+              <a href="#" className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800/80 text-neutral-400 hover:text-white hover:bg-brand-600/20 hover:border-brand-500/40 transition-all duration-300 hover:scale-105">
                 <Twitter className="w-4 h-4" />
               </a>
-              <a href="#" className="p-2 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors">
+              <a href="#" className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800/80 text-neutral-400 hover:text-white hover:bg-brand-600/20 hover:border-brand-500/40 transition-all duration-300 hover:scale-105">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="#" className="p-2 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors">
+              <a href="#" className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800/80 text-neutral-400 hover:text-white hover:bg-brand-600/20 hover:border-brand-500/40 transition-all duration-300 hover:scale-105">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href="#" className="p-2 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors">
+              <a href="#" className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800/80 text-neutral-400 hover:text-white hover:bg-brand-600/20 hover:border-brand-500/40 transition-all duration-300 hover:scale-105">
                 <Youtube className="w-4 h-4" />
               </a>
             </div>
@@ -109,7 +113,7 @@ export default function Footer() {
             <ul className="space-y-2 text-xs">
               {categoriesList.map((cat) => (
                 <li key={cat.slug}>
-                  <Link href={`/category/${cat.slug}`} className="hover:text-white transition-colors">
+                  <Link href={`/category/${cat.slug}`} className="hover:text-white hover:translate-x-0.5 inline-block transition-all">
                     {cat.name}
                   </Link>
                 </li>
@@ -125,18 +129,18 @@ export default function Footer() {
             <ul className="space-y-2 text-xs">
               {topReviews.map((rev, i) => (
                 <li key={i}>
-                  <Link href={rev.href} className="hover:text-white transition-colors line-clamp-1">
+                  <Link href={rev.href} className="hover:text-white hover:translate-x-0.5 transition-all line-clamp-1 inline-block">
                     {rev.title}
                   </Link>
                 </li>
               ))}
-              <li>
-                <Link href="/deals" className="text-amazon-orange font-bold hover:underline">
+              <li className="pt-1">
+                <Link href="/deals" className="inline-flex items-center gap-1 text-amazon-orange font-bold hover:text-amber-400 transition-colors">
                   🔥 Latest Amazon Deals
                 </Link>
               </li>
               <li>
-                <Link href="/comparisons" className="hover:text-white transition-colors">
+                <Link href="/comparisons" className="hover:text-white hover:translate-x-0.5 inline-block transition-all">
                   ⚖️ Head-to-Head Comparisons
                 </Link>
               </li>
@@ -149,24 +153,25 @@ export default function Footer() {
               Company & Legal
             </h3>
             <ul className="space-y-2 text-xs">
-              <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
-              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
-              <li><Link href="/affiliate-disclosure" className="hover:text-white transition-colors">Affiliate Disclosure</Link></li>
-              <li><Link href="/cookie-policy" className="hover:text-white transition-colors">Cookie Policy</Link></li>
-              <li><Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link></li>
+              <li><Link href="/about" className="hover:text-white hover:translate-x-0.5 inline-block transition-all">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-white hover:translate-x-0.5 inline-block transition-all">Contact Us</Link></li>
+              <li><Link href="/privacy" className="hover:text-white hover:translate-x-0.5 inline-block transition-all">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white hover:translate-x-0.5 inline-block transition-all">Terms & Conditions</Link></li>
+              <li><Link href="/affiliate-disclosure" className="hover:text-white hover:translate-x-0.5 inline-block transition-all">Affiliate Disclosure</Link></li>
+              <li><Link href="/cookie-policy" className="hover:text-white hover:translate-x-0.5 inline-block transition-all">Cookie Policy</Link></li>
+              <li><Link href="/refund-policy" className="hover:text-white hover:translate-x-0.5 inline-block transition-all">Refund Policy</Link></li>
             </ul>
           </div>
         </div>
 
         {/* Amazon Affiliate Disclosure Banner */}
-        <div className="p-4 rounded-2xl bg-neutral-800/60 border border-neutral-800 text-xs text-neutral-400 leading-relaxed mb-8">
-          <strong className="text-neutral-300">Amazon Affiliate Disclosure:</strong> TechPulse is a participant in the Amazon Services LLC Associates Program and regional Amazon affiliate programs worldwide. As an Amazon Associate, we earn from qualifying purchases. Product prices, availability, and promotions are accurate as of the date/time indicated and are subject to change.
+        <div className="p-5 rounded-2xl bg-neutral-900/80 border border-neutral-800/80 text-xs text-neutral-300/90 leading-relaxed mb-8 shadow-inner backdrop-blur-xs relative overflow-hidden hover:border-neutral-700/80 transition-colors">
+          <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amazon-orange to-brand-500" />
+          <strong className="text-white font-bold">Amazon Affiliate Disclosure:</strong> TechPulse is a participant in the Amazon Services LLC Associates Program and regional Amazon affiliate programs worldwide. As an Amazon Associate, we earn from qualifying purchases. Product prices, availability, and promotions are accurate as of the date/time indicated and are subject to change.
         </div>
 
         {/* Bottom Bar: Country Selector & Copyright */}
-        <div className="pt-6 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
+        <div className="pt-6 border-t border-neutral-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
           <div>
             © {new Date().getFullYear()} TechPulse Reviews. All rights reserved.
           </div>

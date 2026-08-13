@@ -69,13 +69,13 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800 shadow-xs transition-all duration-300">
+    <header className="sticky top-0 z-50 bg-white/80 dark:bg-neutral-950/85 backdrop-blur-xl border-b border-neutral-200/60 dark:border-neutral-800/80 shadow-xs transition-all duration-300">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-2 sm:gap-4">
           
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white font-extrabold text-base sm:text-lg shadow-sm group-hover:scale-105 transition-transform">
+          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+            <div className="w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-brand-500 via-brand-600 to-brand-700 flex items-center justify-center text-white font-extrabold text-base sm:text-lg shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform duration-300">
               {siteName.charAt(0)}
             </div>
             <span className="font-extrabold text-lg sm:text-xl text-neutral-900 dark:text-white tracking-tight font-sans truncate max-w-[130px] xs:max-w-none">
@@ -98,7 +98,7 @@ export default function Header() {
             >
               Home
               {isActive('/') && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 dark:bg-brand-400 rounded-full animate-in fade-in zoom-in duration-200" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-brand-500 to-brand-600 rounded-full animate-in fade-in zoom-in duration-200" />
               )}
             </Link>
 
@@ -110,7 +110,7 @@ export default function Header() {
             >
               Reviews
               {isActive('/blog') && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 dark:bg-brand-400 rounded-full animate-in fade-in zoom-in duration-200" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-brand-500 to-brand-600 rounded-full animate-in fade-in zoom-in duration-200" />
               )}
             </Link>
 
@@ -122,7 +122,7 @@ export default function Header() {
             >
               Best Products
               {isActive('/products') && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 dark:bg-brand-400 rounded-full animate-in fade-in zoom-in duration-200" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-brand-500 to-brand-600 rounded-full animate-in fade-in zoom-in duration-200" />
               )}
             </Link>
 
@@ -134,7 +134,7 @@ export default function Header() {
             >
               Comparisons
               {isActive('/comparisons') && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 dark:bg-brand-400 rounded-full animate-in fade-in zoom-in duration-200" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-brand-500 to-brand-600 rounded-full animate-in fade-in zoom-in duration-200" />
               )}
             </Link>
 
@@ -159,20 +159,20 @@ export default function Header() {
               </button>
 
               {isCategoryOpen && (
-                <div className="absolute top-full left-0 w-72 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800 py-2 px-1 grid grid-cols-1 gap-0.5 animate-in fade-in slide-in-from-top-2 duration-150 z-50">
+                <div className="absolute top-full left-0 w-72 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl rounded-2xl shadow-soft-xl border border-neutral-200/80 dark:border-neutral-800 py-2 px-1 grid grid-cols-1 gap-0.5 animate-in fade-in slide-in-from-top-2 duration-150 z-50">
                   {categories.length > 0 ? (
                     categories.map((cat) => (
                       <Link
                         key={cat.id}
                         href={`/category/${cat.slug}`}
-                        className="px-3.5 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-colors flex items-center justify-between"
+                        className="px-3.5 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/80 dark:hover:bg-neutral-800/80 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-colors flex items-center justify-between"
                         onClick={() => setIsCategoryOpen(false)}
                       >
                         <span>{cat.name}</span>
                       </Link>
                     ))
                   ) : (
-                    <div className="px-4 py-2 text-xs text-neutral-400">Loading categories...</div>
+                    <div className="px-4 py-2 text-xs text-neutral-400 dark:text-neutral-500">Loading categories...</div>
                   )}
                 </div>
               )}

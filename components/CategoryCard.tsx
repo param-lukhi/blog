@@ -47,7 +47,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
   return (
     <Link
       href={`/category/${category.slug}`}
-      className="group relative bg-white hover:bg-neutral-50/80 border border-neutral-200/90 hover:border-brand-300 rounded-2xl p-4 shadow-soft hover:shadow-soft-lg transition-all duration-300 flex items-center justify-between overflow-hidden"
+      className="group relative bg-white dark:bg-neutral-900 hover:bg-neutral-50/80 dark:hover:bg-neutral-800/80 border border-neutral-200/90 dark:border-neutral-800 hover:border-brand-300 dark:hover:border-brand-600/50 rounded-2xl p-4 shadow-soft hover:shadow-soft-xl transition-all duration-300 flex items-center justify-between overflow-hidden"
     >
       <div className="flex items-center gap-3.5">
         {/* Visual Icon Badge with Smooth Gradient & Shadow */}
@@ -56,16 +56,16 @@ export default function CategoryCard({ category }: CategoryCardProps) {
         </div>
 
         <div>
-          <h3 className="font-extrabold text-neutral-900 text-sm group-hover:text-brand-600 transition-colors leading-tight">
+          <h3 className="font-extrabold text-neutral-900 dark:text-white text-sm group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors leading-tight">
             {category.name}
           </h3>
-          <span className="text-[11px] font-semibold text-neutral-400 group-hover:text-neutral-600 transition-colors">
+          <span className="text-[11px] font-semibold text-neutral-400 dark:text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors">
             Explore Buying Guides
           </span>
         </div>
       </div>
 
-      <div className="w-7 h-7 rounded-full bg-neutral-100 group-hover:bg-brand-600 text-neutral-400 group-hover:text-white flex items-center justify-center transition-colors shrink-0 ml-2">
+      <div className="w-7 h-7 rounded-full bg-neutral-100 dark:bg-neutral-800 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 text-neutral-400 dark:text-neutral-400 group-hover:text-white flex items-center justify-center transition-colors shrink-0 ml-2">
         <ChevronRight className="w-4 h-4 stroke-[2.5]" />
       </div>
     </Link>

@@ -34,11 +34,11 @@ export default function ProductCard({ product }: ProductCardProps) {
   const inWishlist = isInWishlist(product.id);
 
   return (
-    <div className="group bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 shadow-soft hover:shadow-soft-lg transition-all duration-200 flex flex-col overflow-hidden">
+    <div className="group bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 shadow-soft hover:shadow-soft-xl transition-all duration-300 flex flex-col overflow-hidden">
       {/* Image Container */}
       <div className="relative aspect-[4/3] bg-neutral-50 dark:bg-neutral-800/40 overflow-hidden flex items-center justify-center p-4">
         {product.isDeal && (
-          <span className="absolute top-3 left-3 z-10 inline-flex items-center gap-1 bg-amber-500 text-white text-[11px] font-extrabold uppercase tracking-wide px-2.5 py-1 rounded-full shadow-sm">
+          <span className="absolute top-3 left-3 z-10 inline-flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[11px] font-extrabold uppercase tracking-wide px-2.5 py-1 rounded-full shadow-md shadow-amber-500/20">
             <Sparkles className="w-3 h-3" /> Deal
           </span>
         )}
@@ -67,7 +67,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <img
           src={firstImage}
           alt={product.name}
-          className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+          className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
         />
       </div>
 

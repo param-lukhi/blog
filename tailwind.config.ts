@@ -49,6 +49,10 @@ const config: Config = {
       boxShadow: {
         'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
         'soft-lg': '0 10px 25px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.03)',
+        'soft-xl': '0 20px 40px -5px rgba(0, 0, 0, 0.1), 0 8px 16px -4px rgba(0, 0, 0, 0.04)',
+        'glow-brand': '0 0 25px -5px rgba(37, 99, 235, 0.3)',
+        'glow-amazon': '0 0 25px -5px rgba(255, 153, 0, 0.35)',
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.12)',
       }
     },
   },

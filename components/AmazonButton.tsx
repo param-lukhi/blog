@@ -94,7 +94,7 @@ export default function AmazonButton({
       rel="noopener noreferrer"
       onClick={handleClick}
       title={`Open ${regional.marketplaceName} (${regional.domain}) in new tab`}
-      className={`inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-neutral-950 font-sans hover:shadow-soft-lg active:scale-[0.99] transition-all cursor-pointer select-none border border-amber-600/30 ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-600 text-neutral-950 font-sans shadow-sm hover:shadow-glow-amazon active:scale-[0.98] transition-all duration-200 cursor-pointer select-none border border-amber-500/40 ${sizeClasses[size]} ${className}`}
     >
       <ShoppingCart className={size === 'sm' ? 'w-3.5 h-3.5' : size === 'lg' ? 'w-5 h-5' : 'w-4 h-4'} />
       
