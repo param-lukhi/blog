@@ -23,7 +23,7 @@ interface ProductItem {
 
 export default function EditBlogPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string; parentId?: string | null; parent?: { name: string } | null }[]>([]);
   const [productsList, setProductsList] = useState<ProductItem[]>([]);
   const [productId, setProductId] = useState('');
   const [loading, setLoading] = useState(true);
@@ -416,7 +416,7 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
                 >
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
-                      {cat.name}
+                      {cat.parent ? `↳ ${cat.name} (${cat.parent.name})` : `📁 ${cat.name}`}
                     </option>
                   ))}
                 </select>

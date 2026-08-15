@@ -23,7 +23,7 @@ interface ProductItem {
 
 export default function NewBlogPage() {
   const router = useRouter();
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string; parentId?: string | null; parent?: { name: string } | null }[]>([]);
   const [productsList, setProductsList] = useState<ProductItem[]>([]);
   const [productId, setProductId] = useState('');
 
@@ -395,7 +395,7 @@ export default function NewBlogPage() {
                 >
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
-                      {cat.name}
+                      {cat.parent ? `↳ ${cat.name} (${cat.parent.name})` : `📁 ${cat.name}`}
                     </option>
                   ))}
                 </select>

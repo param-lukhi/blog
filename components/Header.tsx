@@ -13,6 +13,9 @@ interface Category {
   id: string;
   name: string;
   slug: string;
+  icon?: string | null;
+  parentId?: string | null;
+  subcategories?: { id: string; name: string; slug: string; icon?: string | null }[];
 }
 
 export default function Header() {
@@ -158,18 +161,44 @@ export default function Header() {
               </button>
 
               {isCategoryOpen && (
-                <div className="absolute top-full left-0 w-72 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl rounded-2xl shadow-soft-xl border border-neutral-200/80 dark:border-neutral-800 py-2 px-1 grid grid-cols-1 gap-0.5 animate-in fade-in slide-in-from-top-2 duration-150 z-50">
+                <div className="absolute top-full left-0 w-80 max-h-96 overflow-y-auto bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl rounded-2xl shadow-soft-xl border border-neutral-200/80 dark:border-neutral-800 p-2 grid grid-cols-1 gap-1 animate-in fade-in slide-in-from-top-2 duration-150 z-50">
                   {categories.length > 0 ? (
-                    categories.map((cat) => (
-                      <Link
-                        key={cat.id}
-                        href={`/category/${cat.slug}`}
-                        className="px-3.5 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/80 dark:hover:bg-neutral-800/80 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-colors flex items-center justify-between"
-                        onClick={() => setIsCategoryOpen(false)}
-                      >
-                        <span>{cat.name}</span>
-                      </Link>
-                    ))
+                    categories
+                      .filter((c) => !c.parentId)
+                      .map((cat) => (
+                        <div key={cat.id} className="space-y-1">
+                          <Link
+                            href={`/category/${cat.slug}`}
+                            className="px-3 py-2 text-xs font-bold text-neutral-800 dark:text-neutral-200 hover:bg-brand-50 dark:hover:bg-neutral-800 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-colors flex items-center justify-between group"
+                            onClick={() => setIsCategoryOpen(false)}
+                          >
+                            <span className="flex items-center gap-2">
+                              <span>{cat.icon || '📁'}</span>
+                              <span>{cat.name}</span>
+                            </span>
+                            {cat.subcategories && cat.subcategories.length > 0 && (
+                              <span className="text-[10px] text-neutral-400 font-normal">
+                                {cat.subcategories.length} subs
+                              </span>
+                            )}
+                          </Link>
+                          {cat.subcategories && cat.subcategories.length > 0 && (
+                            <div className="pl-6 pr-2 py-0.5 space-y-0.5 border-l-2 border-neutral-100 dark:border-neutral-800 ml-4">
+                              {cat.subcategories.map((sub) => (
+                                <Link
+                                  key={sub.id}
+                                  href={`/category/${sub.slug}`}
+                                  className="px-2.5 py-1 text-[11px] text-neutral-500 dark:text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 rounded-lg flex items-center gap-1.5 transition-colors"
+                                  onClick={() => setIsCategoryOpen(false)}
+                                >
+                                  <span>{sub.icon || '🏷️'}</span>
+                                  <span>{sub.name}</span>
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))
                   ) : (
                     <div className="px-4 py-2 text-xs text-neutral-400 dark:text-neutral-500">Loading categories...</div>
                   )}

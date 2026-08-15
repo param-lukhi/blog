@@ -29,7 +29,7 @@ interface Product {
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string; parentId?: string | null; parent?: { name: string } | null }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -619,7 +619,7 @@ export default function AdminProductsPage() {
                       >
                         {categories.map((c) => (
                           <option key={c.id} value={c.id}>
-                            {c.name}
+                            {c.parent ? `↳ ${c.name} (${c.parent.name})` : `📁 ${c.name}`}
                           </option>
                         ))}
                       </select>
