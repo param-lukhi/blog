@@ -79,13 +79,29 @@ export default function AdminAutomationPage() {
       const data = await res.json();
       if (data.url) {
         setImageUrl(data.url);
+        // Auto-populate product name from clean filename if empty
+        if (!productQuery.trim()) {
+          const cleanName = file.name
+            .replace(/\.[a-zA-Z0-9]+$/, '')
+            .replace(/[-_]+/g, ' ')
+            .trim();
+          if (cleanName.length > 2 && !/^\d+$/.test(cleanName)) {
+            setProductQuery(
+              cleanName
+                .split(' ')
+                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(' ')
+            );
+          }
+        }
       } else {
-        alert('Failed to upload image. Please try again.');
+        alert(data.error || 'Failed to upload image. Please try again.');
       }
     } catch (err) {
-      alert('Image upload error');
+      alert('Image upload error. Please check file format and try again.');
     } finally {
       setUploadingImage(false);
+      e.target.value = '';
     }
   };
 
@@ -347,8 +363,16 @@ export default function AdminAutomationPage() {
                     className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-2xl text-xs outline-none focus:border-amber-500 font-medium"
                   />
                   {imageUrl && (
-                    <div className="mt-2 flex items-center gap-2 text-[11px] text-emerald-600 font-bold">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Image attached successfully
+                    <div className="mt-2 flex items-center gap-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={imageUrl}
+                        alt="Attached product preview"
+                        className="w-9 h-9 object-cover rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-2xs"
+                      />
+                      <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 font-bold">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Image attached successfully
+                      </div>
                     </div>
                   )}
                 </div>

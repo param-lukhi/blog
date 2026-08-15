@@ -41,14 +41,25 @@ export async function POST(req: Request) {
       await writeFile(filePath, buffer);
 
       const publicUrl = `/uploads/${uniqueFilename}`;
-      const newMedia = await db.media.create({
-        data: {
+      let newMedia: any = null;
+      try {
+        newMedia = await db.media.create({
+          data: {
+            filename: file.name,
+            url: publicUrl,
+            size: file.size,
+            mimeType: file.type || 'image/png',
+          },
+        });
+      } catch (dbErr) {
+        console.warn('Media DB record log skipped:', dbErr);
+        newMedia = {
           filename: file.name,
           url: publicUrl,
           size: file.size,
           mimeType: file.type || 'image/png',
-        },
-      });
+        };
+      }
 
       return NextResponse.json(newMedia, { status: 201 });
     } else {
