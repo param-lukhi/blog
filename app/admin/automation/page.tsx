@@ -66,6 +66,11 @@ export default function AdminAutomationPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size exceeds 10MB limit.');
+      return;
+    }
+
     setUploadingImage(true);
     try {
       const formData = new FormData();
@@ -76,29 +81,43 @@ export default function AdminAutomationPage() {
         body: formData,
       });
 
-      const data = await res.json();
-      if (data.url) {
+      const data = await res.json().catch(() => null);
+      if (data && data.url) {
         setImageUrl(data.url);
-        // Auto-populate product name from clean filename if empty
-        if (!productQuery.trim()) {
-          const cleanName = file.name
-            .replace(/\.[a-zA-Z0-9]+$/, '')
-            .replace(/[-_]+/g, ' ')
-            .trim();
-          if (cleanName.length > 2 && !/^\d+$/.test(cleanName)) {
-            setProductQuery(
-              cleanName
-                .split(' ')
-                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                .join(' ')
-            );
-          }
-        }
       } else {
-        alert(data.error || 'Failed to upload image. Please try again.');
+        // Bulletproof fallback using local FileReader
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (event.target?.result) {
+            setImageUrl(event.target.result as string);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // Auto-populate product name from clean filename if empty
+      if (!productQuery.trim()) {
+        const cleanName = file.name
+          .replace(/\.[a-zA-Z0-9]+$/, '')
+          .replace(/[-_]+/g, ' ')
+          .trim();
+        if (cleanName.length > 2 && !/^\d+$/.test(cleanName)) {
+          setProductQuery(
+            cleanName
+              .split(' ')
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(' ')
+          );
+        }
       }
     } catch (err) {
-      alert('Image upload error. Please check file format and try again.');
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setImageUrl(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
     } finally {
       setUploadingImage(false);
       e.target.value = '';

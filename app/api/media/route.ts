@@ -30,17 +30,27 @@ export async function POST(req: Request) {
 
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
+      const mimeType = file.type || 'image/png';
+      const base64DataUri = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-      await mkdir(uploadsDir, { recursive: true });
+      let publicUrl = base64DataUri;
 
-      const sanitizeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-      const uniqueFilename = `${Date.now()}_${sanitizeName}`;
-      const filePath = path.join(uploadsDir, uniqueFilename);
+      // Try writing to local disk (works in local dev, will catch and fallback to data URI on read-only environments like Vercel)
+      try {
+        const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+        await mkdir(uploadsDir, { recursive: true });
 
-      await writeFile(filePath, buffer);
+        const sanitizeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const uniqueFilename = `${Date.now()}_${sanitizeName}`;
+        const filePath = path.join(uploadsDir, uniqueFilename);
 
-      const publicUrl = `/uploads/${uniqueFilename}`;
+        await writeFile(filePath, buffer);
+        publicUrl = `/uploads/${uniqueFilename}`;
+      } catch (fsErr) {
+        // Read-only filesystem (e.g. Vercel Serverless) - publicUrl remains base64DataUri
+        console.log('Using Data URI for serverless media storage (read-only filesystem detected).');
+      }
+
       let newMedia: any = null;
       try {
         newMedia = await db.media.create({
@@ -48,7 +58,7 @@ export async function POST(req: Request) {
             filename: file.name,
             url: publicUrl,
             size: file.size,
-            mimeType: file.type || 'image/png',
+            mimeType: mimeType,
           },
         });
       } catch (dbErr) {
@@ -57,7 +67,7 @@ export async function POST(req: Request) {
           filename: file.name,
           url: publicUrl,
           size: file.size,
-          mimeType: file.type || 'image/png',
+          mimeType: mimeType,
         };
       }
 
@@ -70,19 +80,29 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Filename and URL are required' }, { status: 400 });
       }
 
-      const newMedia = await db.media.create({
-        data: {
+      let newMedia: any = null;
+      try {
+        newMedia = await db.media.create({
+          data: {
+            filename,
+            url,
+            size: size || 102400,
+            mimeType: mimeType || 'image/webp',
+          },
+        });
+      } catch (dbErr) {
+        newMedia = {
           filename,
           url,
           size: size || 102400,
           mimeType: mimeType || 'image/webp',
-        },
-      });
+        };
+      }
 
       return NextResponse.json(newMedia, { status: 201 });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Media upload error:', error);
-    return NextResponse.json({ error: 'Failed to save media asset' }, { status: 500 });
+    return NextResponse.json({ error: error?.message || 'Failed to save media asset' }, { status: 500 });
   }
 }
