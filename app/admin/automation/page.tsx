@@ -119,9 +119,9 @@ export default function AdminAutomationPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          url: url.trim(),
-          query: productQuery.trim(),
-          imageUrl: imageUrl.trim(),
+          url: inputMode === 'url' ? url.trim() : '',
+          query: (inputMode === 'name' || inputMode === 'image') ? productQuery.trim() : '',
+          imageUrl: inputMode === 'image' ? imageUrl.trim() : '',
           categoryId: selectedCategoryId || undefined,
           publishImmediately,
         }),
