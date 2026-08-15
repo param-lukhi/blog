@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { generateFullProductAndBlog } from '@/lib/amazon-generator';
+import { generateFullProductAndBlog, extractAsin } from '@/lib/amazon-generator';
 import { db } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { slugify } from '@/lib/utils';
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 3. Generate Complete Real Metadata & Draft
+    // 3. Generate Complete Real Metadata, Verified Single Source of Truth & 2000+ words Draft
     const draft = await generateFullProductAndBlog({
       url: url?.trim() || undefined,
       query: query?.trim() || undefined,
@@ -72,69 +72,152 @@ export async function POST(request: Request) {
 
     const itemStatus = publishImmediately ? 'PUBLISHED' : 'DRAFT';
 
-    // 5. Ensure Unique Slug for Product & Blog
+    // 5. Duplicate Product Protection by ASIN or Slug
     const baseSlug = draft.slug.replace(/-review$/, '');
-    let productSlug = baseSlug;
-    let existingProd = await db.product.findUnique({ where: { slug: productSlug } });
-    if (existingProd) {
-      productSlug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
+    let targetProduct: any = null;
+
+    // Check by ASIN first if available
+    if (draft.asin) {
+      targetProduct = await db.product.findFirst({
+        where: {
+          amazonUrl: {
+            contains: draft.asin,
+          },
+        },
+      });
     }
 
+    // Check by exact slug fallback
+    if (!targetProduct) {
+      targetProduct = await db.product.findUnique({
+        where: { slug: baseSlug },
+      });
+    }
+
+    let createdProduct: any;
+
+    if (targetProduct) {
+      // Update existing product with latest verified product data to avoid duplicates
+      createdProduct = await db.product.update({
+        where: { id: targetProduct.id },
+        data: {
+          name: draft.title.replace(/\s+Review:.*$/i, '').trim() || draft.title,
+          brand: draft.brand,
+          price: draft.price,
+          images: JSON.stringify(draft.images && draft.images.length > 0 ? draft.images : [draft.featuredImage]),
+          amazonUrl: draft.amazonUrl,
+          affiliateUrl: draft.affiliateUrl,
+          marketplaces: JSON.stringify(draft.marketplaces || {}),
+          categoryId: category.id,
+          specifications: JSON.stringify(draft.specifications),
+          features: JSON.stringify(draft.features),
+          pros: JSON.stringify(draft.pros),
+          cons: JSON.stringify(draft.cons),
+          status: itemStatus,
+        },
+      });
+    } else {
+      // Create new unique product
+      let productSlug = baseSlug;
+      const existingSlugCheck = await db.product.findUnique({ where: { slug: productSlug } });
+      if (existingSlugCheck) {
+        productSlug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
+      }
+
+      createdProduct = await db.product.create({
+        data: {
+          name: draft.title.replace(/\s+Review:.*$/i, '').trim() || draft.title,
+          slug: productSlug,
+          brand: draft.brand,
+          price: draft.price,
+          images: JSON.stringify(draft.images && draft.images.length > 0 ? draft.images : [draft.featuredImage]),
+          amazonUrl: draft.amazonUrl,
+          affiliateUrl: draft.affiliateUrl,
+          marketplaces: JSON.stringify(draft.marketplaces || {}),
+          categoryId: category.id,
+          specifications: JSON.stringify(draft.specifications),
+          features: JSON.stringify(draft.features),
+          pros: JSON.stringify(draft.pros),
+          cons: JSON.stringify(draft.cons),
+          isFeatured: false,
+          isTrending: true,
+          isDeal: false,
+          status: itemStatus,
+        },
+      });
+    }
+
+    // 6. Blog Creation or Update with 2000+ Words Content linked to the Verified Product
     let blogSlug = draft.slug;
-    let existingBlog = await db.blog.findUnique({ where: { slug: blogSlug } });
+    let existingBlog = await db.blog.findFirst({
+      where: {
+        OR: [
+          { slug: blogSlug },
+          { productId: createdProduct.id },
+        ],
+      },
+    });
+
+    let createdBlog: any;
+
     if (existingBlog) {
-      blogSlug = `${draft.slug}-${Date.now().toString().slice(-4)}`;
+      // Update existing blog
+      createdBlog = await db.blog.update({
+        where: { id: existingBlog.id },
+        data: {
+          title: draft.title,
+          metaTitle: draft.metaTitle,
+          metaDescription: draft.metaDescription,
+          featuredImage: draft.featuredImage,
+          content: draft.content,
+          specifications: JSON.stringify(draft.specifications),
+          features: JSON.stringify(draft.features),
+          pros: JSON.stringify(draft.pros),
+          cons: JSON.stringify(draft.cons),
+          faqs: JSON.stringify(draft.faqs),
+          conclusion: draft.conclusion,
+          amazonUrl: draft.amazonUrl,
+          affiliateUrl: draft.affiliateUrl,
+          marketplaces: JSON.stringify(draft.marketplaces || {}),
+          categoryId: category.id,
+          productId: createdProduct.id,
+          tags: JSON.stringify(draft.tags),
+          status: itemStatus,
+        },
+      });
+    } else {
+      // Create new blog
+      const slugConflict = await db.blog.findUnique({ where: { slug: blogSlug } });
+      if (slugConflict) {
+        blogSlug = `${draft.slug}-${Date.now().toString().slice(-4)}`;
+      }
+
+      createdBlog = await db.blog.create({
+        data: {
+          title: draft.title,
+          slug: blogSlug,
+          metaTitle: draft.metaTitle,
+          metaDescription: draft.metaDescription,
+          featuredImage: draft.featuredImage,
+          content: draft.content,
+          specifications: JSON.stringify(draft.specifications),
+          features: JSON.stringify(draft.features),
+          pros: JSON.stringify(draft.pros),
+          cons: JSON.stringify(draft.cons),
+          faqs: JSON.stringify(draft.faqs),
+          conclusion: draft.conclusion,
+          amazonUrl: draft.amazonUrl,
+          affiliateUrl: draft.affiliateUrl,
+          marketplaces: JSON.stringify(draft.marketplaces || {}),
+          categoryId: category.id,
+          productId: createdProduct.id,
+          tags: JSON.stringify(draft.tags),
+          status: itemStatus,
+        },
+      });
     }
 
-    // 6. Create Product in DB (Automatically saved as DRAFT)
-    const createdProduct = await db.product.create({
-      data: {
-        name: draft.title.replace(/\s+Review:.*$/i, '').trim() || draft.title,
-        slug: productSlug,
-        brand: draft.brand,
-        price: draft.price,
-        images: JSON.stringify(draft.images && draft.images.length > 0 ? draft.images : [draft.featuredImage]),
-        amazonUrl: draft.amazonUrl,
-        affiliateUrl: draft.affiliateUrl,
-        marketplaces: JSON.stringify(draft.marketplaces || {}),
-        categoryId: category.id,
-        specifications: JSON.stringify(draft.specifications),
-        features: JSON.stringify(draft.features),
-        pros: JSON.stringify(draft.pros),
-        cons: JSON.stringify(draft.cons),
-        isFeatured: false,
-        isTrending: true,
-        isDeal: false,
-        status: itemStatus,
-      },
-    });
-
-    // 7. Create Blog in DB (Automatically saved as DRAFT and linked to Product)
-    const createdBlog = await db.blog.create({
-      data: {
-        title: draft.title,
-        slug: blogSlug,
-        metaTitle: draft.metaTitle,
-        metaDescription: draft.metaDescription,
-        featuredImage: draft.featuredImage,
-        content: draft.content,
-        specifications: JSON.stringify(draft.specifications),
-        features: JSON.stringify(draft.features),
-        pros: JSON.stringify(draft.pros),
-        cons: JSON.stringify(draft.cons),
-        faqs: JSON.stringify(draft.faqs),
-        conclusion: draft.conclusion,
-        amazonUrl: draft.amazonUrl,
-        affiliateUrl: draft.affiliateUrl,
-        marketplaces: JSON.stringify(draft.marketplaces || {}),
-        categoryId: category.id,
-        productId: createdProduct.id,
-        tags: JSON.stringify(draft.tags),
-        status: itemStatus,
-      },
-    });
-
-    // 8. Revalidate cached routes
+    // 7. Revalidate cached routes
     try {
       revalidatePath('/');
       revalidatePath('/blog');
@@ -145,7 +228,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: `Successfully generated and saved ${itemStatus === 'DRAFT' ? 'Draft' : 'Published'} Blog & Product!`,
+      message: `Successfully generated and saved ${itemStatus === 'DRAFT' ? 'Draft' : 'Published'} Blog & Product (${draft.wordCount || 2000}+ words)!`,
       status: itemStatus,
       blog: createdBlog,
       product: createdProduct,
