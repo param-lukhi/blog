@@ -37,7 +37,10 @@ export async function POST(request: Request) {
       }
     }
 
-    // 3. Generate Complete Real Metadata, Verified Single Source of Truth & 2000+ words Draft
+    // 3. Exact ASIN Verification Engine: Extract and verify input ASIN
+    const inputAsin = extractAsin(url);
+
+    // 4. Generate Complete Real Metadata, Verified Single Source of Truth & 2000+ words Draft
     const draft = await generateFullProductAndBlog({
       url: url?.trim() || undefined,
       query: query?.trim() || undefined,
@@ -45,6 +48,16 @@ export async function POST(request: Request) {
       affiliateTag: tag,
       targetCategory: targetCategoryName,
     });
+
+    // 5. ASIN Matching Validation: If user provided an Amazon URL with ASIN, ensure exact match
+    if (inputAsin && draft.asin && inputAsin.toUpperCase() !== draft.asin.toUpperCase()) {
+      return NextResponse.json(
+        {
+          error: `❌ Product ID mismatch: Input ASIN (${inputAsin}) does not match returned product ASIN (${draft.asin}). Stopped generation to prevent incorrect product data.`,
+        },
+        { status: 400 }
+      );
+    }
 
     // 4. Find or Auto-Create Category
     let category = requestedCategoryId

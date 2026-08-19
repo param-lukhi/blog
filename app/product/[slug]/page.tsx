@@ -134,15 +134,25 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
           </div>
 
           <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800 space-y-4">
-            <AmazonButton
-              url={product.affiliateUrl || product.amazonUrl}
-              price={product.price}
-              productId={product.id}
-              marketplaces={product.marketplaces}
-              size="lg"
-              className="w-full"
-              text="Buy Now on Amazon"
-            />
+            <div className="flex flex-col sm:flex-row gap-3">
+              <AmazonButton
+                url={product.affiliateUrl || product.amazonUrl}
+                price={product.price}
+                productId={product.id}
+                marketplaces={product.marketplaces}
+                size="lg"
+                className="w-full flex-1"
+                text="Buy Now on Amazon"
+              />
+              {product.blogs.length > 0 && (
+                <Link
+                  href={`/blog/${product.blogs[0].slug}`}
+                  className="px-6 py-3.5 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 transition-all shadow-sm shrink-0"
+                >
+                  <span>📖 Read Full Review</span>
+                </Link>
+              )}
+            </div>
             <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-500" />

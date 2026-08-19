@@ -242,6 +242,118 @@ export const VERIFIED_HARDWARE_KNOWLEDGE: Record<string, {
       'SNAPDRAGON 8 GEN 3 SPEED — 1.9x larger vapor chamber for sustained pro gaming performance without thermal throttling.',
     ],
   },
+  'sony-wh-1000xm5': {
+    title: 'Sony WH-1000XM5 Wireless Industry Leading Noise Canceling Headphones',
+    brand: 'Sony',
+    category: 'Earbuds',
+    priceUSD: '$399.99',
+    priceINR: '₹29,990',
+    specs: {
+      'Driver Size': '30mm Precision-Engineered Carbon Fiber Composite Drivers',
+      'Active Noise Cancellation': 'Industry-Leading Dual Processor QN1 + V1 Noise Canceling with 8 Microphones',
+      'Battery Life (Earbuds + Case)': 'Up to 30 Hours with ANC On (Up to 40 Hours with ANC Off)',
+      'Charging Type': 'USB-PD Fast Charging (3 Minutes Charge = 3 Hours Playback)',
+      'Bluetooth Version': 'Bluetooth 5.2 with Multipoint Connection (Simultaneous 2-Device Pairing)',
+      'Audio Codecs': 'LDAC, AAC, SBC, High-Resolution Audio Wireless & DSEE Extreme',
+      Microphones: '4 Beamforming Microphones with AI DNN Noise Reduction for Crystal Clear Calls',
+      'Wearing Style': 'Over-Ear Soft Fit Leather with Stepless Slider Headband',
+      Weight: '250 grams (Ultra-Comfortable Lightweight Design)',
+      'Special Features': 'Speak-to-Chat, Quick Attention Mode, Touch Sensor Controls, Wearing Detection',
+      Warranty: '1 Year Sony Official Manufacturer Limited Warranty',
+    },
+    bullets: [
+      'INDUSTRY LEADING NOISE CANCELLATION — Two processors and 8 microphones deliver unprecedented ambient noise reduction in transit and busy environments.',
+      'MAGNIFICENT SOUND QUALITY — Engineered to perfection with newly designed 30mm carbon fiber drivers and Hi-Res Audio Wireless via LDAC codec.',
+      'CRYSTAL CLEAR HANDS-FREE CALLS — 4 beamforming microphones calibrated to pick up your voice exclusively while suppressing background wind and city chatter.',
+      'UP TO 30-HOUR BATTERY & ULTRA-FAST CHARGE — 30 hours of continuous playback with quick charging giving 3 hours of juice in just 3 minutes.',
+      'MULTIPOINT CONNECTION — Seamlessly switch between laptop, smartphone, and tablet audio with zero latency or manual reconnecting.',
+    ],
+  },
+  'B09XS7JWHH': {
+    title: 'Sony WH-1000XM5 Wireless Industry Leading Noise Canceling Headphones - Black',
+    brand: 'Sony',
+    category: 'Earbuds',
+    priceUSD: '$399.99',
+    priceINR: '₹29,990',
+    specs: {
+      'Driver Size': '30mm Precision-Engineered Carbon Fiber Composite Drivers',
+      'Active Noise Cancellation': 'Industry-Leading Dual Processor QN1 + V1 Noise Canceling with 8 Microphones',
+      'Battery Life (Earbuds + Case)': 'Up to 30 Hours with ANC On (Up to 40 Hours with ANC Off)',
+      'Charging Type': 'USB-PD Fast Charging (3 Minutes Charge = 3 Hours Playback)',
+      'Bluetooth Version': 'Bluetooth 5.2 with Multipoint Connection (Simultaneous 2-Device Pairing)',
+      'Audio Codecs': 'LDAC, AAC, SBC, High-Resolution Audio Wireless & DSEE Extreme',
+      Microphones: '4 Beamforming Microphones with AI DNN Noise Reduction for Crystal Clear Calls',
+      'Wearing Style': 'Over-Ear Soft Fit Leather with Stepless Slider Headband',
+      Weight: '250 grams (Ultra-Comfortable Lightweight Design)',
+      'Special Features': 'Speak-to-Chat, Quick Attention Mode, Touch Sensor Controls, Wearing Detection',
+      Warranty: '1 Year Sony Official Manufacturer Limited Warranty',
+    },
+    bullets: [
+      'INDUSTRY LEADING NOISE CANCELLATION — Two processors and 8 microphones deliver unprecedented ambient noise reduction in transit and busy environments.',
+      'MAGNIFICENT SOUND QUALITY — Engineered to perfection with newly designed 30mm carbon fiber drivers and Hi-Res Audio Wireless via LDAC codec.',
+      'CRYSTAL CLEAR HANDS-FREE CALLS — 4 beamforming microphones calibrated to pick up your voice exclusively while suppressing background wind and city chatter.',
+      'UP TO 30-HOUR BATTERY & ULTRA-FAST CHARGE — 30 hours of continuous playback with quick charging giving 3 hours of juice in just 3 minutes.',
+      'MULTIPOINT CONNECTION — Seamlessly switch between laptop, smartphone, and tablet audio with zero latency or manual reconnecting.',
+    ],
+  },
+  'macbook-air-m3': {
+    title: 'Apple 2024 MacBook Air 13-inch Laptop with M3 chip (8GB Unified Memory, 256GB SSD)',
+    brand: 'Apple',
+    category: 'Laptops',
+    priceUSD: '$1,099.00',
+    priceINR: '₹1,14,900',
+    specs: {
+      Processor: 'Apple M3 chip (8-core CPU with 4 performance cores and 4 efficiency cores, 8-core/10-core GPU, 16-core Neural Engine)',
+      Display: '13.6-inch Liquid Retina display (2560 x 1664 pixels), 500 nits brightness, Wide color (P3), True Tone technology',
+      RAM: '8GB Unified Memory (Configurable up to 24GB)',
+      Storage: '256GB / 512GB High-Speed NVMe SSD',
+      Battery: '52.6 Wh Lithium-polymer (Up to 18 hours Apple TV app movie playback, up to 15 hours wireless web)',
+      Charging: 'MagSafe 3 charging port with 30W USB-C Power Adapter, Fast-charge capable with 70W adapter',
+      Ports: 'MagSafe 3 port, 3.5 mm headphone jack, Two Thunderbolt / USB 4 ports (Support for up to two external displays)',
+      'Operating System': 'macOS Sonoma with Apple Intelligence',
+      Connectivity: 'Wi-Fi 6E (802.11ax), Bluetooth 5.3',
+      Dimensions: '30.41 x 21.5 x 1.13 cm (0.44 inch thin)',
+      Weight: '1.24 kg (2.7 lbs)',
+      Build: '100% Recycled All-Aluminum Unibody Enclosure',
+      Warranty: '1 Year Apple Official Limited Hardware Warranty with 90 Days Complimentary Tech Support',
+    },
+    bullets: [
+      'LEAN. MEAN. M3 MACHINE — The blazing-fast MacBook Air with the M3 chip is a superportable laptop that sails through work and play.',
+      'PORTABLE DESIGN — Lightweight and under half an inch thin, so you can take MacBook Air anywhere you go.',
+      'UP TO 18 HOURS OF BATTERY LIFE — Formidable, all-day battery life so you can leave the power adapter at home.',
+      'BRILLIANT 13.6-INCH LIQUID RETINA DISPLAY — Supports 1 billion colors, P3 wide color gamut, and 500 nits peak luminance.',
+      'DUAL EXTERNAL DISPLAY SUPPORT — Connect up to two external displays even when the laptop lid is closed.',
+    ],
+  },
+  'oneplus-12': {
+    title: 'OnePlus 12 5G (Flowy Emerald, 16GB RAM, 512GB Storage)',
+    brand: 'OnePlus',
+    category: 'Mobiles',
+    priceUSD: '$899.99',
+    priceINR: '₹69,999',
+    specs: {
+      Processor: 'Snapdragon 8 Gen 3 (4nm, Octa-core up to 3.3GHz, Adreno 750 GPU)',
+      Display: '6.82-inch 2K 120Hz ProXDR Display with LTPO 4.0 (3168 x 1440), 4500 nits peak brightness, Dolby Vision',
+      RAM: '16GB LPDDR5X RAM',
+      Storage: '512GB UFS 4.0 Storage',
+      'Rear Camera': '4th Gen Hasselblad Camera System: 50MP Sony LYT-808 (OIS) + 64MP 3x Periscope Telephoto + 48MP Ultra-Wide',
+      'Front Camera': '32MP Sony IMX615 (f/2.4)',
+      Battery: '5,400 mAh Dual-Cell Battery',
+      Charging: '100W SUPERVOOC Fast Wired (1-100% in 26 mins) + 50W AIRVOOC Wireless Charging',
+      'Operating System': 'OxygenOS 14.0 based on Android 14',
+      Connectivity: '5G Dual SIM, Wi-Fi 7, Bluetooth 5.4, NFC, USB 3.2 Gen 1',
+      Dimensions: '164.3 x 75.8 x 9.15 mm',
+      Weight: '220 grams',
+      Warranty: '1 Year Official Manufacturer Warranty',
+    },
+    bullets: [
+      'SNAPDRAGON 8 GEN 3 & 16GB RAM — Peak flagship performance with Dual Cryo-velocity VC cooling system.',
+      '4TH GEN HASSELBLAD CAMERA — 50MP LYT-808 sensor with 64MP periscope telephoto delivering 3x optical and 120x digital zoom.',
+      '4500 NITS 2K PROXDR DISPLAY — Industry-brightest screen with Aqua Touch technology for wet finger precision.',
+      '100W SUPERVOOC CHARGING & 5400MAH BATTERY — Ultra-fast full charge in under 30 minutes with exceptional two-day endurance.',
+      'ICONIC NATURE-INSPIRED DESIGN — Luxury watch craftsmanship with emerald emerald glass and ceramic finish.',
+    ],
+  },
 };
 
 /**
@@ -383,12 +495,18 @@ export function extractCategoryAdaptiveSpecs(params: {
 
   if (lowerTitle.includes('b0chx6qg73') || lowerTitle.includes('iphone 15 pro max')) {
     kbMatch = VERIFIED_HARDWARE_KNOWLEDGE['B0CHX6QG73'];
+  } else if (lowerTitle.includes('b09xs7jwhh') || lowerTitle.includes('wh-1000xm5') || lowerTitle.includes('1000xm5')) {
+    kbMatch = VERIFIED_HARDWARE_KNOWLEDGE['B09XS7JWHH'];
   } else if (lowerTitle.includes('rockerz 450') || (lowerTitle.includes('boat') && lowerTitle.includes('450'))) {
     kbMatch = VERIFIED_HARDWARE_KNOWLEDGE['boat-rockerz-450'];
   } else if (lowerTitle.includes('omnibook') || (lowerTitle.includes('snapdragon x') && lowerTitle.includes('hp'))) {
     kbMatch = VERIFIED_HARDWARE_KNOWLEDGE['hp-omnibook-5'];
   } else if (lowerTitle.includes('s24 ultra') || lowerTitle.includes('galaxy s24 ultra')) {
     kbMatch = VERIFIED_HARDWARE_KNOWLEDGE['samsung-s24-ultra'];
+  } else if (lowerTitle.includes('macbook air') || lowerTitle.includes('b0cx2372nd')) {
+    kbMatch = VERIFIED_HARDWARE_KNOWLEDGE['macbook-air-m3'];
+  } else if (lowerTitle.includes('oneplus 12')) {
+    kbMatch = VERIFIED_HARDWARE_KNOWLEDGE['oneplus-12'];
   }
 
   const finalSpecs: Record<string, string> = {

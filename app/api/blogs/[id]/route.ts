@@ -52,6 +52,40 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
+export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const body = await request.json();
+    const updateData: any = { ...body };
+    delete updateData.id;
+    delete updateData.createdAt;
+    delete updateData.updatedAt;
+    delete updateData.category;
+    delete updateData.product;
+    delete updateData.comments;
+
+    if (typeof updateData.specifications === 'object') updateData.specifications = JSON.stringify(updateData.specifications);
+    if (typeof updateData.features === 'object') updateData.features = JSON.stringify(updateData.features);
+    if (typeof updateData.pros === 'object') updateData.pros = JSON.stringify(updateData.pros);
+    if (typeof updateData.cons === 'object') updateData.cons = JSON.stringify(updateData.cons);
+    if (typeof updateData.faqs === 'object') updateData.faqs = JSON.stringify(updateData.faqs);
+    if (typeof updateData.tags === 'object') updateData.tags = JSON.stringify(updateData.tags);
+
+    const updatedBlog = await db.blog.update({
+      where: { id: params.id },
+      data: updateData,
+    });
+
+    revalidatePath('/');
+    revalidatePath('/blog');
+    revalidatePath(`/blog/${updatedBlog.slug}`);
+
+    return NextResponse.json(updatedBlog);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Failed to patch blog' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
     const blog = await db.blog.findUnique({ where: { id: params.id } });
