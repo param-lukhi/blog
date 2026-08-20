@@ -203,7 +203,7 @@ export async function identifyExactProduct(params: {
         scraped.title.trim().toLowerCase() === 'amazon' ||
         scraped.title.length < 5;
 
-      if (!isGenericMarketplaceTitle) {
+      if (!isGenericMarketplaceTitle && scraped.title) {
         exactTitle = scraped.title;
       } else if (query?.trim()) {
         exactTitle = query.trim();

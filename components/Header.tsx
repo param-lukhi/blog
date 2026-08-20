@@ -147,60 +147,75 @@ export default function Header() {
               onMouseLeave={() => setIsCategoryOpen(false)}
             >
               <button
-                className={`flex items-center gap-1 py-1 hover:text-brand-600 dark:hover:text-brand-400 transition-colors outline-none ${
+                className={`flex items-center gap-1.5 py-1 hover:text-brand-600 dark:hover:text-brand-400 transition-colors outline-none cursor-pointer ${
                   isActive('/category') ? 'text-brand-600 dark:text-brand-400 font-bold' : ''
                 }`}
                 onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                aria-expanded={isCategoryOpen}
               >
-                Categories
+                <span>Categories</span>
                 <ChevronDown
                   className={`w-4 h-4 transition-transform duration-200 ${
-                    isCategoryOpen ? 'rotate-180 text-brand-600 dark:text-brand-400' : ''
+                    isCategoryOpen ? 'rotate-180 text-brand-600 dark:text-brand-400' : 'text-neutral-400'
                   }`}
                 />
               </button>
 
               {isCategoryOpen && (
-                <div className="absolute top-full left-0 w-80 max-h-96 overflow-y-auto bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl rounded-2xl shadow-soft-xl border border-neutral-200/80 dark:border-neutral-800 p-2 grid grid-cols-1 gap-1 animate-in fade-in slide-in-from-top-2 duration-150 z-50">
+                <div className="absolute top-full left-0 w-80 sm:w-96 max-h-[30rem] overflow-y-auto bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl rounded-2xl shadow-soft-xl border border-neutral-200/80 dark:border-neutral-800 p-2.5 space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-150 z-50 divide-y divide-neutral-100 dark:divide-neutral-800/60">
                   {categories.length > 0 ? (
                     categories
                       .filter((c) => !c.parentId)
-                      .map((cat) => (
-                        <div key={cat.id} className="space-y-1">
-                          <Link
-                            href={`/category/${cat.slug}`}
-                            className="px-3 py-2 text-xs font-bold text-neutral-800 dark:text-neutral-200 hover:bg-brand-50 dark:hover:bg-neutral-800 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-colors flex items-center justify-between group"
-                            onClick={() => setIsCategoryOpen(false)}
-                          >
-                            <span className="flex items-center gap-2">
-                              <span>{cat.icon || '📁'}</span>
-                              <span>{cat.name}</span>
-                            </span>
-                            {cat.subcategories && cat.subcategories.length > 0 && (
-                              <span className="text-[10px] text-neutral-400 font-normal">
-                                {cat.subcategories.length} subs
+                      .map((cat) => {
+                        // Gather all subcategories (from relation or parentId match)
+                        const rawSubs = [
+                          ...(cat.subcategories || []),
+                          ...categories.filter((c) => c.parentId === cat.id),
+                        ];
+                        const subs = Array.from(
+                          new Map(rawSubs.map((s) => [s.id, s])).values()
+                        );
+
+                        return (
+                          <div key={cat.id} className="pt-1.5 first:pt-0 space-y-1">
+                            {/* Main Category Link / Header */}
+                            <Link
+                              href={`/category/${cat.slug}`}
+                              className="px-3 py-2 text-xs font-bold text-neutral-900 dark:text-neutral-100 hover:bg-brand-50 dark:hover:bg-neutral-800/80 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-colors flex items-center justify-between group"
+                              onClick={() => setIsCategoryOpen(false)}
+                            >
+                              <span className="flex items-center gap-2.5 truncate">
+                                <span className="text-base shrink-0">{cat.icon || '📁'}</span>
+                                <span className="truncate">{cat.name}</span>
                               </span>
+                              {subs.length > 0 && (
+                                <span className="text-[10px] font-semibold text-neutral-400 dark:text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full shrink-0 group-hover:bg-brand-100 dark:group-hover:bg-brand-950/60 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                                  {subs.length} {subs.length === 1 ? 'sub' : 'subs'}
+                                </span>
+                              )}
+                            </Link>
+
+                            {/* Subcategories Inside / Under the Main Category */}
+                            {subs.length > 0 && (
+                              <div className="pl-6 pr-2 py-1 space-y-0.5 border-l-2 border-brand-100 dark:border-neutral-800 ml-4.5">
+                                {subs.map((sub) => (
+                                  <Link
+                                    key={sub.id}
+                                    href={`/category/${sub.slug}`}
+                                    className="px-2.5 py-1.5 text-[11px] font-medium text-neutral-600 dark:text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 rounded-lg flex items-center gap-2 transition-colors truncate"
+                                    onClick={() => setIsCategoryOpen(false)}
+                                  >
+                                    <span className="text-xs shrink-0">{sub.icon || '🏷️'}</span>
+                                    <span className="truncate">{sub.name}</span>
+                                  </Link>
+                                ))}
+                              </div>
                             )}
-                          </Link>
-                          {cat.subcategories && cat.subcategories.length > 0 && (
-                            <div className="pl-6 pr-2 py-0.5 space-y-0.5 border-l-2 border-neutral-100 dark:border-neutral-800 ml-4">
-                              {cat.subcategories.map((sub) => (
-                                <Link
-                                  key={sub.id}
-                                  href={`/category/${sub.slug}`}
-                                  className="px-2.5 py-1 text-[11px] text-neutral-500 dark:text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 rounded-lg flex items-center gap-1.5 transition-colors"
-                                  onClick={() => setIsCategoryOpen(false)}
-                                >
-                                  <span>{sub.icon || '🏷️'}</span>
-                                  <span>{sub.name}</span>
-                                </Link>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))
+                          </div>
+                        );
+                      })
                   ) : (
-                    <div className="px-4 py-2 text-xs text-neutral-400 dark:text-neutral-500">Loading categories...</div>
+                    <div className="px-4 py-3 text-xs text-neutral-400 dark:text-neutral-500 text-center">Loading categories...</div>
                   )}
                 </div>
               )}
@@ -263,7 +278,7 @@ export default function Header() {
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-4 pt-3 pb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="lg:hidden bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-4 pt-3 pb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150 max-h-[85vh] overflow-y-auto">
           
           {/* Mobile Quick Actions Bar */}
           <div className="flex items-center justify-end pb-3 border-b border-neutral-100 dark:border-neutral-800 sm:hidden">
@@ -336,21 +351,57 @@ export default function Header() {
             </Link>
           </div>
 
-          <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
-            <div className="px-3 py-1 font-extrabold text-[10px] text-neutral-400 uppercase tracking-wider">
-              Popular Categories
+          {/* Mobile Categories Accordion / Nested List */}
+          <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
+            <div className="px-3 py-1 font-extrabold text-[11px] text-neutral-400 uppercase tracking-wider flex items-center justify-between">
+              <span>Categories & Subcategories</span>
             </div>
-            <div className="grid grid-cols-2 gap-1 px-1">
-              {categories.slice(0, 8).map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/category/${cat.slug}`}
-                  className="px-2.5 py-1.5 text-xs text-neutral-600 dark:text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {cat.name}
-                </Link>
-              ))}
+            <div className="space-y-1.5">
+              {categories.filter((c) => !c.parentId).map((cat) => {
+                const rawSubs = [
+                  ...(cat.subcategories || []),
+                  ...categories.filter((c) => c.parentId === cat.id),
+                ];
+                const subs = Array.from(
+                  new Map(rawSubs.map((s) => [s.id, s])).values()
+                );
+
+                return (
+                  <div key={cat.id} className="rounded-xl bg-neutral-50/80 dark:bg-neutral-800/40 p-2 space-y-1">
+                    <Link
+                      href={`/category/${cat.slug}`}
+                      className="px-2 py-1 text-xs font-bold text-neutral-900 dark:text-white flex items-center justify-between hover:text-brand-600 dark:hover:text-brand-400"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>{cat.icon || '📁'}</span>
+                        <span>{cat.name}</span>
+                      </span>
+                      {subs.length > 0 && (
+                        <span className="text-[10px] text-neutral-400 font-normal">
+                          {subs.length} sub{subs.length > 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </Link>
+
+                    {subs.length > 0 && (
+                      <div className="pl-4 pr-1 py-1 space-y-1 border-l-2 border-neutral-200 dark:border-neutral-700 ml-2">
+                        {subs.map((sub) => (
+                          <Link
+                            key={sub.id}
+                            href={`/category/${sub.slug}`}
+                            className="px-2 py-1 text-[11px] text-neutral-600 dark:text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400 block rounded transition-colors truncate"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            <span className="mr-1.5">{sub.icon || '🏷️'}</span>
+                            <span>{sub.name}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
