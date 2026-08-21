@@ -83,9 +83,9 @@ export default async function CategoryPage({ params }: { params: { slug: string 
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight flex items-center gap-3">
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-white dark:text-white tracking-tight flex items-center gap-3">
             {category.icon && <span className="text-3xl sm:text-4xl">{category.icon}</span>}
-            <span>{category.name}</span>
+            <span className="text-white dark:text-white">{category.name}</span>
           </h1>
 
           {category.description && (

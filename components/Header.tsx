@@ -25,6 +25,11 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [siteName, setSiteName] = useState('TechPulse');
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
+
+  const toggleCategory = (id: string) => {
+    setExpandedCategoryId((prev) => (prev === id ? null : id));
+  };
 
   useEffect(() => {
     // Fetch categories & site settings
@@ -175,40 +180,80 @@ export default function Header() {
                         const subs = Array.from(
                           new Map(rawSubs.map((s) => [s.id, s])).values()
                         );
+                        const isExpanded = expandedCategoryId === cat.id;
 
                         return (
                           <div key={cat.id} className="pt-1.5 first:pt-0 space-y-1">
-                            {/* Main Category Link / Header */}
-                            <Link
-                              href={`/category/${cat.slug}`}
-                              className="px-3 py-2 text-xs font-bold text-neutral-900 dark:text-neutral-100 hover:bg-brand-50 dark:hover:bg-neutral-800/80 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-colors flex items-center justify-between group"
-                              onClick={() => setIsCategoryOpen(false)}
-                            >
-                              <span className="flex items-center gap-2.5 truncate">
-                                <span className="text-base shrink-0">{cat.icon || '📁'}</span>
-                                <span className="truncate">{cat.name}</span>
-                              </span>
-                              {subs.length > 0 && (
-                                <span className="text-[10px] font-semibold text-neutral-400 dark:text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full shrink-0 group-hover:bg-brand-100 dark:group-hover:bg-brand-950/60 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
-                                  {subs.length} {subs.length === 1 ? 'sub' : 'subs'}
+                            {/* Main Category Link / Accordion Header */}
+                            {subs.length > 0 ? (
+                              <button
+                                type="button"
+                                onClick={() => toggleCategory(cat.id)}
+                                aria-expanded={isExpanded}
+                                className="w-full text-left px-3 py-2 text-xs font-bold text-neutral-900 dark:text-neutral-100 hover:bg-brand-50 dark:hover:bg-neutral-800/80 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-colors flex items-center justify-between group cursor-pointer"
+                              >
+                                <span className="flex items-center gap-2.5 truncate">
+                                  <span className="text-base shrink-0">{cat.icon || '📁'}</span>
+                                  <span className="truncate">{cat.name}</span>
                                 </span>
-                              )}
-                            </Link>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <span className="text-[10px] font-semibold text-neutral-400 dark:text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full group-hover:bg-brand-100 dark:group-hover:bg-brand-950/60 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                                    {subs.length} {subs.length === 1 ? 'sub' : 'subs'}
+                                  </span>
+                                  <ChevronDown
+                                    className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                                      isExpanded
+                                        ? 'rotate-180 text-brand-600 dark:text-brand-400'
+                                        : 'text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300'
+                                    }`}
+                                  />
+                                </div>
+                              </button>
+                            ) : (
+                              <Link
+                                href={`/category/${cat.slug}`}
+                                className="w-full text-left px-3 py-2 text-xs font-bold text-neutral-900 dark:text-neutral-100 hover:bg-brand-50 dark:hover:bg-neutral-800/80 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-colors flex items-center justify-between group"
+                                onClick={() => setIsCategoryOpen(false)}
+                              >
+                                <span className="flex items-center gap-2.5 truncate">
+                                  <span className="text-base shrink-0">{cat.icon || '📁'}</span>
+                                  <span className="truncate">{cat.name}</span>
+                                </span>
+                              </Link>
+                            )}
 
-                            {/* Subcategories Inside / Under the Main Category */}
+                            {/* Subcategories with Smooth Expand/Collapse Animation */}
                             {subs.length > 0 && (
-                              <div className="pl-6 pr-2 py-1 space-y-0.5 border-l-2 border-brand-100 dark:border-neutral-800 ml-4.5">
-                                {subs.map((sub) => (
-                                  <Link
-                                    key={sub.id}
-                                    href={`/category/${sub.slug}`}
-                                    className="px-2.5 py-1.5 text-[11px] font-medium text-neutral-600 dark:text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 rounded-lg flex items-center gap-2 transition-colors truncate"
-                                    onClick={() => setIsCategoryOpen(false)}
-                                  >
-                                    <span className="text-xs shrink-0">{sub.icon || '🏷️'}</span>
-                                    <span className="truncate">{sub.name}</span>
-                                  </Link>
-                                ))}
+                              <div
+                                className={`grid transition-all duration-300 ease-in-out ${
+                                  isExpanded
+                                    ? 'grid-rows-[1fr] opacity-100'
+                                    : 'grid-rows-[0fr] opacity-0'
+                                }`}
+                              >
+                                <div className="overflow-hidden">
+                                  <div className="pl-6 pr-2 py-1 space-y-0.5 border-l-2 border-brand-100 dark:border-neutral-800 ml-4.5">
+                                    <Link
+                                      href={`/category/${cat.slug}`}
+                                      className="px-2.5 py-1.5 text-[11px] font-semibold text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/40 rounded-lg flex items-center gap-2 transition-colors truncate"
+                                      onClick={() => setIsCategoryOpen(false)}
+                                    >
+                                      <span className="text-xs shrink-0">✨</span>
+                                      <span className="truncate">All {cat.name}</span>
+                                    </Link>
+                                    {subs.map((sub) => (
+                                      <Link
+                                        key={sub.id}
+                                        href={`/category/${sub.slug}`}
+                                        className="px-2.5 py-1.5 text-[11px] font-medium text-neutral-600 dark:text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 rounded-lg flex items-center gap-2 transition-colors truncate"
+                                        onClick={() => setIsCategoryOpen(false)}
+                                      >
+                                        <span className="text-xs shrink-0">{sub.icon || '🏷️'}</span>
+                                        <span className="truncate">{sub.name}</span>
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </div>
                               </div>
                             )}
                           </div>
@@ -365,38 +410,74 @@ export default function Header() {
                 const subs = Array.from(
                   new Map(rawSubs.map((s) => [s.id, s])).values()
                 );
+                const isExpanded = expandedCategoryId === cat.id;
 
                 return (
                   <div key={cat.id} className="rounded-xl bg-neutral-50/80 dark:bg-neutral-800/40 p-2 space-y-1">
-                    <Link
-                      href={`/category/${cat.slug}`}
-                      className="px-2 py-1 text-xs font-bold text-neutral-900 dark:text-white flex items-center justify-between hover:text-brand-600 dark:hover:text-brand-400"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <span className="flex items-center gap-2">
-                        <span>{cat.icon || '📁'}</span>
-                        <span>{cat.name}</span>
-                      </span>
-                      {subs.length > 0 && (
-                        <span className="text-[10px] text-neutral-400 font-normal">
-                          {subs.length} sub{subs.length > 1 ? 's' : ''}
+                    {subs.length > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => toggleCategory(cat.id)}
+                        aria-expanded={isExpanded}
+                        className="w-full text-left px-2 py-1 text-xs font-bold text-neutral-900 dark:text-white flex items-center justify-between hover:text-brand-600 dark:hover:text-brand-400 cursor-pointer"
+                      >
+                        <span className="flex items-center gap-2 truncate">
+                          <span className="text-sm shrink-0">{cat.icon || '📁'}</span>
+                          <span className="truncate">{cat.name}</span>
                         </span>
-                      )}
-                    </Link>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            {subs.length} sub{subs.length > 1 ? 's' : ''}
+                          </span>
+                          <ChevronDown
+                            className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                              isExpanded ? 'rotate-180 text-brand-600 dark:text-brand-400' : 'text-neutral-400'
+                            }`}
+                          />
+                        </div>
+                      </button>
+                    ) : (
+                      <Link
+                        href={`/category/${cat.slug}`}
+                        className="px-2 py-1 text-xs font-bold text-neutral-900 dark:text-white flex items-center justify-between hover:text-brand-600 dark:hover:text-brand-400"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <span className="flex items-center gap-2 truncate">
+                          <span className="text-sm shrink-0">{cat.icon || '📁'}</span>
+                          <span className="truncate">{cat.name}</span>
+                        </span>
+                      </Link>
+                    )}
 
                     {subs.length > 0 && (
-                      <div className="pl-4 pr-1 py-1 space-y-1 border-l-2 border-neutral-200 dark:border-neutral-700 ml-2">
-                        {subs.map((sub) => (
-                          <Link
-                            key={sub.id}
-                            href={`/category/${sub.slug}`}
-                            className="px-2 py-1 text-[11px] text-neutral-600 dark:text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400 block rounded transition-colors truncate"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            <span className="mr-1.5">{sub.icon || '🏷️'}</span>
-                            <span>{sub.name}</span>
-                          </Link>
-                        ))}
+                      <div
+                        className={`grid transition-all duration-300 ease-in-out ${
+                          isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                        }`}
+                      >
+                        <div className="overflow-hidden">
+                          <div className="pl-4 pr-1 py-1 space-y-1 border-l-2 border-neutral-200 dark:border-neutral-700 ml-2">
+                            <Link
+                              href={`/category/${cat.slug}`}
+                              className="px-2 py-1 text-[11px] font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-600 dark:hover:text-brand-400 block rounded transition-colors truncate"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              <span className="mr-1.5">✨</span>
+                              <span>All {cat.name}</span>
+                            </Link>
+                            {subs.map((sub) => (
+                              <Link
+                                key={sub.id}
+                                href={`/category/${sub.slug}`}
+                                className="px-2 py-1 text-[11px] text-neutral-600 dark:text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400 block rounded transition-colors truncate"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                              >
+                                <span className="mr-1.5">{sub.icon || '🏷️'}</span>
+                                <span>{sub.name}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
