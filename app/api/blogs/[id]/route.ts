@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
+import { safeJsonParse } from '@/lib/utils';
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -16,6 +17,19 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 }
 
+function sanitizeJson(val: any) {
+  if (val === undefined) return undefined;
+  if (val === null) return null;
+  if (typeof val === 'string') {
+    const parsed = safeJsonParse(val, null);
+    if (parsed !== null && typeof parsed === 'object') {
+      return JSON.stringify(parsed);
+    }
+    return val;
+  }
+  return JSON.stringify(val);
+}
+
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
     const body = await request.json();
@@ -29,12 +43,13 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     delete updateData.product;
     delete updateData.comments;
 
-    if (typeof updateData.specifications === 'object') updateData.specifications = JSON.stringify(updateData.specifications);
-    if (typeof updateData.features === 'object') updateData.features = JSON.stringify(updateData.features);
-    if (typeof updateData.pros === 'object') updateData.pros = JSON.stringify(updateData.pros);
-    if (typeof updateData.cons === 'object') updateData.cons = JSON.stringify(updateData.cons);
-    if (typeof updateData.faqs === 'object') updateData.faqs = JSON.stringify(updateData.faqs);
-    if (typeof updateData.tags === 'object') updateData.tags = JSON.stringify(updateData.tags);
+    if (updateData.specifications !== undefined) updateData.specifications = sanitizeJson(updateData.specifications);
+    if (updateData.features !== undefined) updateData.features = sanitizeJson(updateData.features);
+    if (updateData.pros !== undefined) updateData.pros = sanitizeJson(updateData.pros);
+    if (updateData.cons !== undefined) updateData.cons = sanitizeJson(updateData.cons);
+    if (updateData.faqs !== undefined) updateData.faqs = sanitizeJson(updateData.faqs);
+    if (updateData.tags !== undefined) updateData.tags = sanitizeJson(updateData.tags);
+    if (updateData.marketplaces !== undefined) updateData.marketplaces = sanitizeJson(updateData.marketplaces);
 
     const updatedBlog = await db.blog.update({
       where: { id: params.id },
@@ -63,12 +78,13 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     delete updateData.product;
     delete updateData.comments;
 
-    if (typeof updateData.specifications === 'object') updateData.specifications = JSON.stringify(updateData.specifications);
-    if (typeof updateData.features === 'object') updateData.features = JSON.stringify(updateData.features);
-    if (typeof updateData.pros === 'object') updateData.pros = JSON.stringify(updateData.pros);
-    if (typeof updateData.cons === 'object') updateData.cons = JSON.stringify(updateData.cons);
-    if (typeof updateData.faqs === 'object') updateData.faqs = JSON.stringify(updateData.faqs);
-    if (typeof updateData.tags === 'object') updateData.tags = JSON.stringify(updateData.tags);
+    if (updateData.specifications !== undefined) updateData.specifications = sanitizeJson(updateData.specifications);
+    if (updateData.features !== undefined) updateData.features = sanitizeJson(updateData.features);
+    if (updateData.pros !== undefined) updateData.pros = sanitizeJson(updateData.pros);
+    if (updateData.cons !== undefined) updateData.cons = sanitizeJson(updateData.cons);
+    if (updateData.faqs !== undefined) updateData.faqs = sanitizeJson(updateData.faqs);
+    if (updateData.tags !== undefined) updateData.tags = sanitizeJson(updateData.tags);
+    if (updateData.marketplaces !== undefined) updateData.marketplaces = sanitizeJson(updateData.marketplaces);
 
     const updatedBlog = await db.blog.update({
       where: { id: params.id },

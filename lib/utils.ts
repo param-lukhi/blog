@@ -15,11 +15,50 @@ export function slugify(text: string): string {
     .replace(/\-\-+/g, '-');      // Replace multiple - with single -
 }
 
-export function safeJsonParse<T>(str: string | null | undefined, fallback: T): T {
-  if (!str) return fallback;
+export function safeJsonParse<T>(val: any, fallback: T): T {
+  if (val === null || val === undefined || val === '') return fallback;
+  if (typeof val !== 'string') {
+    return val as T;
+  }
+
   try {
-    return JSON.parse(str) as T;
+    let parsed = JSON.parse(val);
+    let safetyCounter = 0;
+    while (typeof parsed === 'string' && safetyCounter < 5) {
+      safetyCounter++;
+      try {
+        const next = JSON.parse(parsed);
+        parsed = next;
+      } catch {
+        break;
+      }
+    }
+
+    if (parsed === null || parsed === undefined) {
+      return fallback;
+    }
+
+    if (Array.isArray(fallback) && !Array.isArray(parsed)) {
+      if (typeof parsed === 'string' && parsed.trim()) {
+        return parsed.split(',').map((s: string) => s.trim()).filter(Boolean) as unknown as T;
+      }
+      return fallback;
+    }
+
+    if (
+      fallback !== null &&
+      typeof fallback === 'object' &&
+      !Array.isArray(fallback) &&
+      (typeof parsed !== 'object' || Array.isArray(parsed))
+    ) {
+      return fallback;
+    }
+
+    return parsed as T;
   } catch (e) {
+    if (Array.isArray(fallback) && typeof val === 'string' && val.trim()) {
+      return val.split(',').map((s: string) => s.trim()).filter(Boolean) as unknown as T;
+    }
     return fallback;
   }
 }

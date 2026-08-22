@@ -2,9 +2,21 @@ import { NextResponse } from 'next/server';
 import { generateFullProductAndBlog, extractAsin } from '@/lib/amazon-generator';
 import { db } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
-import { slugify } from '@/lib/utils';
+import { slugify, safeJsonParse } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
+
+function sanitizeJson(val: any, fallback: any = {}) {
+  if (val === undefined || val === null) return JSON.stringify(fallback);
+  if (typeof val === 'string') {
+    const parsed = safeJsonParse(val, null);
+    if (parsed !== null && typeof parsed === 'object') {
+      return JSON.stringify(parsed);
+    }
+    return val;
+  }
+  return JSON.stringify(val);
+}
 
 export async function POST(request: Request) {
   try {
@@ -117,15 +129,15 @@ export async function POST(request: Request) {
           name: draft.title.replace(/\s+Review:.*$/i, '').trim() || draft.title,
           brand: draft.brand,
           price: draft.price,
-          images: JSON.stringify(draft.images && draft.images.length > 0 ? draft.images : [draft.featuredImage]),
+          images: sanitizeJson(draft.images && draft.images.length > 0 ? draft.images : [draft.featuredImage], []),
           amazonUrl: draft.amazonUrl,
           affiliateUrl: draft.affiliateUrl,
-          marketplaces: JSON.stringify(draft.marketplaces || {}),
+          marketplaces: sanitizeJson(draft.marketplaces || {}, {}),
           categoryId: category.id,
-          specifications: JSON.stringify(draft.specifications),
-          features: JSON.stringify(draft.features),
-          pros: JSON.stringify(draft.pros),
-          cons: JSON.stringify(draft.cons),
+          specifications: sanitizeJson(draft.specifications, {}),
+          features: sanitizeJson(draft.features, []),
+          pros: sanitizeJson(draft.pros, []),
+          cons: sanitizeJson(draft.cons, []),
           status: itemStatus,
         },
       });
@@ -143,15 +155,15 @@ export async function POST(request: Request) {
           slug: productSlug,
           brand: draft.brand,
           price: draft.price,
-          images: JSON.stringify(draft.images && draft.images.length > 0 ? draft.images : [draft.featuredImage]),
+          images: sanitizeJson(draft.images && draft.images.length > 0 ? draft.images : [draft.featuredImage], []),
           amazonUrl: draft.amazonUrl,
           affiliateUrl: draft.affiliateUrl,
-          marketplaces: JSON.stringify(draft.marketplaces || {}),
+          marketplaces: sanitizeJson(draft.marketplaces || {}, {}),
           categoryId: category.id,
-          specifications: JSON.stringify(draft.specifications),
-          features: JSON.stringify(draft.features),
-          pros: JSON.stringify(draft.pros),
-          cons: JSON.stringify(draft.cons),
+          specifications: sanitizeJson(draft.specifications, {}),
+          features: sanitizeJson(draft.features, []),
+          pros: sanitizeJson(draft.pros, []),
+          cons: sanitizeJson(draft.cons, []),
           isFeatured: false,
           isTrending: true,
           isDeal: false,
@@ -183,18 +195,18 @@ export async function POST(request: Request) {
           metaDescription: draft.metaDescription,
           featuredImage: draft.featuredImage,
           content: draft.content,
-          specifications: JSON.stringify(draft.specifications),
-          features: JSON.stringify(draft.features),
-          pros: JSON.stringify(draft.pros),
-          cons: JSON.stringify(draft.cons),
-          faqs: JSON.stringify(draft.faqs),
+          specifications: sanitizeJson(draft.specifications, {}),
+          features: sanitizeJson(draft.features, []),
+          pros: sanitizeJson(draft.pros, []),
+          cons: sanitizeJson(draft.cons, []),
+          faqs: sanitizeJson(draft.faqs, []),
           conclusion: draft.conclusion,
           amazonUrl: draft.amazonUrl,
           affiliateUrl: draft.affiliateUrl,
-          marketplaces: JSON.stringify(draft.marketplaces || {}),
+          marketplaces: sanitizeJson(draft.marketplaces || {}, {}),
           categoryId: category.id,
           productId: createdProduct.id,
-          tags: JSON.stringify(draft.tags),
+          tags: sanitizeJson(draft.tags, []),
           status: itemStatus,
         },
       });
@@ -213,18 +225,18 @@ export async function POST(request: Request) {
           metaDescription: draft.metaDescription,
           featuredImage: draft.featuredImage,
           content: draft.content,
-          specifications: JSON.stringify(draft.specifications),
-          features: JSON.stringify(draft.features),
-          pros: JSON.stringify(draft.pros),
-          cons: JSON.stringify(draft.cons),
-          faqs: JSON.stringify(draft.faqs),
+          specifications: sanitizeJson(draft.specifications, {}),
+          features: sanitizeJson(draft.features, []),
+          pros: sanitizeJson(draft.pros, []),
+          cons: sanitizeJson(draft.cons, []),
+          faqs: sanitizeJson(draft.faqs, []),
           conclusion: draft.conclusion,
           amazonUrl: draft.amazonUrl,
           affiliateUrl: draft.affiliateUrl,
-          marketplaces: JSON.stringify(draft.marketplaces || {}),
+          marketplaces: sanitizeJson(draft.marketplaces || {}, {}),
           categoryId: category.id,
           productId: createdProduct.id,
-          tags: JSON.stringify(draft.tags),
+          tags: sanitizeJson(draft.tags, []),
           status: itemStatus,
         },
       });

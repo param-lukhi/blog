@@ -352,7 +352,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
                   {Object.entries(specifications).map(([key, val]) => (
                     <tr key={key} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
                       <td className="py-3 px-4 font-medium text-neutral-600 dark:text-neutral-400 whitespace-nowrap">{key}</td>
-                      <td className="py-3 px-4 font-bold text-neutral-900 dark:text-white break-words">{val}</td>
+                      <td className="py-3 px-4 font-bold text-neutral-900 dark:text-white break-words">{typeof val === 'object' ? JSON.stringify(val) : String(val ?? '')}</td>
                     </tr>
                   ))}
                 </tbody>

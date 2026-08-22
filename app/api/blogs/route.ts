@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
+import { safeJsonParse } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,6 +75,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required blog fields' }, { status: 400 });
     }
 
+    const sanitizeJson = (val: any, fallback: any) => {
+      if (val === undefined || val === null) return JSON.stringify(fallback);
+      if (typeof val === 'string') {
+        const parsed = safeJsonParse(val, null);
+        if (parsed !== null && typeof parsed === 'object') {
+          return JSON.stringify(parsed);
+        }
+        return val;
+      }
+      return JSON.stringify(val);
+    };
+
     const blog = await db.blog.create({
       data: {
         title,
@@ -82,17 +95,17 @@ export async function POST(request: Request) {
         metaDescription: metaDescription || '',
         featuredImage: featuredImage || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&auto=format&fit=crop&q=80',
         content,
-        specifications: typeof specifications === 'string' ? specifications : JSON.stringify(specifications || {}),
-        features: typeof features === 'string' ? features : JSON.stringify(features || []),
-        pros: typeof pros === 'string' ? pros : JSON.stringify(pros || []),
-        cons: typeof cons === 'string' ? cons : JSON.stringify(cons || []),
-        faqs: typeof faqs === 'string' ? faqs : JSON.stringify(faqs || []),
+        specifications: sanitizeJson(specifications, {}),
+        features: sanitizeJson(features, []),
+        pros: sanitizeJson(pros, []),
+        cons: sanitizeJson(cons, []),
+        faqs: sanitizeJson(faqs, []),
         conclusion: conclusion || '',
         amazonUrl,
         affiliateUrl: affiliateUrl || amazonUrl,
         categoryId,
         productId: productId || null,
-        tags: typeof tags === 'string' ? tags : JSON.stringify(tags || []),
+        tags: sanitizeJson(tags, []),
         status: status || 'PUBLISHED',
       },
     });
