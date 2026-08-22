@@ -17,7 +17,7 @@ export default function AdBanner({
   className = '',
   label = 'Advertisement',
 }: AdBannerProps) {
-  const clientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+  const clientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || 'ca-pub-6177323495001169';
 
   useEffect(() => {
     if (clientId && typeof window !== 'undefined') {
