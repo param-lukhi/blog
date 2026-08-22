@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   description: 'In-depth research-based product reviews, specifications, side-by-side comparisons, and buying guides to help you make smarter purchasing decisions.',
   keywords: ['tech reviews', 'product buying guides', 'smartphone comparisons', 'laptop guides', 'audio reviews', 'gadget deals'],
   authors: [{ name: 'TechPulse Editorial Team' }],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://techpulsereviews.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app'),
   verification: siteVerification
     ? {
         google: siteVerification,

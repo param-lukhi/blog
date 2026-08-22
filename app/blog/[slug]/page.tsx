@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   if (!blog) return {};
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techpulsereviews.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
   const pageUrl = `${siteUrl}/blog/${blog.slug}`;
   const title = blog.metaTitle || `${blog.title} | TechPulse`;
   const description = blog.metaDescription || `Read our comprehensive research-based review and buying guide for ${blog.title}.`;
@@ -132,7 +132,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
     blog.updatedAt &&
     blog.updatedAt.getTime() - blog.createdAt.getTime() > 24 * 60 * 60 * 1000;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techpulsereviews.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
   const pageUrl = `${siteUrl}/blog/${blog.slug}`;
 
   // Structured Data Schemas

@@ -170,12 +170,13 @@ export function generateFAQSchema(faqs: Array<{ question: string; answer: string
 }
 
 export function generateOrganizationSchema() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'TechPulse',
-    url: 'https://techpulsereviews.com',
-    logo: 'https://techpulsereviews.com/logo.png',
+    url: siteUrl,
+    logo: `${siteUrl}/logo.png`,
     sameAs: [
       'https://twitter.com/techpulse',
       'https://facebook.com/techpulse',

@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   if (!product) return {};
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techpulsereviews.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
   const pageUrl = `${siteUrl}/product/${product.slug}`;
   const title = `${product.name} - Price, Specs & Alternatives | TechPulse`;
   const description = `Full technical specifications, feature breakdown, and Amazon pricing for ${product.name} by ${product.brand}.`;
@@ -58,7 +58,7 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
 
   if (!product) notFound();
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techpulsereviews.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
   const pageUrl = `${siteUrl}/product/${product.slug}`;
 
   const images = safeJsonParse<string[]>(product.images, []);
