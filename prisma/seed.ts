@@ -10,12 +10,14 @@ async function main() {
   const categoriesData = [
     { name: 'Mobiles', slug: 'mobiles', description: 'Smartphones, flagship phones, and mobile accessories.', icon: 'Smartphone' },
     { name: 'Laptops', slug: 'laptops', description: 'MacBooks, Windows laptops, ultrabooks, and notebooks.', icon: 'Laptop' },
-    { name: 'TVs', slug: 'tvs', description: 'OLED, QLED, Smart 4K & 8K Televisions.', icon: 'Tv' },
-    { name: 'Earbuds', slug: 'earbuds', description: 'Wireless earbuds, noise canceling headphones, and audio.', icon: 'Headphones' },
+    { name: 'Audio & Earbuds', slug: 'earbuds', description: 'Wireless earbuds, noise canceling headphones, and audio.', icon: 'Headphones' },
     { name: 'Smart Watches', slug: 'smart-watches', description: 'Fitness trackers, Apple Watches, and smart wearables.', icon: 'Watch' },
-    { name: 'Accessories', slug: 'accessories', description: 'Chargers, power banks, cables, and tech adapters.', icon: 'Plugin' },
+    { name: 'TVs', slug: 'tvs', description: 'OLED, QLED, Smart 4K & 8K Televisions.', icon: 'Tv' },
     { name: 'Gaming', slug: 'gaming', description: 'Consoles, gaming laptops, mice, keyboards, and VR headsets.', icon: 'Gamepad2' },
-    { name: 'Home & Kitchen', slug: 'home-kitchen', description: 'Furniture, decor, smart home gear, and living essentials.', icon: 'Home' },
+    { name: 'Home & Kitchen', slug: 'home-kitchen', description: 'Smart home gear, robotic vacuums, and living essentials.', icon: 'Home' },
+    { name: 'Accessories', slug: 'accessories', description: 'Chargers, power banks, cables, and tech adapters.', icon: 'Plugin' },
+    { name: 'Personal Care', slug: 'personal-care', description: 'Grooming tools, smart toothbrushes, and health tech.', icon: 'Sparkles' },
+    { name: 'AI & Technology', slug: 'ai-technology', description: 'AI productivity tools, gadgets, and tech explainers.', icon: 'Cpu' },
   ];
 
   for (const cat of categoriesData) {
@@ -73,10 +75,10 @@ async function main() {
   // 4. Seed Default Settings
   const settingsData = [
     { key: 'site_name', value: 'TechPulse Reviews' },
-    { key: 'site_tagline', value: 'Honest, Expert Product Reviews & Unbiased Buying Guides' },
+    { key: 'site_tagline', value: 'Research-Based Product Reviews & Unbiased Buying Guides' },
     { key: 'site_logo', value: 'TechPulse' },
-    { key: 'hero_title', value: 'The Best Products, Tested & Reviewed by Experts' },
-    { key: 'hero_subtitle', value: 'We buy, test, and analyze thousands of products so you can buy with total confidence.' },
+    { key: 'hero_title', value: 'Research-Based Product Reviews & Buying Guides' },
+    { key: 'hero_subtitle', value: 'We research product specifications, pricing, user feedback, features, and available product information to help you make smarter buying decisions.' },
     { key: 'hero_button_text', value: 'Browse Latest Reviews' },
     { key: 'default_currency', value: 'USD' },
     { key: 'enable_auto_currency', value: 'true' },

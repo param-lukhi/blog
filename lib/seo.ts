@@ -1,9 +1,67 @@
+export interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+export function generateBreadcrumbSchema(items: BreadcrumbItem[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
+
+export interface ArticleSchemaProps {
+  title: string;
+  description: string;
+  image: string;
+  url: string;
+  datePublished: string;
+  dateModified?: string;
+  authorName?: string;
+  publisherName?: string;
+  publisherLogo?: string;
+}
+
+export function generateArticleSchema(a: ArticleSchemaProps) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: a.title,
+    description: a.description,
+    image: a.image ? [a.image] : [],
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': a.url,
+    },
+    datePublished: a.datePublished,
+    dateModified: a.dateModified || a.datePublished,
+    author: {
+      '@type': 'Person',
+      name: a.authorName || 'TechPulse Editorial Team',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: a.publisherName || 'TechPulse Reviews',
+      logo: {
+        '@type': 'ImageObject',
+        url: a.publisherLogo || 'https://techpulsereviews.com/logo.png',
+      },
+    },
+  };
+}
+
 export interface ProductSchemaProps {
   name: string;
   description: string;
   image: string;
   brand: string;
-  price: string;
+  price?: string;
   currency?: string;
   url: string;
   ratingValue?: number;
@@ -11,31 +69,40 @@ export interface ProductSchemaProps {
 }
 
 export function generateProductSchema(p: ProductSchemaProps) {
-  const cleanPrice = p.price.replace(/[^0-9.]/g, '') || '999';
+  const cleanPrice = p.price ? p.price.replace(/[^0-9.]/g, '') : undefined;
 
-  return {
+  const schema: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: p.name,
     description: p.description,
-    image: p.image,
+    image: p.image ? [p.image] : [],
     brand: {
       '@type': 'Brand',
       name: p.brand,
     },
-    offers: {
+  };
+
+  if (cleanPrice && cleanPrice !== '') {
+    schema.offers = {
       '@type': 'Offer',
       price: cleanPrice,
       priceCurrency: p.currency || 'USD',
       availability: 'https://schema.org/InStock',
       url: p.url,
-    },
-    aggregateRating: {
+    };
+  }
+
+  // Only include aggregateRating if genuine ratings are provided
+  if (p.ratingValue && p.ratingValue > 0 && p.reviewCount && p.reviewCount > 0) {
+    schema.aggregateRating = {
       '@type': 'AggregateRating',
-      ratingValue: p.ratingValue || 4.8,
-      reviewCount: p.reviewCount || 124,
-    },
-  };
+      ratingValue: p.ratingValue,
+      reviewCount: p.reviewCount,
+    };
+  }
+
+  return schema;
 }
 
 export interface ReviewSchemaProps {
@@ -52,7 +119,7 @@ export interface ReviewSchemaProps {
 }
 
 export function generateReviewSchema(r: ReviewSchemaProps) {
-  return {
+  const schema: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'Review',
     name: r.title,
@@ -71,16 +138,23 @@ export function generateReviewSchema(r: ReviewSchemaProps) {
         name: r.itemReviewed.brand,
       },
     },
-    reviewRating: {
+  };
+
+  // Only add reviewRating when a genuine rating value is supplied
+  if (r.ratingValue && r.ratingValue > 0) {
+    schema.reviewRating = {
       '@type': 'Rating',
-      ratingValue: r.ratingValue || 4.9,
+      ratingValue: r.ratingValue,
       bestRating: 5,
       worstRating: 1,
-    },
-  };
+    };
+  }
+
+  return schema;
 }
 
 export function generateFAQSchema(faqs: Array<{ question: string; answer: string }>) {
+  if (!faqs || faqs.length === 0) return null;
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',

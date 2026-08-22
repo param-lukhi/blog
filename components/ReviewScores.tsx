@@ -99,10 +99,10 @@ export default function ReviewScores({ scoresData }: ReviewScoresProps) {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-neutral-100 dark:border-neutral-800">
         <div>
           <span className="text-xs font-extrabold uppercase tracking-wider text-brand-600 dark:text-brand-400">
-            TechPulse Test Bench Ratings
+            TechPulse Evaluation Breakdown
           </span>
           <h3 className="text-xl font-bold text-neutral-900 dark:text-white mt-1">
-            Performance Breakdown & Benchmark Ratings
+            Feature Breakdown & Rating Analysis
           </h3>
         </div>
 

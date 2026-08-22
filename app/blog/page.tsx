@@ -8,8 +8,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata = {
-  title: 'All Product Reviews & Tech Guides - TechPulse',
-  description: 'Explore in-depth, hands-on tech reviews, buying guides, and expert benchmark testing for smartphones, laptops, TVs, and gadgets.',
+  title: 'Product Reviews, Buying Guides & Tech Articles - TechPulse',
+  description: 'Explore in-depth product reviews, buying guides, specification breakdowns, and comparison guides for smartphones, laptops, audio gear, and gadgets.',
 };
 
 export default async function BlogListPage() {
@@ -33,10 +33,10 @@ export default async function BlogListPage() {
             <BookOpen className="w-4 h-4 text-brand-600 dark:text-brand-400" /> Editorial Reviews & Guides
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
-            Latest Hands-on Product Reviews
+            Research-Based Product Reviews & Guides
           </h1>
           <p className="text-base text-neutral-600 dark:text-neutral-400">
-            Unbiased testing, camera samples, performance benchmarks, and Amazon price drop recommendations.
+            In-depth specification analysis, verified user feedback synthesis, pros & cons, and curated buying recommendations.
           </p>
         </div>
 

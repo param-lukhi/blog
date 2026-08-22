@@ -7,17 +7,17 @@ import { MARKETPLACE_LIST } from '@/lib/location';
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Record<string, string>>({
     site_name: 'TechPulse Reviews',
-    site_tagline: 'Honest, Expert Product Reviews & Unbiased Buying Guides',
-    hero_title: 'The Best Products, Tested & Reviewed by Experts',
-    hero_subtitle: 'We buy, test, and analyze thousands of products so you can buy with total confidence.',
+    site_tagline: 'Research-Based Product Reviews & Unbiased Buying Guides',
+    hero_title: 'Research-Based Product Reviews & Buying Guides',
+    hero_subtitle: 'We research product specifications, pricing, user feedback, features, and available product information to help you make smarter buying decisions.',
     hero_button_text: 'Browse Latest Reviews',
-    default_currency: 'INR',
+    default_currency: 'USD',
     enable_auto_currency: 'true',
     enable_multi_country: 'true',
-    default_marketplace: 'Amazon.in',
-    affiliate_tag: 'techpulsein-20',
-    ga_id: 'G-MEASUREMENT_ID',
-    google_site_verification: 'VERIFICATION_TOKEN',
+    default_marketplace: 'amazon.com',
+    affiliate_tag: 'techpulse-20',
+    ga_id: '',
+    google_site_verification: '',
   });
 
   const [saving, setSaving] = useState(false);

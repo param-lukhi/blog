@@ -223,6 +223,7 @@ export default function ComparisonsPage() {
                       productId={p1.id}
                       marketplaces={p1.marketplaces}
                       size="sm"
+                      text={`Check ${p1.brand || 'Device 1'} Price`}
                       className="w-full justify-center py-2.5 text-xs font-extrabold"
                     />
                   </div>
@@ -279,6 +280,7 @@ export default function ComparisonsPage() {
                       productId={p2.id}
                       marketplaces={p2.marketplaces}
                       size="sm"
+                      text={`Check ${p2.brand || 'Device 2'} Price`}
                       className="w-full justify-center py-2.5 text-xs font-extrabold"
                     />
                   </div>
@@ -319,18 +321,12 @@ export default function ComparisonsPage() {
                       <div className="text-xs font-bold text-purple-600 dark:text-purple-400 truncate">
                         {p2.name}:
                       </div>
-                      {p2Pros.length > 0 ? (
-                        <div className="space-y-1">
-                          {p2Pros.map((pro: string, i: number) => (
-                            <div key={i} className="flex items-start gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                              <Check className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                              <span className="break-words">{pro}</span>
-                            </div>
-                          ))}
+                      {p2Pros.map((pro: string, i: number) => (
+                        <div key={i} className="flex items-start gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                          <Check className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                          <span className="break-words">{pro}</span>
                         </div>
-                      ) : (
-                        <span className="text-xs text-neutral-400">Standard features</span>
-                      )}
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -441,6 +437,7 @@ export default function ComparisonsPage() {
                       productId={p1.id}
                       marketplaces={p1.marketplaces}
                       size="sm"
+                      text={`Check ${p1.brand || 'Device 1'} Price`}
                     />
                   </div>
                   <div className="space-y-3 px-3">
@@ -467,6 +464,7 @@ export default function ComparisonsPage() {
                       productId={p2.id}
                       marketplaces={p2.marketplaces}
                       size="sm"
+                      text={`Check ${p2.brand || 'Device 2'} Price`}
                     />
                   </div>
                 </div>

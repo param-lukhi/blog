@@ -6,13 +6,35 @@ import { ShieldCheck, Mail, Send, CheckCircle2, Twitter, Facebook, Instagram, Yo
 
 export default function Footer() {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
-      setSubscribed(true);
-      setEmail('');
+    if (!email.trim() || !email.includes('@')) {
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+    setLoading(true);
+    setErrorMsg('');
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      if (res.ok) {
+        setSubscribed(true);
+        setEmail('');
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setErrorMsg(data.error || 'Subscription failed. Please try again.');
+      }
+    } catch {
+      setErrorMsg('Network error. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -20,7 +42,7 @@ export default function Footer() {
     { name: 'Mobiles', slug: 'mobiles' },
     { name: 'Laptops', slug: 'laptops' },
     { name: 'TVs', slug: 'tvs' },
-    { name: 'Earbuds', slug: 'earbuds' },
+    { name: 'Audio & Earbuds', slug: 'earbuds' },
     { name: 'Smart Watches', slug: 'smart-watches' },
     { name: 'Accessories', slug: 'accessories' },
     { name: 'Gaming', slug: 'gaming' },
@@ -29,8 +51,8 @@ export default function Footer() {
 
   const topReviews = [
     { title: 'Apple iPhone 15 Pro Max Review', href: '/blog/apple-iphone-15-pro-max-review' },
-    { title: 'Sony WH-1000XM5 Noise Canceling', href: '/blog/sony-wh-1000xm5-review' },
-    { title: 'MacBook Air M3 15" Deep Dive', href: '/blog/macbook-air-m3-review' },
+    { title: 'Sony WH-1000XM5 Noise Canceling', href: '/blog/sony-wh-1000xm5-noise-canceling-headphones' },
+    { title: 'MacBook Air M3 15" Deep Dive', href: '/blog/apple-macbook-air-m3-15-inch' },
   ];
 
   return (
@@ -53,7 +75,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-neutral-400 text-xs leading-relaxed max-w-sm">
-              Hands-on tech reviews, benchmark comparisons, and real-time Amazon price deals across 20 regional marketplaces.
+              Research-based product reviews, specification comparisons, and curated tech buying guides across regional marketplaces.
             </p>
 
             {/* Newsletter Subscription Form */}
@@ -64,25 +86,31 @@ export default function Footer() {
               {subscribed ? (
                 <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs p-3 rounded-xl flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
-                  <span>Subscribed! You will receive weekly tech deals.</span>
+                  <span>Subscribed! You will receive weekly tech deals and buying guides.</span>
                 </div>
               ) : (
-                <form onSubmit={handleSubscribe} className="flex flex-col xs:flex-row gap-2 max-w-sm">
-                  <input
-                    type="email"
-                    required
-                    placeholder="Enter your email..."
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-neutral-900 border border-neutral-800 text-white text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all placeholder-neutral-500"
-                  />
-                  <button
-                    type="submit"
-                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold text-xs shrink-0 transition-all flex items-center justify-center gap-1 shadow-md shadow-brand-600/20"
-                  >
-                    <span>Subscribe</span>
-                    <Send className="w-3 h-3" />
-                  </button>
+                <form onSubmit={handleSubscribe} className="flex flex-col gap-2 max-w-sm">
+                  <div className="flex flex-col xs:flex-row gap-2">
+                    <input
+                      type="email"
+                      required
+                      placeholder="Enter your email..."
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-neutral-900 border border-neutral-800 text-white text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all placeholder-neutral-500"
+                    />
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold text-xs shrink-0 transition-all flex items-center justify-center gap-1 shadow-md shadow-brand-600/20 disabled:opacity-60"
+                    >
+                      <span>{loading ? 'Subscribing...' : 'Subscribe'}</span>
+                      <Send className="w-3 h-3" />
+                    </button>
+                  </div>
+                  {errorMsg && (
+                    <p className="text-[11px] text-rose-400 font-medium">{errorMsg}</p>
+                  )}
                 </form>
               )}
             </div>

@@ -53,33 +53,33 @@ async function getData() {
 export default async function HomePage() {
   const { categories, featuredProducts, trendingProducts, dealProducts, latestBlogs, settings } = await getData();
 
-  const heroTitle = settings.hero_title || 'The Best Products, Tested & Reviewed by Experts';
-  const heroSubtitle = settings.hero_subtitle || 'We buy, test, and analyze thousands of tech products so you can buy with total confidence.';
+  const heroTitle = settings.hero_title || 'Research-Based Product Reviews & Buying Guides';
+  const heroSubtitle = settings.hero_subtitle || 'We research product specifications, pricing, user feedback, features, and available product information to help you make smarter buying decisions.';
   const heroButtonText = settings.hero_button_text || 'Browse Latest Reviews';
 
   const homeFaqs = [
     {
-      question: 'How does TechPulse select and test products?',
-      answer: 'Our editorial lab independently buys and tests products using standardized benchmark suites across performance, display, camera, battery, and durability.',
+      question: 'How does TechPulse research and evaluate products?',
+      answer: 'Our editorial team thoroughly analyzes official technical specifications, user feedback, verified buyer sentiment, build quality data, and price-to-performance metrics to formulate balanced, research-driven buying guides and reviews.',
     },
     {
-      question: 'Are product prices updated automatically for my country?',
-      answer: 'Yes! TechPulse automatically detects your region and displays live Amazon marketplace prices and localized affiliate links for 20 operating countries.',
+      question: 'How are product prices and deals determined?',
+      answer: 'We research and track official Amazon catalog prices and regional marketplace promotions. Because merchant prices fluctuate regularly, always verify final pricing and warranty details directly on Amazon at checkout.',
     },
     {
       question: 'Does TechPulse accept paid sponsorships for review scores?',
-      answer: 'No. We maintain strict editorial independence. Manufacturers cannot pay for higher ratings or biased reviews.',
+      answer: 'No. We maintain strict editorial independence. Brand sponsorships or affiliate relationships never dictate our ratings, product selection, or review conclusions.',
     },
   ];
 
   const testimonials = [
     {
-      quote: 'TechPulse saved me from buying the wrong laptop! Their side-by-side comparison table was incredibly detailed.',
+      quote: 'TechPulse saved me from buying the wrong laptop! Their side-by-side comparison table was clear and easy to understand.',
       author: 'Alex Rivera',
       role: 'Verified Reader',
     },
     {
-      quote: 'The regional price conversion for Amazon India was seamless. Got the iPhone 15 Pro Max at the lowest tracked deal price.',
+      quote: 'The regional price details for Amazon India were very helpful. Found the right tech gear within my exact budget.',
       author: 'Priya Sharma',
       role: 'Tech Enthusiast',
     },
@@ -97,7 +97,7 @@ export default async function HomePage() {
         <div className="max-w-4xl mx-auto text-center relative z-10 space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/15 border border-brand-500/30 text-brand-300 text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-inner">
             <Sparkles className="w-3.5 h-3.5 text-brand-400 animate-pulse" />
-            <span>Independent & Unbiased Testing</span>
+            <span>Research-Based & Editorial Independence</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
@@ -121,7 +121,7 @@ export default async function HomePage() {
               className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-neutral-900/90 hover:bg-neutral-800/90 text-neutral-100 font-semibold text-sm border border-neutral-700/80 shadow-md backdrop-blur-xs transition-all flex items-center justify-center gap-2 hover:border-amber-500/40"
             >
               <Zap className="w-4 h-4 text-amber-400" />
-              <span>Today&apos;s Amazon Deals</span>
+              <span>Explore Top Deals</span>
             </Link>
           </div>
 
@@ -129,7 +129,7 @@ export default async function HomePage() {
           <div className="pt-10 border-t border-neutral-800/80 grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-4 text-xs text-neutral-400">
             <div className="flex items-center justify-center gap-2">
               <Award className="w-4 h-4 text-brand-400 shrink-0" />
-              <span>Hands-on Lab Benchmarks</span>
+              <span>Specification & Feature Analysis</span>
             </div>
             <div className="flex items-center justify-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -137,7 +137,7 @@ export default async function HomePage() {
             </div>
             <div className="flex items-center justify-center gap-2">
               <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>Daily Amazon Price Tracker</span>
+              <span>Curated Amazon Recommendations</span>
             </div>
           </div>
         </div>
@@ -155,7 +155,7 @@ export default async function HomePage() {
               Popular Product Review Hubs
             </h2>
             <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">
-              Select a category to view expert testing, buying guides, and hands-on reviews.
+              Select a category to view buying guides, feature breakdowns, and research-backed reviews.
             </p>
           </div>
         </div>
@@ -178,9 +178,9 @@ export default async function HomePage() {
                 </div>
                 <div>
                   <h2 className="text-xl font-extrabold text-neutral-900 dark:text-white">
-                    Today&apos;s Top Amazon Deals
+                    Today&apos;s Top Deals & Discounts
                   </h2>
-                  <p className="text-xs text-neutral-600 dark:text-neutral-400">Handpicked price drops and limited time discounts</p>
+                  <p className="text-xs text-neutral-600 dark:text-neutral-400">Handpicked price drops and notable product discounts</p>
                 </div>
               </div>
 
@@ -213,7 +213,7 @@ export default async function HomePage() {
               Compare Any Two Devices Side-by-Side
             </h2>
             <p className="text-neutral-300 text-sm leading-relaxed">
-              Unsure between two flagships? Select any two smartphones, laptops, or earbuds to instantly compare specs, benchmark scores, and regional Amazon pricing.
+              Unsure between two devices? Select any two smartphones, laptops, or earbuds to compare detailed specs, features, pros, cons, and merchant links.
             </p>
           </div>
           <Link
@@ -231,9 +231,9 @@ export default async function HomePage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-extrabold text-neutral-900 dark:text-white font-sans">
-              Latest Hands-on Product Reviews
+              Latest Product Reviews & Guides
             </h2>
-            <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">Detailed evaluation of specifications, pros, cons, and performance</p>
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">Detailed evaluation of specifications, pros, cons, and user value</p>
           </div>
           <Link
             href="/blog"
@@ -259,7 +259,7 @@ export default async function HomePage() {
               <h2 className="text-2xl font-extrabold text-neutral-900 dark:text-white font-sans">
                 Featured Product Recommendations
               </h2>
-              <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">Our top recommended picks across categories</p>
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">Our curated product picks across categories</p>
             </div>
           </div>
 
@@ -271,7 +271,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 7. Testimonials */}
+      {/* 7. Reader Feedback */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-neutral-50 dark:bg-neutral-900 rounded-3xl p-8 border border-neutral-200 dark:border-neutral-800 space-y-6">
           <div className="text-center max-w-xl mx-auto space-y-1">
@@ -279,7 +279,7 @@ export default async function HomePage() {
               Reader Feedback
             </span>
             <h2 className="text-2xl font-extrabold text-neutral-900 dark:text-white">
-              Trusted by 100,000+ Smart Shoppers
+              Feedback from Our Readers
             </h2>
           </div>
 
@@ -311,7 +311,7 @@ export default async function HomePage() {
             Frequently Asked Questions
           </h2>
           <p className="text-xs text-neutral-500 dark:text-neutral-400">
-            Learn more about our review process and Amazon affiliate partner system.
+            Learn more about our editorial methodology and affiliate disclosure standards.
           </p>
         </div>
         <FaqAccordion faqs={homeFaqs} />

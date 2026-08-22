@@ -52,7 +52,7 @@ export default function AdminSEOPage() {
             <label className="block font-bold text-neutral-700 dark:text-neutral-300 mb-1">Site Meta Title Pattern</label>
             <input
               type="text"
-              defaultValue="%s - Hands-on Tech Reviews & Amazon Deals"
+              defaultValue="%s | TechPulse Reviews"
               className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-xs"
             />
           </div>
@@ -60,7 +60,7 @@ export default function AdminSEOPage() {
             <label className="block font-bold text-neutral-700 dark:text-neutral-300 mb-1">Default Meta Description</label>
             <textarea
               rows={3}
-              defaultValue="TechPulse Reviews brings you unbiased hands-on tech reviews, benchmark comparisons, and live regional Amazon price drops."
+              defaultValue="TechPulse Reviews brings you comprehensive research-based product reviews, specification breakdowns, and curated buying guides."
               className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-xs"
             />
           </div>

@@ -10,20 +10,43 @@ import ProductCard from '@/components/ProductCard';
 import ReviewScores from '@/components/ReviewScores';
 import PriceHistoryChart from '@/components/PriceHistoryChart';
 import SocialShare from '@/components/SocialShare';
+import AffiliateDisclosureNotice from '@/components/AffiliateDisclosureNotice';
+import ProductAlternatives from '@/components/ProductAlternatives';
+import AdBanner from '@/components/AdBanner';
 import { safeJsonParse } from '@/lib/utils';
-import { CheckCircle2, ChevronRight, ShieldCheck } from 'lucide-react';
-import { generateProductSchema } from '@/lib/seo';
+import { CheckCircle2, ChevronRight, ShieldCheck, Tag } from 'lucide-react';
+import { generateProductSchema, generateBreadcrumbSchema } from '@/lib/seo';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const product = await db.product.findUnique({
     where: { slug: params.slug },
+    include: { category: true },
   });
 
   if (!product) return {};
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techpulsereviews.com';
+  const pageUrl = `${siteUrl}/product/${product.slug}`;
+  const title = `${product.name} - Price, Specs & Alternatives | TechPulse`;
+  const description = `Full technical specifications, feature breakdown, and Amazon pricing for ${product.name} by ${product.brand}.`;
+
   return {
-    title: `${product.name} - Price, Specs & Best Amazon Deals`,
-    description: `Full specifications and Amazon price comparison for ${product.name}.`,
+    title,
+    description,
+    alternates: {
+      canonical: pageUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: pageUrl,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
   };
 }
 
@@ -34,6 +57,9 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
   });
 
   if (!product) notFound();
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techpulsereviews.com';
+  const pageUrl = `${siteUrl}/product/${product.slug}`;
 
   const images = safeJsonParse<string[]>(product.images, []);
   const mainImage = images[0] || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80';
@@ -50,7 +76,7 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
 
   // Fetch related products
   const relatedProducts = await db.product.findMany({
-    where: { categoryId: product.categoryId, id: { not: product.id } },
+    where: { categoryId: product.categoryId, id: { not: product.id }, status: 'PUBLISHED' },
     take: 4,
   });
 
@@ -60,8 +86,14 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
     image: mainImage,
     brand: product.brand,
     price: product.price,
-    url: `https://techpulsereviews.com/product/${product.slug}`,
+    url: pageUrl,
   });
+
+  const breadcrumbLd = generateBreadcrumbSchema([
+    { name: 'Home', url: siteUrl },
+    { name: product.category.name, url: `${siteUrl}/category/${product.category.slug}` },
+    { name: product.name, url: pageUrl },
+  ]);
 
   return (
     <div className="pb-16 pt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white dark:bg-neutral-950">
@@ -69,9 +101,13 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
 
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mb-6">
+      <nav className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mb-6 overflow-x-auto whitespace-nowrap">
         <Link href="/" className="hover:text-brand-600 dark:hover:text-brand-400">Home</Link>
         <ChevronRight className="w-3 h-3 text-neutral-400" />
         <Link href={`/category/${product.category.slug}`} className="hover:text-brand-600 dark:hover:text-brand-400">
@@ -82,7 +118,7 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
       </nav>
 
       {/* Main Grid: Gallery & Buying Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
         
         {/* Gallery */}
         <div className="bg-neutral-50 dark:bg-neutral-900 rounded-3xl p-8 border border-neutral-200/80 dark:border-neutral-800 flex items-center justify-center min-h-[400px]">
@@ -142,21 +178,21 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
                 marketplaces={product.marketplaces}
                 size="lg"
                 className="w-full flex-1"
-                text="Buy Now on Amazon"
+                text="Check Price on Amazon"
               />
               {product.blogs.length > 0 && (
                 <Link
                   href={`/blog/${product.blogs[0].slug}`}
                   className="px-6 py-3.5 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 transition-all shadow-sm shrink-0"
                 >
-                  <span>📖 Read Full Review</span>
+                  <span>📖 Read Full Guide</span>
                 </Link>
               )}
             </div>
             <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                <span>Amazon Official Seller</span>
+                <span>Amazon Official Merchant Link</span>
               </div>
               <SocialShare title={product.name} />
             </div>
@@ -164,7 +200,13 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
         </div>
       </div>
 
-      {/* Review Benchmarks */}
+      {/* Subtle Affiliate Disclosure */}
+      <AffiliateDisclosureNotice compact className="mb-12" />
+
+      {/* AdSense Placement */}
+      <AdBanner slot="product-top-ad" format="horizontal" />
+
+      {/* Review Scores Breakdown */}
       <ReviewScores scoresData={ratingScores || undefined} />
 
       {/* Price History */}
@@ -172,12 +214,19 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
 
       {/* Specifications Table */}
       {Object.keys(specifications).length > 0 && (
-        <section className="mb-16">
-          <h2 className="text-2xl font-extrabold text-neutral-900 dark:text-white mb-6">Technical Specifications</h2>
+        <section className="my-12">
+          <div className="mb-6">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-brand-600 dark:text-brand-400">
+              Detailed Specifications
+            </span>
+            <h2 className="text-2xl font-extrabold text-neutral-900 dark:text-white mt-1">
+              Technical Specifications & Features
+            </h2>
+          </div>
           <div className="bg-neutral-50 dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200/80 dark:border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             {Object.entries(specifications).map(([k, v]) => (
-              <div key={k} className="bg-white dark:bg-neutral-800/40 p-3 rounded-xl border border-neutral-200/60 dark:border-neutral-700/60 flex justify-between gap-3 min-w-0">
-                <span className="text-neutral-500 dark:text-neutral-400 font-medium shrink-0">{k}</span>
+              <div key={k} className="bg-white dark:bg-neutral-800/40 p-3.5 rounded-xl border border-neutral-200/60 dark:border-neutral-700/60 flex justify-between gap-3 min-w-0">
+                <span className="text-neutral-500 dark:text-neutral-400 font-medium shrink-0">{k}:</span>
                 <span className="font-bold text-neutral-900 dark:text-white text-right min-w-0 break-words">{v}</span>
               </div>
             ))}
@@ -187,28 +236,29 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
 
       {/* Pros & Cons */}
       {(pros.length > 0 || cons.length > 0) && (
-        <ProsCons pros={pros} cons={cons} />
+        <div className="my-12">
+          <ProsCons pros={pros} cons={cons} />
+        </div>
+      )}
+
+      {/* Smart Alternatives */}
+      {relatedProducts.length > 0 && (
+        <ProductAlternatives
+          currentProductId={product.id}
+          currentProductName={product.name}
+          alternatives={relatedProducts}
+        />
       )}
 
       {/* Related Blogs for this Product */}
       {product.blogs.length > 0 && (
-        <section className="mt-16">
-          <h2 className="text-2xl font-extrabold text-neutral-900 dark:text-white mb-6">Hands-on Reviews for this Product</h2>
+        <section className="mt-16 pt-12 border-t border-neutral-200 dark:border-neutral-800">
+          <h2 className="text-2xl font-extrabold text-neutral-900 dark:text-white mb-6">
+            Guides & Reviews for this Product
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {product.blogs.map((b) => (
               <BlogCard key={b.id} blog={b} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Related Products */}
-      {relatedProducts.length > 0 && (
-        <section className="mt-16 pt-12 border-t border-neutral-200 dark:border-neutral-800">
-          <h2 className="text-2xl font-extrabold text-neutral-900 dark:text-white mb-6">Similar Products in {product.category.name}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {relatedProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
             ))}
           </div>
         </section>
