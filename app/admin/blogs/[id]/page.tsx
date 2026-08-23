@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import RichTextEditor from '@/components/RichTextEditor';
 import { safeJsonParse, slugify } from '@/lib/utils';
 import { Save, ArrowLeft, Plus, Trash, Zap, ExternalLink, ShoppingBag, Sparkles, Upload, TrendingDown, Star, RefreshCw } from 'lucide-react';
@@ -21,11 +21,8 @@ interface ProductItem {
   cons?: string;
 }
 
-export default function EditBlogPage({ params }: { params?: { id: string } }) {
+export default function EditBlogPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const routeParams = useParams();
-  const blogId = (routeParams?.id as string) || params?.id || '';
-
   const [categories, setCategories] = useState<{ id: string; name: string; parentId?: string | null; parent?: { name: string } | null }[]>([]);
   const [productsList, setProductsList] = useState<ProductItem[]>([]);
   const [productId, setProductId] = useState('');
@@ -107,23 +104,26 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
   };
 
   useEffect(() => {
+    if (!params?.id) {
+      setLoading(false);
+      return;
+    }
+
     fetch('/api/categories')
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setCategories(data);
       })
-      .catch(() => {});
+      .catch((err) => console.error('Error loading categories:', err));
 
     fetch('/api/products?status=ALL')
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setProductsList(data);
       })
-      .catch(() => {});
+      .catch((err) => console.error('Error loading products:', err));
 
-    if (!blogId) return;
-
-    fetch(`/api/blogs/${blogId}`)
+    fetch(`/api/blogs/${params.id}`)
       .then((res) => {
         if (!res.ok) throw new Error('Blog not found');
         return res.json();
@@ -142,54 +142,50 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
           setAffiliateUrl(blog.affiliateUrl || '');
           setConclusion(blog.conclusion || '');
           setStatus(blog.status || 'PUBLISHED');
-          setViews(typeof blog.views === 'number' ? blog.views : (parseInt(blog.views) || 0));
+          setViews(blog.views || 0);
 
           const tags = safeJsonParse<string[]>(blog.tags, []);
-          setTagsStr(Array.isArray(tags) ? tags.join(', ') : '');
+          setTagsStr(tags.join(', '));
 
           const pList = safeJsonParse<string[]>(blog.pros, []);
-          setPros(Array.isArray(pList) ? pList : []);
+          setPros(pList);
 
           const cList = safeJsonParse<string[]>(blog.cons, []);
-          setCons(Array.isArray(cList) ? cList : []);
+          setCons(cList);
 
           const fList = safeJsonParse<{ question: string; answer: string }[]>(blog.faqs, []);
-          setFaqs(Array.isArray(fList) ? fList.filter((f) => f && typeof f === 'object') : []);
+          setFaqs(fList);
 
           const sObj = safeJsonParse<Record<string, any>>(blog.specifications, {});
-          if (sObj && typeof sObj === 'object') {
-            if (sObj._ratingScores) {
-              const rObj = typeof sObj._ratingScores === 'string'
-                ? safeJsonParse<Record<string, number | string>>(sObj._ratingScores, {})
-                : sObj._ratingScores;
-              if (rObj && typeof rObj === 'object' && !Array.isArray(rObj)) {
-                const rArr = Object.entries(rObj).map(([label, val]) => ({ label, score: String(val) }));
-                if (rArr.length > 0) setRatingsState(rArr);
-              } else if (Array.isArray(rObj)) {
-                setRatingsState(rObj);
-              }
-            }
+          if (sObj && sObj._ratingScores) {
+            const rObj = typeof sObj._ratingScores === 'string'
+              ? safeJsonParse<Record<string, number | string>>(sObj._ratingScores, {})
+              : sObj._ratingScores;
+            const rArr = Object.entries(rObj || {}).map(([label, val]) => ({ label, score: String(val) }));
+            if (rArr.length > 0) setRatingsState(rArr);
+          }
 
-            if (sObj._priceHistory) {
-              const pArr = typeof sObj._priceHistory === 'string'
-                ? safeJsonParse<{ date: string; price: string }[]>(sObj._priceHistory, [])
-                : sObj._priceHistory;
-              if (Array.isArray(pArr) && pArr.length > 0) setPriceHistoryState(pArr);
-            }
+          if (sObj && sObj._priceHistory) {
+            const pArr = typeof sObj._priceHistory === 'string'
+              ? safeJsonParse<{ date: string; price: string }[]>(sObj._priceHistory, [])
+              : sObj._priceHistory;
+            if (Array.isArray(pArr) && pArr.length > 0) setPriceHistoryState(pArr);
+          }
 
+          if (sObj) {
             const sArr = Object.entries(sObj)
               .filter(([k]) => k !== '_ratingScores' && k !== '_priceHistory')
-              .map(([k, v]) => ({ key: k, value: typeof v === 'object' ? JSON.stringify(v) : String(v ?? '') }));
+              .map(([k, v]) => ({ key: k, value: String(v) }));
             setSpecs(sArr);
           }
         }
         setLoading(false);
       })
       .catch((err) => {
-        console.error('Failed to load blog:', err);
+        console.error('Error fetching blog detail:', err);
         setLoading(false);
       });
-  }, [blogId]);
+  }, [params?.id]);
 
   const handleImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -286,7 +282,7 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
       tags,
     };
 
-    const res = await fetch(`/api/blogs/${blogId}`, {
+    const res = await fetch(`/api/blogs/${params.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -319,10 +315,10 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-extrabold text-neutral-900">Edit Product Blog</h1>
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-brand-50 text-brand-700 font-extrabold text-xs border border-brand-200">
-                👁️ {(views || 0).toLocaleString()} Views
+                👁️ {views.toLocaleString()} Views
               </span>
             </div>
-            <p className="text-xs text-neutral-500">ID: {blogId}</p>
+            <p className="text-xs text-neutral-500">ID: {params.id}</p>
           </div>
         </div>
 
@@ -378,7 +374,7 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
               className="w-full px-3.5 py-2.5 rounded-xl border border-brand-300 text-xs font-bold text-neutral-900 bg-white outline-none focus:border-brand-600"
             >
               <option value="">-- Select Product from Database --</option>
-              {(productsList || []).map((p) => (
+              {productsList.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name} ({p.brand}) - {p.price}
                 </option>
@@ -434,7 +430,7 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
                   required
                   className="w-full px-3.5 py-2 rounded-xl border border-neutral-300 text-xs outline-none focus:border-brand-500 bg-white"
                 >
-                  {(categories || []).map((cat) => (
+                  {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.parent ? `↳ ${cat.name} (${cat.parent.name})` : `📁 ${cat.name}`}
                     </option>
@@ -468,13 +464,9 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
                 <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
                 <div>
                   <div className="text-base font-black text-amber-700 leading-none">
-                    {Array.isArray(ratingsState) && ratingsState.length > 0
-                      ? (
-                          ratingsState.reduce((acc, r) => acc + (parseFloat(r?.score || '0') || 0), 0) /
-                          ratingsState.length
-                        ).toFixed(1)
-                      : '9.0'}{' '}
-                    <span className="text-[10px] text-neutral-400">/ 10</span>
+                    {(
+                      ratingsState.reduce((acc, r) => acc + (parseFloat(r.score) || 0), 0) / (ratingsState.length || 1)
+                    ).toFixed(1)} <span className="text-[10px] text-neutral-400">/ 10</span>
                   </div>
                   <div className="text-[9px] font-extrabold text-neutral-400 uppercase tracking-wider">
                     Overall Score
@@ -540,7 +532,7 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
 
             {/* Ratings List */}
             <div className="space-y-3 pt-1">
-              {(ratingsState || []).map((r, idx) => (
+              {ratingsState.map((r, idx) => (
                 <div
                   key={idx}
                   className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-white p-3 rounded-xl border border-amber-200 shadow-xs"
@@ -624,7 +616,7 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {(priceHistoryState || []).map((ph, idx) => (
+              {priceHistoryState.map((ph, idx) => (
                 <div key={idx} className="flex gap-2 items-center bg-white p-2.5 rounded-xl border border-emerald-200">
                   <input
                     type="text"
@@ -673,7 +665,7 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
               </button>
             </div>
 
-            {(specs || []).map((s, idx) => (
+            {specs.map((s, idx) => (
               <div key={idx} className="flex gap-2">
                 <input
                   type="text"
@@ -713,7 +705,7 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-emerald-700 mb-2">Pros</label>
-                {(pros || []).map((p, idx) => (
+                {pros.map((p, idx) => (
                   <div key={idx} className="flex gap-2 mb-2">
                     <input
                       type="text"
@@ -759,7 +751,7 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
                     />
                     <button
                       type="button"
-                      onClick={() => setCons((cons || []).filter((_, i) => i !== idx))}
+                      onClick={() => setCons(cons.filter((_, i) => i !== idx))}
                       className="text-rose-500 hover:text-rose-700"
                     >
                       <Trash className="w-3.5 h-3.5" />
@@ -768,60 +760,13 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
                 ))}
                 <button
                   type="button"
-                  onClick={() => setCons([...(cons || []), ''])}
+                  onClick={() => setCons([...cons, ''])}
                   className="text-xs text-brand-600 font-bold flex items-center gap-1 mt-1"
                 >
                   <Plus className="w-3 h-3" /> Add Con
                 </button>
               </div>
             </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-soft space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-neutral-900 text-sm">Frequently Asked Questions (FAQs)</h3>
-              <button
-                type="button"
-                onClick={() => setFaqs([...(faqs || []), { question: '', answer: '' }])}
-                className="text-xs text-brand-600 font-bold flex items-center gap-1"
-              >
-                <Plus className="w-3 h-3" /> Add FAQ
-              </button>
-            </div>
-
-            {(faqs || []).map((faq, idx) => (
-              <div key={idx} className="bg-neutral-50 p-4 rounded-xl border border-neutral-200 space-y-2 relative">
-                <input
-                  type="text"
-                  placeholder="Question..."
-                  value={faq?.question || ''}
-                  onChange={(e) => {
-                    const newFaqs = [...(faqs || [])];
-                    newFaqs[idx] = { ...newFaqs[idx], question: e.target.value };
-                    setFaqs(newFaqs);
-                  }}
-                  className="w-full px-3 py-1.5 rounded-lg border border-neutral-300 text-xs font-bold"
-                />
-                <textarea
-                  placeholder="Answer..."
-                  rows={2}
-                  value={faq?.answer || ''}
-                  onChange={(e) => {
-                    const newFaqs = [...(faqs || [])];
-                    newFaqs[idx] = { ...newFaqs[idx], answer: e.target.value };
-                    setFaqs(newFaqs);
-                  }}
-                  className="w-full px-3 py-1.5 rounded-lg border border-neutral-300 text-xs"
-                />
-                <button
-                  type="button"
-                  onClick={() => setFaqs((faqs || []).filter((_, i) => i !== idx))}
-                  className="absolute top-2 right-2 text-rose-500 hover:text-rose-700"
-                >
-                  <Trash className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -866,6 +811,19 @@ export default function EditBlogPage({ params }: { params?: { id: string } }) {
                     <span>{uploadingImage ? 'Uploading...' : 'Upload Image'}</span>
                   </label>
                 </div>
+
+                {featuredImage && (
+                  <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 mt-2">
+                    <img
+                      src={featuredImage}
+                      alt="Featured Image Preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80';
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
