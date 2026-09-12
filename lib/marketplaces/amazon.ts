@@ -133,8 +133,20 @@ export class AmazonAdapter implements MarketplaceAdapter {
     }
 
     const asin = this.extractProductId(baseUrlOrId);
+    let domain = 'amazon.com';
+    if (baseUrlOrId) {
+      if (baseUrlOrId.includes('amazon.in')) domain = 'amazon.in';
+      else if (baseUrlOrId.includes('amazon.co.uk')) domain = 'amazon.co.uk';
+      else if (baseUrlOrId.includes('amazon.ca')) domain = 'amazon.ca';
+      else if (baseUrlOrId.includes('amazon.de')) domain = 'amazon.de';
+      else if (baseUrlOrId.includes('amazon.fr')) domain = 'amazon.fr';
+      else if (baseUrlOrId.includes('amazon.es')) domain = 'amazon.es';
+      else if (baseUrlOrId.includes('amazon.it')) domain = 'amazon.it';
+      else if (baseUrlOrId.includes('amazon.co.jp')) domain = 'amazon.co.jp';
+      else if (baseUrlOrId.includes('amazon.com.au')) domain = 'amazon.com.au';
+    }
     if (asin) {
-      return `https://www.amazon.com/dp/${asin}?tag=${defaultTag}`;
+      return `https://www.${domain}/dp/${asin}?tag=${defaultTag}`;
     }
 
     if (baseUrlOrId.startsWith('http://') || baseUrlOrId.startsWith('https://')) {
@@ -142,7 +154,7 @@ export class AmazonAdapter implements MarketplaceAdapter {
       return `${baseUrlOrId}${separator}tag=${defaultTag}`;
     }
 
-    return `https://www.amazon.com/s?k=${encodeURIComponent(baseUrlOrId)}&tag=${defaultTag}`;
+    return `https://www.${domain}/s?k=${encodeURIComponent(baseUrlOrId)}&tag=${defaultTag}`;
   }
 
   async scrapeProduct(url: string): Promise<ScrapedProductData | null> {

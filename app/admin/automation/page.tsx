@@ -25,8 +25,9 @@ export default function AdminAutomationPage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [publishImmediately, setPublishImmediately] = useState(false);
 
-  // Categories list
+  // Categories list & Active Affiliate Tag
   const [categories, setCategories] = useState<CategoryOption[]>([]);
+  const [connectedTag, setConnectedTag] = useState<string>('techpulse-20');
 
   // Intermediate Product Verification Modal / Matches State
   const [searchingMatches, setSearchingMatches] = useState(false);
@@ -80,6 +81,15 @@ export default function AdminAutomationPage() {
       .then((data) => {
         if (Array.isArray(data)) {
           setCategories(data);
+        }
+      })
+      .catch(() => {});
+
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.affiliate_tag) {
+          setConnectedTag(data.affiliate_tag);
         }
       })
       .catch(() => {});
@@ -337,14 +347,24 @@ export default function AdminAutomationPage() {
       {/* Generator Card */}
       <div className="bg-white dark:bg-neutral-900 p-6 sm:p-8 rounded-3xl border border-neutral-200/80 dark:border-neutral-800 shadow-soft space-y-6">
         
-        {/* Supported Options Pill */}
-        <div className="flex items-center gap-2 flex-wrap text-[11px] font-bold text-neutral-500 dark:text-neutral-400">
-          <span className="text-amber-600 dark:text-amber-400">Supported Input Modes:</span>
-          <span className="px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800">Option A: Name + Image + Link</span>
-          <span className="px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800">Option B: Name + Link</span>
-          <span className="px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800">Option C: Name + Image</span>
-          <span className="px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800">Option D: Link Only</span>
-          <span className="px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800">Option E: Name Only</span>
+        {/* Supported Options Pill & Connected Account Status */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-neutral-100 dark:border-neutral-800">
+          <div className="flex items-center gap-2 flex-wrap text-[11px] font-bold text-neutral-500 dark:text-neutral-400">
+            <span className="text-amber-600 dark:text-amber-400">Supported Input Modes:</span>
+            <span className="px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800">Option A: Name + Image + Link</span>
+            <span className="px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800">Option B: Name + Link</span>
+            <span className="px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800">Option C: Name + Image</span>
+            <span className="px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800">Option D: Link Only</span>
+            <span className="px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800">Option E: Name Only</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800 text-[11px] font-bold text-emerald-800 dark:text-emerald-300 w-fit">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>Connected Associate Tag: <code className="px-1.5 py-0.5 bg-emerald-100/70 dark:bg-emerald-900/60 rounded text-emerald-900 dark:text-emerald-200">{connectedTag || 'techpulse-20'}</code></span>
+            <Link href="/admin/settings" className="ml-1 text-emerald-600 dark:text-emerald-400 underline hover:text-emerald-700">
+              Change
+            </Link>
+          </div>
         </div>
 
         {/* Generator Form */}

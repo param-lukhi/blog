@@ -145,6 +145,25 @@ export default function AdminSettingsPage() {
             </select>
           </div>
         </div>
+
+        {/* Amazon Associate Tag / Tracking ID */}
+        <div className="pt-3 border-t border-blue-200/80">
+          <label className="block text-blue-950 text-xs font-bold mb-1">
+            Amazon Associates Tracking ID / Affiliate Tag (Store ID)
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={settings.affiliate_tag || ''}
+              onChange={(e) => handleChange('affiliate_tag', e.target.value)}
+              placeholder="e.g., yourstore-21 (India) or yourtag-20 (USA)"
+              className="flex-1 px-3.5 py-2.5 rounded-xl border border-blue-300 outline-none focus:border-brand-500 bg-white text-xs font-bold text-neutral-900"
+            />
+          </div>
+          <p className="text-[11px] text-blue-800/80 mt-1">
+            💡 <strong>How it works:</strong> When you generate blogs from Product Name, Image, or Amazon links in the <strong>Amazon Generator</strong>, all Buy buttons, comparison tables, and deals will automatically link with this Associate Tag so you earn commissions.
+          </p>
+        </div>
       </div>
 
       {/* 2. General Branding */}
