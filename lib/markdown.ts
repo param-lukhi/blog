@@ -11,11 +11,11 @@ export function parseMarkdownToHtml(markdown: string): string {
   // 1. Parse Block Images (![alt](url)) first into full responsive image cards
   html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_match, alt, src) => {
     const cleanSrc = src.trim();
-    const cleanAlt = (alt || 'Product Image').trim();
-    return `\n\n<div class="my-8 rounded-3xl overflow-hidden shadow-md border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-3 max-w-2xl mx-auto"><img src="${cleanSrc}" alt="${cleanAlt}" class="w-full h-auto max-h-[450px] object-contain rounded-2xl mx-auto" loading="lazy" onError="this.src='https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80'" /><span class="block text-center text-xs text-neutral-500 dark:text-neutral-400 font-semibold mt-2.5 pb-1">${cleanAlt}</span></div>\n\n`;
+    const cleanAlt = (alt || 'Product Hardware Photo').trim();
+    return `\n\n<div class="my-10 rounded-3xl overflow-hidden shadow-lg border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 max-w-2xl mx-auto group transition-all duration-300 hover:shadow-xl"><div class="relative overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800/80 flex items-center justify-center p-3"><img src="${cleanSrc}" alt="${cleanAlt}" class="w-full h-auto max-h-[460px] object-contain rounded-xl mx-auto transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" onError="this.src='https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80'" /></div><div class="flex items-center justify-center gap-2 mt-3 text-xs font-semibold text-neutral-600 dark:text-neutral-400"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-[11px] font-bold text-neutral-800 dark:text-neutral-200 border border-neutral-200/60 dark:border-neutral-700">📸 ${cleanAlt}</span></div></div>\n\n`;
   });
 
-  // 2. Parse Markdown Tables
+  // 2. Parse Markdown Tables with sleek modern styling
   const tableRegex = /^\|(.+)\|\n\|(?:\s*[-:]+[-|\s:]*)\|\n((?:\|.+\|\n?)+)/gm;
   html = html.replace(tableRegex, (match, headerRow, bodyRows) => {
     const headers = headerRow
@@ -33,24 +33,26 @@ export function parseMarkdownToHtml(markdown: string): string {
           .filter((cell: string) => cell.length > 0)
       );
 
-    const thead = `<thead><tr class="bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white font-extrabold border-b border-neutral-200 dark:border-neutral-700">${headers
-      .map((h: string) => `<th class="p-3 border-r border-neutral-200 dark:border-neutral-700 text-left text-xs uppercase tracking-wider">${formatInlineMarkdown(h)}</th>`)
+    const thead = `<thead><tr class="bg-gradient-to-r from-neutral-100 to-neutral-50 dark:from-neutral-800 dark:to-neutral-850 text-neutral-900 dark:text-white font-extrabold border-b-2 border-neutral-200 dark:border-neutral-700">${headers
+      .map((h: string) => `<th class="p-3.5 border-r border-neutral-200 dark:border-neutral-700 text-left text-xs uppercase tracking-wider">${formatInlineMarkdown(h)}</th>`)
       .join('')}</tr></thead>`;
 
     const tbody = `<tbody>${rows
       .map(
         (r: string[], idx: number) =>
-          `<tr class="${idx % 2 === 0 ? 'bg-white dark:bg-neutral-900' : 'bg-neutral-50/50 dark:bg-neutral-800/30'} border-b border-neutral-100 dark:border-neutral-800">${r
-            .map((cell: string) => `<td class="p-3 border-r border-neutral-200/60 dark:border-neutral-800 text-sm">${formatInlineMarkdown(cell)}</td>`)
+          `<tr class="${idx % 2 === 0 ? 'bg-white dark:bg-neutral-900' : 'bg-neutral-50/70 dark:bg-neutral-800/40'} border-b border-neutral-100 dark:border-neutral-800 hover:bg-brand-50/30 dark:hover:bg-brand-950/20 transition-colors">${r
+            .map((cell: string) => `<td class="p-3.5 border-r border-neutral-200/50 dark:border-neutral-800 text-sm font-medium text-neutral-800 dark:text-neutral-200">${formatInlineMarkdown(cell)}</td>`)
             .join('')}</tr>`
       )
       .join('')}</tbody>`;
 
-    return `<div class="overflow-x-auto my-6 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-xs"><table class="w-full text-left text-xs border-collapse">${thead}${tbody}</table></div>`;
+    return `<div class="overflow-x-auto my-8 border border-neutral-200 dark:border-neutral-800 rounded-3xl shadow-sm"><table class="w-full text-left text-xs border-collapse">${thead}${tbody}</table></div>`;
   });
 
-  // 3. Parse Block Quotes ( > Quote text )
-  html = html.replace(/^>\s*(.+)$/gm, '<blockquote class="border-l-4 border-brand-500 pl-4 py-2 my-4 italic bg-brand-50/40 dark:bg-brand-950/20 rounded-r-xl font-serif text-neutral-800 dark:text-neutral-200">$1</blockquote>');
+  // 3. Parse Callouts & Block Quotes ( > Quote text )
+  html = html.replace(/^>\s*(?:\[!(?:NOTE|TIP|IMPORTANT)\]\s*)?(.+)$/gm, (_match, text) => {
+    return `<div class="my-6 p-5 rounded-2xl bg-gradient-to-r from-brand-50/80 to-blue-50/40 dark:from-brand-950/40 dark:to-blue-950/20 border-l-4 border-brand-500 shadow-xs space-y-1"><div class="flex items-center gap-1.5 font-extrabold text-brand-900 dark:text-brand-300 text-xs uppercase tracking-wider"><span>💡 Key Takeaway & Analysis</span></div><div class="text-neutral-800 dark:text-neutral-200 text-sm sm:text-base leading-relaxed font-sans font-medium">${text}</div></div>`;
+  });
 
   // 4. Parse Headings
   html = html.replace(/^####\s+(.+)$/gm, '<h4 class="text-lg font-bold text-neutral-900 dark:text-white mt-6 mb-2 tracking-tight">$1</h4>');
