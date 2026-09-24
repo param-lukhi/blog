@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function setAdminPassword() {
   const newPassword = process.argv[2] || process.env.ADMIN_PASSWORD || 'AdminPassword123!';
-  const targetEmail = process.env.ADMIN_EMAIL || 'lukhiparam904@gmail.com';
+  const targetEmail = process.env.ADMIN_EMAIL || 'indiadealzz@gmail.com';
 
   if (!newPassword || newPassword.trim().length < 6) {
     console.error('Error: Password must be at least 6 characters long.');

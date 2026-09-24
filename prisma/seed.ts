@@ -47,7 +47,7 @@ async function main() {
   }
 
   // 3. Seed Users
-  const defaultAdminEmail = process.env.ADMIN_EMAIL || 'lukhiparam904@gmail.com';
+  const defaultAdminEmail = process.env.ADMIN_EMAIL || 'indiadealzz@gmail.com';
   const defaultAdminPassword = process.env.ADMIN_PASSWORD || 'AdminPassword123!';
   const hashedPassword = await bcrypt.hash(defaultAdminPassword, 10);
 
