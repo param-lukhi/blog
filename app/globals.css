@@ -9,12 +9,12 @@
     max-width: 100vw;
   }
   body {
-    @apply bg-white text-neutral-900 font-sans antialiased transition-colors duration-300;
+    @apply bg-neutral-50/50 text-neutral-900 font-sans antialiased transition-colors duration-300;
     overflow-x: hidden;
     max-width: 100vw;
   }
   .dark body {
-    @apply bg-neutral-950 text-neutral-100;
+    @apply bg-[#0b0f17] text-neutral-100;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -132,26 +132,35 @@
   background: #404040;
 }
 
-/* Modern Gradient Glow Utilities */
+/* Modern Gradient Glow & Visual Effects Utilities */
 .bg-grid-pattern {
-  background-size: 30px 30px;
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
 }
 .dark .bg-grid-pattern {
   background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
                     linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
 }
 
-/* Ambient gradient background helper */
-.ambient-glow {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(80px);
-  pointer-events: none;
-  opacity: 0.4;
+/* Glassmorphism Card Style */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(229, 231, 235, 0.8);
 }
-.dark .ambient-glow {
-  opacity: 0.18;
+.dark .glass-card {
+  background: rgba(18, 24, 38, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Shimmer Highlight Effect */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2.5s infinite;
+}
