@@ -14,28 +14,31 @@ export async function POST(request: Request) {
 
     const normalizedEmail = String(emailInput).trim().toLowerCase();
     const allowedAdminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
-
-    if (allowedAdminEmail && normalizedEmail !== allowedAdminEmail) {
-      return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
-    }
+    const envPassword = process.env.ADMIN_PASSWORD || '';
 
     let isPasswordValid = false;
-    let user = null;
+    let user: any = null;
 
-    // 2. Try fetching User from database safely
+    // 1. Check user in database
     try {
-      user = await db.user.findUnique({
-        where: { email: normalizedEmail },
+      user = await db.user.findFirst({
+        where: {
+          email: {
+            equals: normalizedEmail,
+            mode: 'insensitive',
+          },
+        },
       });
     } catch (dbError) {
       console.warn('[AUTH] Database lookup warning:', dbError);
     }
 
+    // 2. Validate password against Database User if found
     if (user && user.status === 'ACTIVE' && user.password) {
       if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
         isPasswordValid = await bcrypt.compare(passwordInput, user.password);
       } else {
-        // Handle unhashed legacy password by migrating to bcrypt
+        // Plain text fallback / migration
         isPasswordValid = (user.password === passwordInput);
         if (isPasswordValid) {
           const hashedPassword = await bcrypt.hash(passwordInput, 10);
@@ -47,10 +50,11 @@ export async function POST(request: Request) {
       }
     }
 
-    // 3. Fallback: check against configured environment variable ADMIN_PASSWORD
-    if (!isPasswordValid && process.env.ADMIN_PASSWORD) {
-      const envPassword = process.env.ADMIN_PASSWORD;
-      if (passwordInput === envPassword || passwordInput.trim() === envPassword.trim()) {
+    // 3. Fallback to process.env if database user matching or env matching
+    if (!isPasswordValid && envPassword) {
+      const isEmailMatch = !allowedAdminEmail || normalizedEmail === allowedAdminEmail;
+      const isPassMatch = passwordInput === envPassword || passwordInput.trim() === envPassword.trim();
+      if (isEmailMatch && isPassMatch) {
         isPasswordValid = true;
       }
     }
@@ -62,9 +66,9 @@ export async function POST(request: Request) {
     const response = NextResponse.json({
       success: true,
       user: {
-        name: user?.name || 'Param Lukhi',
+        name: user?.name || 'Admin',
         email: normalizedEmail,
-        role: 'ADMIN',
+        role: user?.role || 'ADMIN',
       },
     });
 
@@ -77,7 +81,6 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',
     });
-
 
     return response;
   } catch (error) {
