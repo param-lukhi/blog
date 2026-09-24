@@ -4,8 +4,9 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionToken = request.cookies.get('admin_session')?.value;
-  const expectedSecret = process.env.ADMIN_SESSION_SECRET || 'authenticated_token_secret';
-  const isAuthenticated = Boolean(sessionToken && sessionToken === expectedSecret);
+  const expectedSecret = process.env.ADMIN_SESSION_SECRET;
+  const isAuthenticated = Boolean(expectedSecret && sessionToken && sessionToken === expectedSecret);
+
 
   // Protect all /admin routes except /admin/login
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {

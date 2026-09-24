@@ -120,8 +120,9 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
-              Hands-on Reviews & Buying Guides ({blogs.length})
+              Researched Reviews &amp; Buying Guides ({blogs.length})
             </h2>
+
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {blogs.map((b) => (

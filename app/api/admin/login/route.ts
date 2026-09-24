@@ -13,30 +13,29 @@ export async function POST(request: Request) {
     }
 
     const normalizedEmail = String(emailInput).trim().toLowerCase();
-    const allowedAdminEmail = (process.env.ADMIN_EMAIL || 'lukhiparam904@gmail.com').trim().toLowerCase();
+    const allowedAdminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
 
-    // 1. Strict Email check: Only lukhiparam904@gmail.com (or process.env.ADMIN_EMAIL) is allowed to log in
-    if (normalizedEmail !== allowedAdminEmail) {
+    if (allowedAdminEmail && normalizedEmail !== allowedAdminEmail) {
       return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
     }
 
     let isPasswordValid = false;
     let user = null;
 
-    // 2. Try fetching User from database safely without throwing on DB network error
+    // 2. Try fetching User from database safely
     try {
       user = await db.user.findUnique({
         where: { email: normalizedEmail },
       });
     } catch (dbError) {
-      console.warn('[AUTH] Database lookup warning (falling back to env credentials):', dbError);
+      console.warn('[AUTH] Database lookup warning:', dbError);
     }
 
     if (user && user.status === 'ACTIVE' && user.password) {
       if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
         isPasswordValid = await bcrypt.compare(passwordInput, user.password);
       } else {
-        // Handle unhashed legacy password
+        // Handle unhashed legacy password by migrating to bcrypt
         isPasswordValid = (user.password === passwordInput);
         if (isPasswordValid) {
           const hashedPassword = await bcrypt.hash(passwordInput, 10);
@@ -48,9 +47,9 @@ export async function POST(request: Request) {
       }
     }
 
-    // 3. Fallback: check against environment variable ADMIN_PASSWORD
-    if (!isPasswordValid) {
-      const envPassword = process.env.ADMIN_PASSWORD || 'Hanumandada@904';
+    // 3. Fallback: check against configured environment variable ADMIN_PASSWORD
+    if (!isPasswordValid && process.env.ADMIN_PASSWORD) {
+      const envPassword = process.env.ADMIN_PASSWORD;
       if (passwordInput === envPassword || passwordInput.trim() === envPassword.trim()) {
         isPasswordValid = true;
       }
@@ -70,7 +69,7 @@ export async function POST(request: Request) {
     });
 
     // 4. Set secure HTTP-only session cookie
-    const sessionSecret = process.env.ADMIN_SESSION_SECRET || 'authenticated_token_secret';
+    const sessionSecret = process.env.ADMIN_SESSION_SECRET || 'techpulse_secure_session_key_2026';
     response.cookies.set('admin_session', sessionSecret, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -78,6 +77,7 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',
     });
+
 
     return response;
   } catch (error) {

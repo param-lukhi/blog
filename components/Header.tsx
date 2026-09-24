@@ -62,13 +62,14 @@ export default function Header() {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'Reviews', href: '/blog' },
-    { name: 'Best Products', href: '/products' },
+    { name: 'Reviews & Guides', href: '/blog' },
+    { name: 'Products', href: '/products' },
     { name: 'Comparisons', href: '/comparisons' },
     { name: 'Deals', href: '/deals', isSpecial: true },
-    { name: 'Blog', href: '/blog' },
     { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
   ];
+
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';

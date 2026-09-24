@@ -507,28 +507,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
           </section>
         )}
       </div>
-
-      {/* Floating Sticky Quick Buy Bar for Mobile */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 py-3 px-4 shadow-2xl sm:hidden">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className="text-xs font-bold text-neutral-900 dark:text-white truncate">
-              {linkedProduct?.name || blog.title}
-            </div>
-            <div className="text-xs font-extrabold text-amber-600 dark:text-amber-400">
-              {linkedProduct?.price || ''}
-            </div>
-          </div>
-          <AmazonButton
-            url={blog.affiliateUrl || blog.amazonUrl}
-            price={blog.product?.price}
-            blogId={blog.id}
-            marketplaces={blog.marketplaces || blog.product?.marketplaces}
-            size="sm"
-            text="Buy on Amazon"
-          />
-        </div>
-      </div>
     </article>
   );
 }
+

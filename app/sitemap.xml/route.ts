@@ -34,14 +34,14 @@ export async function GET(request: Request) {
     { path: '/products', priority: '0.9', changefreq: 'daily' },
     { path: '/comparisons', priority: '0.8', changefreq: 'weekly' },
     { path: '/deals', priority: '0.8', changefreq: 'daily' },
-    { path: '/about', priority: '0.6', changefreq: 'monthly' },
-    { path: '/contact', priority: '0.6', changefreq: 'monthly' },
-    { path: '/privacy', priority: '0.5', changefreq: 'yearly' },
-    { path: '/terms', priority: '0.5', changefreq: 'yearly' },
+    { path: '/about', priority: '0.7', changefreq: 'monthly' },
+    { path: '/contact', priority: '0.7', changefreq: 'monthly' },
+    { path: '/privacy', priority: '0.6', changefreq: 'monthly' },
+    { path: '/terms', priority: '0.6', changefreq: 'monthly' },
     { path: '/affiliate-disclosure', priority: '0.6', changefreq: 'monthly' },
-    { path: '/cookie-policy', priority: '0.4', changefreq: 'yearly' },
-    { path: '/refund-policy', priority: '0.4', changefreq: 'yearly' },
+    { path: '/cookie-policy', priority: '0.5', changefreq: 'monthly' },
   ];
+
 
   // Helper to format ISO date to W3C datetime (YYYY-MM-DDThh:mm:ssTZD)
   const formatDate = (date: Date) => {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { safeJsonParse } from '@/lib/utils';
+import { isAuthorizedAdmin } from '@/lib/auth';
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -31,6 +32,10 @@ function sanitizeJson(val: any) {
 }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     
@@ -68,6 +73,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const updateData: any = { ...body };
@@ -103,6 +112,10 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const blog = await db.blog.findUnique({ where: { id: params.id } });
     await db.blog.delete({ where: { id: params.id } });
@@ -116,3 +129,4 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ error: 'Failed to delete blog' }, { status: 500 });
   }
 }
+

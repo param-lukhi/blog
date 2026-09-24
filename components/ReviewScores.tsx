@@ -62,25 +62,30 @@ export default function ReviewScores({ scoresData }: ReviewScoresProps) {
       const obj = safeJsonParse<Record<string, number | string>>(scoresData, {});
       parsedScores = Object.entries(obj).map(([label, val], idx) => ({
         label,
-        score: Math.min(10, Math.max(0, parseFloat(String(val)) || 9.0)),
+        score: Math.min(10, Math.max(0, parseFloat(String(val)) || 8.5)),
         color: COLOR_PALETTE[idx % COLOR_PALETTE.length],
       }));
     } else if (Array.isArray(scoresData)) {
       parsedScores = scoresData.map((item, idx) => ({
         ...item,
-        score: Math.min(10, Math.max(0, Number(item.score) || 9.0)),
+        score: Math.min(10, Math.max(0, Number(item.score) || 8.5)),
         color: item.color || COLOR_PALETTE[idx % COLOR_PALETTE.length],
       }));
     } else if (typeof scoresData === 'object') {
       parsedScores = Object.entries(scoresData).map(([label, val], idx) => ({
         label,
-        score: Math.min(10, Math.max(0, parseFloat(String(val)) || 9.0)),
+        score: Math.min(10, Math.max(0, parseFloat(String(val)) || 8.5)),
         color: COLOR_PALETTE[idx % COLOR_PALETTE.length],
       }));
     }
   }
 
-  const finalScores = parsedScores.length > 0 ? parsedScores : DEFAULT_SCORES;
+  // If no genuine scores are provided for this product, do not render fabricated scores
+  if (parsedScores.length === 0) {
+    return null;
+  }
+
+  const finalScores = parsedScores;
 
   const overallScore = (
     finalScores.reduce((acc, s) => acc + s.score, 0) / (finalScores.length || 1)
@@ -93,6 +98,7 @@ export default function ReviewScores({ scoresData }: ReviewScoresProps) {
     }
     return <Award className="w-4 h-4" />;
   };
+
 
   return (
     <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 sm:p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm my-8 space-y-6">
