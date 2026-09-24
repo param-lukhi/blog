@@ -118,14 +118,6 @@ export default function AdminNavbar({ isSidebarCollapsed, onToggleSidebar }: Adm
                   <span className="w-2 h-2 rounded-full bg-amber-500" />
                   <span>Add Product</span>
                 </Link>
-                <Link
-                  href="/admin/automation"
-                  onClick={() => setIsQuickCreateOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors"
-                >
-                  <span className="w-2 h-2 rounded-full bg-purple-500" />
-                  <span>Amazon AI Generator</span>
-                </Link>
               </div>
             )}
           </div>
@@ -281,14 +273,6 @@ export default function AdminNavbar({ isSidebarCollapsed, onToggleSidebar }: Adm
                   className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800 hover:bg-brand-50 dark:hover:bg-brand-950/40 font-bold text-neutral-800 dark:text-neutral-200 hover:text-brand-600 transition-colors flex items-center justify-between"
                 >
                   <span>Products Catalog</span>
-                  <ExternalLink className="w-3.5 h-3.5 opacity-60" />
-                </Link>
-                <Link
-                  href="/admin/automation"
-                  onClick={() => setIsSearchOpen(false)}
-                  className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800 hover:bg-brand-50 dark:hover:bg-brand-950/40 font-bold text-neutral-800 dark:text-neutral-200 hover:text-brand-600 transition-colors flex items-center justify-between"
-                >
-                  <span>Amazon AI Generator</span>
                   <ExternalLink className="w-3.5 h-3.5 opacity-60" />
                 </Link>
                 <Link

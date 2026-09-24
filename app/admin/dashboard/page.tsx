@@ -169,11 +169,10 @@ export default function AdminDashboardPage() {
 
         <div className="flex items-center gap-3">
           <Link
-            href="/admin/automation"
-            className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
+            href="/admin/products"
+            className="px-4 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
           >
-            <Zap className="w-4 h-4" />
-            <span>Amazon AI Generator</span>
+            <span>Products</span>
           </Link>
 
           <Link
