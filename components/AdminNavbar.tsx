@@ -24,6 +24,18 @@ export default function AdminNavbar({ isSidebarCollapsed, onToggleSidebar }: Adm
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false);
+  const [adminUser, setAdminUser] = useState<{ name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    fetch('/api/admin/check-auth')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.authenticated && data.user) {
+          setAdminUser(data.user);
+        }
+      })
+      .catch(() => {});
+  }, [pathname]);
 
   // Close dropdowns on outside click or esc key
   useEffect(() => {
@@ -188,8 +200,12 @@ export default function AdminNavbar({ isSidebarCollapsed, onToggleSidebar }: Adm
             {isProfileOpen && (
               <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800 p-2 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1">
                 <div className="px-3 py-2 border-b border-neutral-100 dark:border-neutral-800">
-                  <div className="font-extrabold text-xs text-neutral-900 dark:text-white">Param Lukhi</div>
-                  <div className="text-[11px] text-neutral-400">lukhiparam904@gmail.com</div>
+                  <div className="font-extrabold text-xs text-neutral-900 dark:text-white truncate">
+                    {adminUser?.name || 'Administrator'}
+                  </div>
+                  <div className="text-[11px] text-neutral-400 truncate">
+                    {adminUser?.email || 'indiadealzz@gmail.com'}
+                  </div>
                 </div>
 
                 <Link

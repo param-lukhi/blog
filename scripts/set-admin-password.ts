@@ -15,15 +15,17 @@ async function setAdminPassword() {
   console.log(`Updating admin password for: ${targetEmail}...`);
   const hashedPassword = await bcrypt.hash(newPassword.trim(), 10);
 
+  const adminName = process.env.ADMIN_NAME || 'IndiaDealzz Admin';
   const user = await prisma.user.upsert({
     where: { email: targetEmail },
     update: {
+      name: adminName,
       password: hashedPassword,
       status: 'ACTIVE',
       role: 'ADMIN',
     },
     create: {
-      name: 'Param Lukhi',
+      name: adminName,
       email: targetEmail,
       password: hashedPassword,
       role: 'ADMIN',
