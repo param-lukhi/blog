@@ -1,7 +1,19 @@
 import { NextResponse } from 'next/server';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 5 contact form submissions per 10 minutes per IP
+    const clientIp = getClientIp(request);
+    const rateLimit = checkRateLimit(`contact_${clientIp}`, 5, 10 * 60);
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many contact requests. Please wait a few minutes before trying again.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { name, email, subject, message } = body;
 
@@ -17,9 +29,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Message must be at least 5 characters long' }, { status: 400 });
     }
 
-    // In a production setup with configured SMTP/Resend/SendGrid, dispatch email here.
-    // For now, log server-side contact request securely without exposing secrets
-    console.log(`[Contact Form Received] From: ${name} (${email}), Subject: ${subject || 'General Inquiry'}`);
+    if (message.trim().length > 5000) {
+      return NextResponse.json({ error: 'Message cannot exceed 5000 characters' }, { status: 400 });
+    }
+
+    // Log server-side contact request securely without exposing secrets
+    console.log(`[Contact Form Received] From: ${name.trim()} (${email.trim()}), Subject: ${subject ? String(subject).trim() : 'General Inquiry'}`);
 
     return NextResponse.json(
       {

@@ -9,8 +9,8 @@ import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Today\'s Best Tech Deals & Amazon Price Drops - TechPulse',
-  description: 'Handpicked Amazon tech deals, price drops, and verified discounts on smartphones, laptops, and audio gear.',
+  title: 'Today\'s Best Tech Deals & Price Drops - BlogWeb904',
+  description: 'Handpicked tech deals, multi-store price drops, and verified discounts on smartphones, laptops, and audio gear.',
   alternates: {
     canonical: '/deals',
   },

@@ -2,6 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { db } from '@/lib/db';
+import PriceComparisonTable from '@/components/PriceComparisonTable';
 import AmazonButton from '@/components/AmazonButton';
 import RegionalPrice from '@/components/RegionalPrice';
 import ProsCons from '@/components/ProsCons';
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
   const pageUrl = `${siteUrl}/blog/${blog.slug}`;
-  const title = blog.metaTitle || `${blog.title} | TechPulse`;
+  const title = blog.metaTitle || `${blog.title} | BlogWeb904`;
   const description = blog.metaDescription || `Read our comprehensive research-based review and buying guide for ${blog.title}.`;
 
   return {
@@ -63,7 +64,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
   const blog = await db.blog.findUnique({
     where: { slug: params.slug },
-    include: { category: true, product: true },
+    include: {
+      category: true,
+      product: {
+        include: {
+          prices: {
+            orderBy: { price: 'asc' },
+          },
+        },
+      },
+    },
   });
 
   if (!blog || blog.status !== 'PUBLISHED') {
@@ -319,6 +329,35 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
             </span>
           </div>
         </div>
+
+        {/* Multi-Store Price Comparison Table (if product is linked or has prices) */}
+        {linkedProduct && (linkedProduct.prices?.length > 0 || linkedProduct.price) && (
+          <div className="mb-10">
+            <PriceComparisonTable
+              productName={linkedProduct.name}
+              prices={
+                linkedProduct.prices && linkedProduct.prices.length > 0
+                  ? linkedProduct.prices
+                  : linkedProduct.price
+                  ? [
+                      {
+                        storeName: 'Amazon',
+                        storeSlug: 'amazon',
+                        price: parseFloat(linkedProduct.price.replace(/[^0-9.]/g, '')) || null,
+                        originalPrice: null,
+                        inStock: true,
+                        offerText: 'Prime Free Delivery',
+                        productUrl: linkedProduct.amazonUrl,
+                        affiliateUrl: linkedProduct.affiliateUrl || linkedProduct.amazonUrl,
+                        lastCheckedAt: linkedProduct.updatedAt,
+                      },
+                    ]
+                  : []
+              }
+              defaultCurrency="INR"
+            />
+          </div>
+        )}
 
         {/* Table of Contents */}
         <TableOfContents content={blog.content} />

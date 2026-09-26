@@ -3,11 +3,11 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { safeJsonParse } from '@/lib/utils';
 import { isAuthorizedAdmin } from '@/lib/auth';
+import { logActivity } from '@/lib/activity';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-
   try {
     const { searchParams } = new URL(request.url);
     const categorySlug = searchParams.get('category');
@@ -55,7 +55,6 @@ export async function POST(request: Request) {
   }
 
   try {
-
     const body = await request.json();
     const {
       title,
@@ -76,6 +75,8 @@ export async function POST(request: Request) {
       productId,
       tags,
       status,
+      qualityChecklist,
+      scheduledAt,
     } = body;
 
     if (!title || !slug || !content || !categoryId || !amazonUrl) {
@@ -96,8 +97,8 @@ export async function POST(request: Request) {
 
     const blog = await db.blog.create({
       data: {
-        title,
-        slug,
+        title: title.trim(),
+        slug: slug.trim().toLowerCase(),
         metaTitle: metaTitle || title,
         metaDescription: metaDescription || '',
         featuredImage: featuredImage || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&auto=format&fit=crop&q=80',
@@ -113,8 +114,16 @@ export async function POST(request: Request) {
         categoryId,
         productId: productId || null,
         tags: sanitizeJson(tags, []),
-        status: status || 'PUBLISHED',
+        status: status || 'DRAFT',
+        qualityChecklist: qualityChecklist ? (typeof qualityChecklist === 'string' ? qualityChecklist : JSON.stringify(qualityChecklist)) : null,
       },
+    });
+
+    await logActivity({
+      action: blog.status === 'PUBLISHED' ? 'BLOG_PUBLISHED' : 'BLOG_CREATED',
+      entity: 'Blog',
+      entityId: blog.id,
+      details: { title: blog.title, status: blog.status },
     });
 
     revalidatePath('/');
@@ -126,3 +135,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create blog' }, { status: 500 });
   }
 }
+

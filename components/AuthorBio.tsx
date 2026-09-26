@@ -10,13 +10,13 @@ interface AuthorBioProps {
 }
 
 export default function AuthorBio({
-  name = 'TechPulse Editorial Team',
+  name = 'BlogWeb904 Editorial Team',
   bio = 'Our editorial research team specializes in consumer electronics, product teardowns, specification analysis, and market comparison guides to help buyers find the best tech within their budget.',
   role = 'Editorial Research & Buying Guide Specialist',
   avatar,
   className = '',
 }: AuthorBioProps) {
-  const initial = name.charAt(0).toUpperCase() || 'T';
+  const initial = name.charAt(0).toUpperCase() || 'B';
 
   return (
     <div className={`bg-white dark:bg-neutral-900 rounded-3xl p-6 sm:p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm ${className}`}>
@@ -54,7 +54,7 @@ export default function AuthorBio({
 
           <div className="pt-2 flex items-center gap-2 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Adheres to TechPulse Research & Editorial Standards</span>
+            <span>Adheres to BlogWeb904 Research & Editorial Standards</span>
           </div>
         </div>
       </div>

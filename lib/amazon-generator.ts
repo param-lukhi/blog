@@ -865,7 +865,7 @@ When weighing the **${title}** against the broader **${categoryName}** market at
  * Builds Schema.org JSON-LD structured schemas.
  */
 function buildStructuredSchemas(data: VerifiedProductData, slug: string): StructuredSchemas {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techpulse.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
   const numericPrice = parseFloat(data.price.replace(/[^0-9.]/g, '') || '199');
 
   const productSchema = {
@@ -901,12 +901,12 @@ function buildStructuredSchemas(data: VerifiedProductData, slug: string): Struct
     dateModified: data.verifiedAt,
     author: {
       '@type': 'Organization',
-      name: 'TechPulse Editorial Team',
+      name: 'BlogWeb904 Editorial Team',
       url: siteUrl,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'TechPulse',
+      name: 'BlogWeb904',
       logo: {
         '@type': 'ImageObject',
         url: `${siteUrl}/logo.png`,

@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { ShieldCheck, Info, CheckCircle2 } from 'lucide-react';
 
 export const metadata = {
-  title: 'Affiliate & Amazon Associates Disclosure - TechPulse Reviews',
-  description: 'Learn how TechPulse earns revenue through affiliate partnerships and how we maintain complete editorial independence.',
+  title: 'Affiliate & Amazon Associates Disclosure - BlogWeb904 Reviews',
+  description: 'Learn how BlogWeb904 earns revenue through affiliate partnerships and how we maintain complete editorial independence.',
 };
 
 export default function AffiliateDisclosurePage() {
@@ -18,7 +18,7 @@ export default function AffiliateDisclosurePage() {
           Affiliate & Amazon Associates Disclosure
         </h1>
         <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          Last Updated: August 2026
+          Last Updated: September 2026
         </p>
       </div>
 
@@ -28,7 +28,7 @@ export default function AffiliateDisclosurePage() {
           <span>Official Amazon Associates Program Statement</span>
         </div>
         <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium">
-          TechPulse (<strong>techpulsereviews.com</strong>) is a participant in the <strong>Amazon Services LLC Associates Program</strong> and regional Amazon affiliate programs worldwide, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com, Amazon.in, Amazon.co.uk, and related regional storefronts.
+          BlogWeb904 (<strong>blogweb904.vercel.app</strong>) is a participant in the <strong>Amazon Services LLC Associates Program</strong> and regional Amazon affiliate programs worldwide, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com, Amazon.in, Amazon.co.uk, and related regional storefronts.
         </p>
       </div>
 
@@ -73,7 +73,7 @@ export default function AffiliateDisclosurePage() {
             Product Pricing, Availability & Deals
           </h2>
           <p>
-            Prices and availability for products featured on TechPulse are accurate according to catalog records and merchant listings at the time of publication and are subject to change by merchants at any time.
+            Prices and availability for products featured on BlogWeb904 are accurate according to catalog records and merchant listings at the time of publication and are subject to change by merchants at any time.
           </p>
           <p>
             Any price, discount, shipping, or availability information displayed on Amazon or the respective retailer&apos;s site at the moment of checkout will apply to your final purchase.

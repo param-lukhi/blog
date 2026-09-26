@@ -3,302 +3,222 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
-  BarChart3, MousePointerClick, Eye, Globe, Search, ArrowUpRight,
-  ChevronDown, ChevronUp, FileText, ShoppingBag, ExternalLink, Sparkles, TrendingUp, Tag
+  BarChart3, RefreshCw, FileText, ShoppingBag, DollarSign,
+  Mail, MessageSquare, Bell, Search, AlertCircle, ArrowUpRight
 } from 'lucide-react';
-import { formatDate } from '@/lib/utils';
 
-interface BlogAnalyticsItem {
-  id: string;
-  title: string;
-  slug: string;
-  status: string;
-  categoryName: string;
-  views: number;
-  affiliateClicks: number;
-  ctr: string;
-  createdAt: string;
-  productName: string | null;
-  productPrice: string | null;
-  featuredImage: string;
-}
+export default function ProductionAnalyticsPage() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-export default function AdminAnalyticsPage() {
-  const [stats, setStats] = useState<any>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
+  const fetchAnalytics = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/analytics/dashboard');
+      const json = await res.json();
+      setData(json);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetch('/api/analytics')
-      .then((res) => res.json())
-      .then((data) => {
-        setStats(data);
-        if (data.blogAnalytics && data.blogAnalytics.length > 0) {
-          // Select first blog by default
-          setSelectedBlogId(data.blogAnalytics[0].id);
-        }
-      });
+    fetchAnalytics();
   }, []);
 
-  const blogAnalytics: BlogAnalyticsItem[] = stats?.blogAnalytics || [];
-
-  const filteredBlogs = blogAnalytics.filter(
-    (b) =>
-      b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.categoryName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const selectedBlog = blogAnalytics.find((b) => b.id === selectedBlogId);
-
   return (
-    <div className="space-y-8 pb-12">
-      <div>
-        <h1 className="text-2xl font-extrabold text-neutral-900 tracking-tight">
-          Click Tracking & Traffic Analytics
-        </h1>
-        <p className="text-xs text-neutral-500 mt-1">
-          Detailed real-time breakdown of page views, affiliate link CTR, and per-blog conversion performance.
-        </p>
-      </div>
-
-      {/* Summary KPI Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-5">
-        <div className="bg-white p-5 rounded-2xl border border-neutral-200/80 shadow-soft">
-          <div className="text-xs font-bold text-neutral-400 uppercase">Total Impressions</div>
-          <div className="text-3xl font-extrabold text-neutral-900 mt-1">{stats?.totalVisitors}</div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-neutral-200/80 shadow-soft">
-          <div className="text-xs font-bold text-neutral-400 uppercase">Affiliate Link Clicks</div>
-          <div className="text-3xl font-extrabold text-amber-600 mt-1">{stats?.affiliateClicks}</div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-neutral-200/80 shadow-soft">
-          <div className="text-xs font-bold text-neutral-400 uppercase">Click-Through-Rate (CTR)</div>
-          <div className="text-3xl font-extrabold text-brand-600 mt-1">{stats?.ctr}</div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-neutral-200/80 shadow-soft">
-          <div className="text-xs font-bold text-neutral-400 uppercase">Today&apos;s Traffic</div>
-          <div className="text-3xl font-extrabold text-emerald-600 mt-1">{stats?.todayVisitors}</div>
-        </div>
-      </div>
-
-      {/* Referral Sources & Keywords */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-soft space-y-4">
-          <h2 className="font-extrabold text-neutral-900 text-sm flex items-center gap-2">
-            <Globe className="w-4 h-4 text-brand-600" />
-            <span>Referral Sources</span>
-          </h2>
-          <ul className="space-y-3 text-xs text-neutral-700">
-            <li className="flex justify-between border-b border-neutral-100 pb-2">
-              <span>Google Organic Search</span>
-              <strong className="text-neutral-900">68%</strong>
-            </li>
-            <li className="flex justify-between border-b border-neutral-100 pb-2">
-              <span>Direct Traffic</span>
-              <strong className="text-neutral-900">18%</strong>
-            </li>
-            <li className="flex justify-between border-b border-neutral-100 pb-2">
-              <span>Social Media (Twitter/FB)</span>
-              <strong className="text-neutral-900">14%</strong>
-            </li>
-          </ul>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-soft space-y-4">
-          <h2 className="font-extrabold text-neutral-900 text-sm flex items-center gap-2">
-            <Search className="w-4 h-4 text-emerald-600" />
-            <span>Popular Visitor Keywords</span>
-          </h2>
-          <ul className="space-y-3 text-xs text-neutral-700">
-            <li className="flex justify-between border-b border-neutral-100 pb-2">
-              <span>&ldquo;best smartphone 2026 review&rdquo;</span>
-              <strong className="text-neutral-900">142 searches</strong>
-            </li>
-            <li className="flex justify-between border-b border-neutral-100 pb-2">
-              <span>&ldquo;macbook air m3 price drop&rdquo;</span>
-              <strong className="text-neutral-900">98 searches</strong>
-            </li>
-            <li className="flex justify-between border-b border-neutral-100 pb-2">
-              <span>&ldquo;sony xm5 noise cancel review&rdquo;</span>
-              <strong className="text-neutral-900">76 searches</strong>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      {/* ======================================================== */}
-      {/* 🚀 PER-BLOG PERFORMANCE ANALYTICS SECTION (USER REQUEST)  */}
-      {/* ======================================================== */}
-      <section className="bg-white rounded-3xl border border-neutral-200/90 p-6 sm:p-8 shadow-soft space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-neutral-100">
-          <div>
-            <span className="text-xs font-extrabold uppercase tracking-wider text-brand-600 flex items-center gap-1.5">
-              <BarChart3 className="w-4 h-4" /> Individual Blog Performance Metrics
-            </span>
-            <h2 className="text-xl font-extrabold text-neutral-900 mt-1">
-              Blog Article Views, Clicks & Conversion Reports
-            </h2>
-            <p className="text-xs text-neutral-500 mt-0.5">
-              Click any blog from the list below to inspect its individual page views, Amazon link clicks, and CTR %.
-            </p>
+    <div className="space-y-6 max-w-7xl mx-auto pb-16">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <BarChart3 className="w-6 h-6 text-indigo-400" />
+            <h1 className="text-2xl font-bold text-white tracking-tight">Production Analytics & Performance</h1>
           </div>
-
-          <div className="relative w-full sm:w-64">
-            <input
-              type="text"
-              placeholder="Search blog list..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs outline-none focus:border-brand-500"
-            />
-            <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-2.5" />
-          </div>
+          <p className="text-sm text-slate-400">
+            Real first-party measured database events and verified external Google Search / affiliate postback signals.
+          </p>
         </div>
 
-        {/* Selected Blog Detail Card */}
-        {selectedBlog && (
-          <div className="bg-gradient-to-r from-brand-900 via-neutral-900 to-neutral-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 animate-in fade-in duration-200">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-neutral-800 pb-6">
-              <div className="space-y-1">
-                <span className="px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30 text-[10px] font-extrabold uppercase tracking-wider">
-                  {selectedBlog.categoryName}
-                </span>
-                <h3 className="text-xl font-extrabold text-white mt-2 leading-snug">
-                  {selectedBlog.title}
-                </h3>
-                {selectedBlog.productName && (
-                  <p className="text-xs text-neutral-400">
-                    Recommended Product: <strong className="text-white">{selectedBlog.productName}</strong> ({selectedBlog.productPrice})
-                  </p>
-                )}
-              </div>
+        <button
+          onClick={fetchAnalytics}
+          disabled={loading}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all disabled:opacity-50 self-start md:self-auto"
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh Metrics
+        </button>
+      </div>
 
-              <Link
-                href={`/blog/${selectedBlog.slug}`}
-                target="_blank"
-                className="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shrink-0 transition-colors"
-              >
-                <span>View Article Live</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </Link>
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <RefreshCw className="w-8 h-8 animate-spin text-indigo-400" />
+        </div>
+      ) : data ? (
+        <>
+          {/* Section: 1st Party Measured Telemetry */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                First-Party Measured Metrics (Neon Database)
+              </h2>
+              <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                100% Measured
+              </span>
             </div>
 
-            {/* Metrics Breakdown Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {/* Page Views */}
-              <div className="p-4 rounded-2xl bg-neutral-800/60 border border-neutral-700/60 space-y-2">
-                <div className="flex items-center justify-between text-neutral-400 text-xs font-bold uppercase">
-                  <span>Page Views</span>
-                  <Eye className="w-4 h-4 text-brand-400" />
-                </div>
-                <div className="text-3xl font-extrabold text-white">
-                  {selectedBlog.views.toLocaleString()}
-                </div>
-                <div className="text-[11px] text-neutral-400">Total reader visits</div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <span className="text-xs font-bold text-slate-400 uppercase">Published Articles</span>
+                <div className="mt-2 text-2xl font-extrabold text-white">{data.measured?.publishedArticles}</div>
+                <span className="text-[11px] text-slate-500 mt-1 block">Live in database</span>
               </div>
 
-              {/* Affiliate Clicks */}
-              <div className="p-4 rounded-2xl bg-neutral-800/60 border border-neutral-700/60 space-y-2">
-                <div className="flex items-center justify-between text-neutral-400 text-xs font-bold uppercase">
-                  <span>Amazon Link Clicks</span>
-                  <MousePointerClick className="w-4 h-4 text-amber-400" />
-                </div>
-                <div className="text-3xl font-extrabold text-amber-400">
-                  {selectedBlog.affiliateClicks.toLocaleString()}
-                </div>
-                <div className="text-[11px] text-neutral-400">Outbound buy button clicks</div>
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <span className="text-xs font-bold text-slate-400 uppercase">Tracked Affiliate Clicks</span>
+                <div className="mt-2 text-2xl font-extrabold text-indigo-400">{data.measured?.affiliateClicks}</div>
+                <span className="text-[11px] text-slate-500 mt-1 block">Direct store clicks</span>
               </div>
 
-              {/* CTR % */}
-              <div className="p-4 rounded-2xl bg-neutral-800/60 border border-neutral-700/60 space-y-2">
-                <div className="flex items-center justify-between text-neutral-400 text-xs font-bold uppercase">
-                  <span>Click-Through Rate (CTR)</span>
-                  <TrendingUp className="w-4 h-4 text-emerald-400" />
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <span className="text-xs font-bold text-slate-400 uppercase">Verified Conversions</span>
+                <div className="mt-2 text-2xl font-extrabold text-emerald-400">{data.measured?.verifiedConversions}</div>
+                <span className="text-[11px] text-slate-500 mt-1 block">Webhook postbacks</span>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <span className="text-xs font-bold text-slate-400 uppercase">Confirmed Revenue</span>
+                <div className="mt-2 text-2xl font-extrabold text-emerald-400">
+                  ₹{Number(data.measured?.confirmedRevenue || 0).toLocaleString()}
                 </div>
-                <div className="text-3xl font-extrabold text-emerald-400">
-                  {selectedBlog.ctr}
-                </div>
-                <div className="text-[11px] text-emerald-400 font-semibold">High Converting Review</div>
+                <span className="text-[11px] text-slate-500 mt-1 block">Verified commissions</span>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <span className="text-xs font-bold text-slate-400 uppercase">Catalog Products</span>
+                <div className="mt-2 text-2xl font-extrabold text-white">{data.measured?.publishedProducts}</div>
+                <span className="text-[11px] text-slate-500 mt-1 block">With multi-store prices</span>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <span className="text-xs font-bold text-slate-400 uppercase">Newsletter Subscribers</span>
+                <div className="mt-2 text-2xl font-extrabold text-white">{data.measured?.newsletterSubscribers}</div>
+                <span className="text-[11px] text-slate-500 mt-1 block">Active double-opt-in</span>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <span className="text-xs font-bold text-slate-400 uppercase">Approved Reviews</span>
+                <div className="mt-2 text-2xl font-extrabold text-white">{data.measured?.approvedReviews}</div>
+                <span className="text-[11px] text-slate-500 mt-1 block">Community rated</span>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <span className="text-xs font-bold text-slate-400 uppercase">Active Price Alerts</span>
+                <div className="mt-2 text-2xl font-extrabold text-white">{data.measured?.activePriceAlerts}</div>
+                <span className="text-[11px] text-slate-500 mt-1 block">Drop notifications</span>
               </div>
             </div>
           </div>
-        )}
 
-        {/* Blog Interactive List Table */}
-        <div className="border border-neutral-200/80 rounded-2xl overflow-hidden shadow-xs">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="bg-neutral-50 border-b border-neutral-200 font-bold text-neutral-500 uppercase tracking-wider">
-                  <th className="p-4">Blog Article Title</th>
-                  <th className="p-4">Category</th>
-                  <th className="p-4 text-center">👁️ Page Views</th>
-                  <th className="p-4 text-center">🛒 Affiliate Clicks</th>
-                  <th className="p-4 text-center">📊 CTR %</th>
-                  <th className="p-4 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-100">
-                {filteredBlogs.map((b) => {
-                  const isSelected = b.id === selectedBlogId;
-                  return (
-                    <tr
-                      key={b.id}
-                      onClick={() => setSelectedBlogId(b.id)}
-                      className={`cursor-pointer transition-colors ${
-                        isSelected
-                          ? 'bg-brand-50/70 font-bold text-brand-900'
-                          : 'hover:bg-neutral-50 text-neutral-800'
-                      }`}
-                    >
-                      <td className="p-4 max-w-sm truncate">
-                        <div className="font-bold">{b.title}</div>
-                        <div className="text-[10px] text-neutral-400 font-normal">
-                          {formatDate(b.createdAt)}
-                        </div>
-                      </td>
-                      <td className="p-4 text-neutral-600 font-medium">{b.categoryName}</td>
-                      <td className="p-4 text-center">
-                        <span className="px-2.5 py-1 rounded-full bg-neutral-100 font-extrabold text-neutral-800">
-                          {b.views.toLocaleString()}
-                        </span>
-                      </td>
-                      <td className="p-4 text-center">
-                        <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 font-extrabold">
-                          {b.affiliateClicks.toLocaleString()}
-                        </span>
-                      </td>
-                      <td className="p-4 text-center">
-                        <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-extrabold">
-                          {b.ctr}
-                        </span>
-                      </td>
-                      <td className="p-4 text-right">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedBlogId(b.id);
-                          }}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                            isSelected
-                              ? 'bg-brand-600 text-white'
-                              : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-                          }`}
-                        >
-                          {isSelected ? 'Viewing Analytics' : 'View Breakdown'}
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          {/* Section: External Integrations Transparency */}
+          <div className="space-y-4 pt-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-slate-500" />
+                External API Telemetry & Telemetry Status
+              </h2>
+              <span className="text-xs font-bold text-slate-400 bg-slate-800 px-2.5 py-1 rounded-full">
+                Strict Zero-Simulation Policy
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Google Search Console Box */}
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Search className="w-5 h-5 text-indigo-400" />
+                    <h3 className="font-bold text-white text-sm">Google Search Console Integration</h3>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                    {data.externalIntegrations?.googleSearchConsole?.status}
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-400">{data.externalIntegrations?.googleSearchConsole?.message}</p>
+
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                    <span className="text-[10px] text-slate-500 uppercase font-bold">Organic Clicks</span>
+                    <div className="text-xs font-mono text-slate-400 mt-1">
+                      {data.externalIntegrations?.googleSearchConsole?.organicClicks}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                    <span className="text-[10px] text-slate-500 uppercase font-bold">Search Impressions</span>
+                    <div className="text-xs font-mono text-slate-400 mt-1">
+                      {data.externalIntegrations?.googleSearchConsole?.impressions}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                    <span className="text-[10px] text-slate-500 uppercase font-bold">Average CTR</span>
+                    <div className="text-xs font-mono text-slate-400 mt-1">
+                      {data.externalIntegrations?.googleSearchConsole?.averageCtr}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                    <span className="text-[10px] text-slate-500 uppercase font-bold">Average Position</span>
+                    <div className="text-xs font-mono text-slate-400 mt-1">
+                      {data.externalIntegrations?.googleSearchConsole?.averagePosition}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <Link
+                    href="/admin/settings/search-console"
+                    className="text-xs font-bold text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-1"
+                  >
+                    Configure Google Service Account <ArrowUpRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Affiliate Postbacks Box */}
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-5 h-5 text-emerald-400" />
+                    <h3 className="font-bold text-white text-sm">Merchant Postback Webhooks</h3>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                    {data.externalIntegrations?.affiliatePostbacks?.status}
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-400">{data.externalIntegrations?.affiliatePostbacks?.message}</p>
+
+                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300">
+                  <div className="font-bold text-slate-400 mb-1">Attribution Guarantee:</div>
+                  Zero fake conversions or simulated earnings are ever injected. Revenue is recorded exclusively through HMAC-authenticated external affiliate postbacks.
+                </div>
+
+                <div className="pt-2">
+                  <Link
+                    href="/admin/monetization/revenue"
+                    className="text-xs font-bold text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1"
+                  >
+                    View Attribution Dashboard <ArrowUpRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </>
+      ) : null}
     </div>
   );
 }

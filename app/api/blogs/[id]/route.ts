@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { safeJsonParse } from '@/lib/utils';
 import { isAuthorizedAdmin } from '@/lib/auth';
+import { logActivity } from '@/lib/activity';
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -55,10 +56,32 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     if (updateData.faqs !== undefined) updateData.faqs = sanitizeJson(updateData.faqs);
     if (updateData.tags !== undefined) updateData.tags = sanitizeJson(updateData.tags);
     if (updateData.marketplaces !== undefined) updateData.marketplaces = sanitizeJson(updateData.marketplaces);
+    if (updateData.qualityChecklist !== undefined) updateData.qualityChecklist = sanitizeJson(updateData.qualityChecklist);
+
+    const existing = await db.blog.findUnique({ where: { id: params.id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
+    }
 
     const updatedBlog = await db.blog.update({
       where: { id: params.id },
       data: updateData,
+    });
+
+    let action = 'BLOG_UPDATED';
+    if (existing.status !== 'PUBLISHED' && updatedBlog.status === 'PUBLISHED') {
+      action = 'BLOG_PUBLISHED';
+    } else if (existing.status === 'PUBLISHED' && updatedBlog.status !== 'PUBLISHED') {
+      action = 'BLOG_UNPUBLISHED';
+    } else if (updatedBlog.status === 'APPROVED') {
+      action = 'BLOG_APPROVED';
+    }
+
+    await logActivity({
+      action,
+      entity: 'Blog',
+      entityId: updatedBlog.id,
+      details: { title: updatedBlog.title, status: updatedBlog.status },
     });
 
     revalidatePath('/');
@@ -94,10 +117,32 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     if (updateData.faqs !== undefined) updateData.faqs = sanitizeJson(updateData.faqs);
     if (updateData.tags !== undefined) updateData.tags = sanitizeJson(updateData.tags);
     if (updateData.marketplaces !== undefined) updateData.marketplaces = sanitizeJson(updateData.marketplaces);
+    if (updateData.qualityChecklist !== undefined) updateData.qualityChecklist = sanitizeJson(updateData.qualityChecklist);
+
+    const existing = await db.blog.findUnique({ where: { id: params.id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
+    }
 
     const updatedBlog = await db.blog.update({
       where: { id: params.id },
       data: updateData,
+    });
+
+    let action = 'BLOG_UPDATED';
+    if (existing.status !== 'PUBLISHED' && updatedBlog.status === 'PUBLISHED') {
+      action = 'BLOG_PUBLISHED';
+    } else if (existing.status === 'PUBLISHED' && updatedBlog.status !== 'PUBLISHED') {
+      action = 'BLOG_UNPUBLISHED';
+    } else if (updatedBlog.status === 'APPROVED') {
+      action = 'BLOG_APPROVED';
+    }
+
+    await logActivity({
+      action,
+      entity: 'Blog',
+      entityId: updatedBlog.id,
+      details: { title: updatedBlog.title, status: updatedBlog.status },
     });
 
     revalidatePath('/');
@@ -118,7 +163,18 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
   try {
     const blog = await db.blog.findUnique({ where: { id: params.id } });
+    if (!blog) {
+      return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
+    }
+
     await db.blog.delete({ where: { id: params.id } });
+
+    await logActivity({
+      action: 'BLOG_DELETED',
+      entity: 'Blog',
+      entityId: params.id,
+      details: { title: blog.title },
+    });
 
     revalidatePath('/');
     revalidatePath('/blog');
@@ -129,4 +185,5 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ error: 'Failed to delete blog' }, { status: 500 });
   }
 }
+
 

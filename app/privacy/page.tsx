@@ -4,8 +4,8 @@ import { ShieldCheck, Lock, Cookie, Eye, ExternalLink, Mail, CheckCircle2 } from
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy - TechPulse Reviews',
-  description: 'Learn how TechPulse handles data, cookies, Google AdSense advertising, and user privacy in compliance with global standards.',
+  title: 'Privacy Policy - BlogWeb904 Reviews',
+  description: 'Learn how BlogWeb904 handles data, cookies, Google AdSense advertising, and user privacy in compliance with global standards.',
   alternates: {
     canonical: '/privacy',
   },
@@ -36,7 +36,7 @@ export default function PrivacyPage() {
           <span>Our Privacy Commitment</span>
         </div>
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          At TechPulse (accessible via <strong>https://blogweb904.vercel.app</strong>), the privacy of our visitors is of utmost importance to us. This Privacy Policy document outlines the types of personal information that is received and collected by TechPulse and how it is utilized, including our strict compliance with Google AdSense publisher policies, GDPR, and CCPA standards.
+          At BlogWeb904 (accessible via <strong>https://blogweb904.vercel.app</strong>), the privacy of our visitors is of utmost importance to us. This Privacy Policy document outlines the types of personal information that is received and collected by BlogWeb904 and how it is utilized, including our strict compliance with Google AdSense publisher policies, GDPR, and CCPA standards.
         </p>
       </div>
 
@@ -48,14 +48,14 @@ export default function PrivacyPage() {
             <span>1. Information We Collect</span>
           </h2>
           <p>
-            TechPulse is an editorial research and buying guide website. We do not require visitors to register an account or provide financial billing information to read our reviews and guides.
+            BlogWeb904 is an editorial research and buying guide website. We do not require visitors to register an account or provide financial billing information to read our reviews and guides.
           </p>
           <ul className="space-y-2 list-disc pl-5 text-neutral-700 dark:text-neutral-300">
             <li>
               <strong>Voluntarily Provided Information:</strong> When you subscribe to our newsletter or submit an inquiry through our Contact Us form, you may provide your name and email address. We use this data exclusively to respond to your inquiry or deliver editorial emails.
             </li>
             <li>
-              <strong>Log Files:</strong> Like most standard web servers, TechPulse uses log files. These files log visits to the website. Information stored includes internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date/time stamps, referring/exit pages, and number of clicks. This information is anonymous and not linked to personally identifiable information.
+              <strong>Log Files:</strong> Like most standard web servers, BlogWeb904 uses log files. These files log visits to the website. Information stored includes internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date/time stamps, referring/exit pages, and number of clicks. This information is anonymous and not linked to personally identifiable information.
             </li>
           </ul>
         </section>
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
             <span>2. Google AdSense & Third-Party Advertising Disclosures</span>
           </h2>
           <p className="text-neutral-800 dark:text-neutral-200 font-medium">
-            Third-party vendors, including <strong>Google</strong>, use cookies to serve advertisements based on a user&apos;s prior visits to TechPulse or other websites across the Internet.
+            Third-party vendors, including <strong>Google</strong>, use cookies to serve advertisements based on a user&apos;s prior visits to BlogWeb904 or other websites across the Internet.
           </p>
           <div className="space-y-3 text-sm text-neutral-700 dark:text-neutral-300">
             <p>
@@ -114,7 +114,7 @@ export default function PrivacyPage() {
             <span>3. Amazon Associates & Affiliate Tracking Cookies</span>
           </h2>
           <p>
-            TechPulse is a participant in the Amazon Services LLC Associates Program and regional Amazon affiliate programs worldwide. When you click on outgoing Amazon product links on our site, Amazon places an HTTP tracking cookie on your device to attribute referral sales and calculate qualifying commissions.
+            BlogWeb904 is a participant in the Amazon Services LLC Associates Program and regional Amazon affiliate programs worldwide. When you click on outgoing Amazon product links on our site, Amazon places an HTTP tracking cookie on your device to attribute referral sales and calculate qualifying commissions.
           </p>
           <p>
             These affiliate cookies do not collect sensitive personal data such as your name, address, or credit card details. You can review Amazon&apos;s privacy policy on official Amazon portals.
@@ -150,7 +150,7 @@ export default function PrivacyPage() {
             </div>
             <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
               <h4 className="font-bold text-neutral-900 dark:text-white mb-1">Right to Opt-Out of Sale</h4>
-              <p className="text-xs text-neutral-600 dark:text-neutral-400">TechPulse does not sell personal user data to third parties for monetary consideration.</p>
+              <p className="text-xs text-neutral-600 dark:text-neutral-400">BlogWeb904 does not sell personal user data to third parties for monetary consideration.</p>
             </div>
             <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
               <h4 className="font-bold text-neutral-900 dark:text-white mb-1">Right to Non-Discrimination</h4>
@@ -165,7 +165,7 @@ export default function PrivacyPage() {
             6. Children&apos;s Information (COPPA)
           </h2>
           <p>
-            Protecting children while using the internet is especially important to us. TechPulse does not knowingly collect any Personal Identifiable Information from children under the age of 13. If you believe your child has provided personal information on our website, please contact us immediately and we will promptly remove such information.
+            Protecting children while using the internet is especially important to us. BlogWeb904 does not knowingly collect any Personal Identifiable Information from children under the age of 13. If you believe your child has provided personal information on our website, please contact us immediately and we will promptly remove such information.
           </p>
         </section>
 
@@ -179,8 +179,8 @@ export default function PrivacyPage() {
             If you have questions about this Privacy Policy, your rights, or wish to make a data request, please contact our editorial and privacy desk:
           </p>
           <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-1 text-sm">
-            <p className="font-bold text-neutral-900 dark:text-white">TechPulse Editorial & Privacy Desk</p>
-            <p className="text-neutral-600 dark:text-neutral-400">Email: <strong>editorial@techpulsereviews.com</strong></p>
+            <p className="font-bold text-neutral-900 dark:text-white">BlogWeb904 Editorial & Privacy Desk</p>
+            <p className="text-neutral-600 dark:text-neutral-400">Email: <strong>editorial@blogweb904.vercel.app</strong></p>
             <p className="text-neutral-600 dark:text-neutral-400">
               Or submit a ticket via our{' '}
               <Link href="/contact" className="text-brand-600 dark:text-brand-400 font-bold underline">

@@ -4,8 +4,8 @@ import { Cookie, ShieldCheck, CheckCircle2, ExternalLink } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Cookie Policy - TechPulse Reviews',
-  description: 'Understand how cookies are used on TechPulse for site preferences, Google AdSense advertising, and affiliate attribution.',
+  title: 'Cookie Policy - BlogWeb904 Reviews',
+  description: 'Understand how cookies are used on BlogWeb904 for site preferences, Google AdSense advertising, and affiliate attribution.',
   alternates: {
     canonical: '/cookie-policy',
   },

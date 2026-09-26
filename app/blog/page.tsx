@@ -8,8 +8,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata = {
-  title: 'Product Reviews, Buying Guides & Tech Articles - TechPulse',
-  description: 'Explore in-depth product reviews, buying guides, specification breakdowns, and comparison guides for smartphones, laptops, audio gear, and gadgets.',
+  title: 'Product Reviews, Buying Guides & Tech Articles - BlogWeb904',
+  description: 'Explore in-depth product reviews, buying guides, specification breakdowns, and multi-store price comparisons for smartphones, laptops, audio gear, and gadgets.',
 };
 
 export default async function BlogListPage() {

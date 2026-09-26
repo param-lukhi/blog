@@ -7,7 +7,9 @@ import {
   LayoutDashboard, ShoppingBag, FileText, FolderKanban,
   Zap, BarChart3, Settings, Image as ImageIcon, Globe, LogOut,
   GitCompare, Tag, Sparkles, MessageSquare, Users, Mail, Link2,
-  Tv, ShieldCheck, Database, HelpCircle, ChevronLeft, ChevronRight
+  Tv, ShieldCheck, Database, HelpCircle, ChevronLeft, ChevronRight,
+  Compass, History, Server, ShieldAlert, TrendingUp, FlaskConical,
+  DollarSign, Search, Send
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -25,6 +27,7 @@ interface Counts {
   brands?: number;
   deals?: number;
   comparisons?: number;
+  research?: number;
 }
 
 export default function AdminSidebar({ isCollapsed = false, onToggleCollapse }: AdminSidebarProps) {
@@ -47,22 +50,38 @@ export default function AdminSidebar({ isCollapsed = false, onToggleCollapse }: 
   };
 
   const navItems = [
+    { name: 'Launch Center', href: '/admin/launch', icon: Rocket, badge: 'P10' },
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'Publishing Engine', href: '/admin/content/publishing', icon: Send, badge: 'P9' },
+    { name: 'Growth Engine', href: '/admin/growth', icon: TrendingUp, badge: 'P8' },
+    { name: 'Production Analytics', href: '/admin/analytics', icon: BarChart3 },
+    { name: 'Content Opportunities', href: '/admin/content/opportunities', icon: Sparkles },
+    { name: 'Editorial Calendar', href: '/admin/content/calendar', icon: Compass },
+    { name: 'Search Console', href: '/admin/seo/search-console', icon: Search },
+    { name: 'Google Indexing', href: '/admin/seo/indexing', icon: Globe },
+    { name: 'Indexing Issues', href: '/admin/seo/indexing/issues', icon: ShieldAlert },
+    { name: 'AdSense Readiness', href: '/admin/monetization/adsense', icon: Tv, badge: 'Audit' },
+    { name: 'Product Research', href: '/admin/research', icon: Compass, badge: 'Workflow', count: counts.research },
     { name: 'Products', href: '/admin/products', icon: ShoppingBag, count: counts.products },
     { name: 'Blogs & Reviews', href: '/admin/blogs', icon: FileText, count: counts.blogs },
     { name: 'Comparisons', href: '/admin/comparisons', icon: GitCompare, count: counts.comparisons },
+    { name: 'Content Hub', href: '/admin/content', icon: Sparkles, badge: 'P5' },
+    { name: 'Moderation Queue', href: '/admin/moderation', icon: ShieldCheck, badge: 'P6' },
     { name: 'Categories', href: '/admin/categories', icon: FolderKanban, count: counts.categories },
     { name: 'Brands', href: '/admin/brands', icon: Tag, count: counts.brands },
     { name: 'Deals', href: '/admin/deals', icon: Sparkles, badge: 'Hot', count: counts.deals },
+    { name: 'Affiliate Revenue', href: '/admin/monetization/revenue', icon: DollarSign, badge: 'Revenue' },
+    { name: 'Growth Experiments', href: '/admin/growth/experiments', icon: FlaskConical },
+    { name: 'Monetization', href: '/admin/monetization', icon: Tv, badge: 'Ads.txt' },
     { name: 'Media Library', href: '/admin/media', icon: ImageIcon },
+    { name: 'Activity Log', href: '/admin/activity', icon: History },
+    { name: 'Incident Center', href: '/admin/system/incidents', icon: ShieldAlert },
     { name: 'Comments', href: '/admin/comments', icon: MessageSquare, count: counts.pendingComments },
     { name: 'Users', href: '/admin/users', icon: Users, count: counts.users },
     { name: 'Newsletter', href: '/admin/newsletter', icon: Mail, count: counts.newsletterSubscribers },
-    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
-    { name: 'Affiliate Links', href: '/admin/affiliate-links', icon: Link2 },
-    { name: 'Advertisements', href: '/admin/advertisements', icon: Tv },
-    { name: 'SEO', href: '/admin/seo', icon: ShieldCheck },
-    { name: 'Backup', href: '/admin/backup', icon: Database },
+    { name: 'System Operations', href: '/admin/system', icon: Server, badge: 'P7' },
+    { name: 'SEO Issue Center', href: '/admin/system/seo', icon: ShieldCheck },
+    { name: 'Deployment Readiness', href: '/admin/system/deployment', icon: ShieldAlert },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
     { name: 'Support', href: '/admin/support', icon: HelpCircle },
   ];
@@ -80,12 +99,12 @@ export default function AdminSidebar({ isCollapsed = false, onToggleCollapse }: 
         <div className="flex items-center justify-between px-3 py-3 mb-4 border-b border-neutral-800">
           <Link href="/admin/dashboard" className="flex items-center gap-2.5 overflow-hidden">
             <div className="w-8 h-8 rounded-xl bg-brand-600 flex items-center justify-center text-white font-extrabold text-base shrink-0 shadow-sm">
-              T
+              B
             </div>
             {!isCollapsed && (
               <div className="truncate">
                 <div className="font-extrabold text-white text-sm tracking-tight leading-tight">
-                  TechPulse
+                  BlogWeb904
                 </div>
                 <div className="text-[10px] text-neutral-400 font-medium">
                   Admin Dashboard

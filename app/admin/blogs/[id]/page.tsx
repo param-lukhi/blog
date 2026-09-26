@@ -3,8 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import RichTextEditor from '@/components/RichTextEditor';
+import MediaPickerModal from '@/components/admin/MediaPickerModal';
+import BlogQualityCheckModal from '@/components/admin/BlogQualityCheckModal';
+import DraftPreviewModal from '@/components/admin/DraftPreviewModal';
 import { safeJsonParse, slugify } from '@/lib/utils';
-import { Save, ArrowLeft, Plus, Trash, Zap, ExternalLink, ShoppingBag, Sparkles, Upload, TrendingDown, Star, RefreshCw } from 'lucide-react';
+import { evaluateBlogQuality } from '@/lib/qualityCheck';
+import { Save, ArrowLeft, Plus, Trash, Zap, ExternalLink, ShoppingBag, Sparkles, Image as ImageIcon, Upload, TrendingDown, Star, RefreshCw, ShieldCheck, Eye, Calendar } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 interface ProductItem {
   id: string;
@@ -28,6 +34,20 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
   const [productId, setProductId] = useState('');
   const [loading, setLoading] = useState(true);
 
+  // Modals state
+  const [showQualityModal, setShowQualityModal] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [qualityChecklist, setQualityChecklist] = useState<Record<string, boolean>>({
+    noFakeClaims: true,
+    researchComplete: true,
+    factsVerified: true,
+    sourcesAdded: true,
+    priceChecked: true,
+    disclosureChecked: true,
+    authorAssigned: true,
+  });
+  const [scheduledAt, setScheduledAt] = useState('');
+
   // Form State
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
@@ -36,6 +56,7 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
   const [categoryId, setCategoryId] = useState('');
   const [featuredImage, setFeaturedImage] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [content, setContent] = useState('');
   const [amazonUrl, setAmazonUrl] = useState('');
   const [affiliateUrl, setAffiliateUrl] = useState('');
@@ -275,6 +296,8 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
       affiliateUrl,
       conclusion,
       status,
+      qualityChecklist,
+      scheduledAt: status === 'SCHEDULED' && scheduledAt ? new Date(scheduledAt).toISOString() : null,
       specifications: specObj,
       pros: pros.filter(Boolean),
       cons: cons.filter(Boolean),
@@ -296,52 +319,84 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
     }
   };
 
+  const currentQuality = evaluateBlogQuality({
+    title,
+    slug,
+    metaTitle,
+    metaDescription,
+    content,
+    featuredImage,
+    amazonUrl,
+    affiliateUrl,
+    faqs,
+    qualityChecklist,
+  });
+
   if (loading) {
     return <div className="p-8 text-neutral-500 font-medium">Loading blog data for editing...</div>;
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl pb-16">
-      <div className="flex items-center justify-between border-b border-neutral-200 pb-4">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="p-2 rounded-xl bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-extrabold text-neutral-900">Edit Product Blog</h1>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-brand-50 text-brand-700 font-extrabold text-xs border border-brand-200">
-                👁️ {views.toLocaleString()} Views
-              </span>
+    <>
+      <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl pb-16">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 pb-4">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="p-2 rounded-xl bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-extrabold text-neutral-900">Edit Product Blog</h1>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-brand-50 text-brand-700 font-extrabold text-xs border border-brand-200">
+                  👁️ {views.toLocaleString()} Views
+                </span>
+              </div>
+              <p className="text-xs text-neutral-500">ID: {params.id}</p>
             </div>
-            <p className="text-xs text-neutral-500">ID: {params.id}</p>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setShowQualityModal(true)}
+              className="px-3.5 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 text-neutral-800 text-xs font-bold flex items-center gap-1.5 transition-all"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+              <span>Quality: {currentQuality.score}%</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowPreviewModal(true)}
+              className="px-3.5 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 text-neutral-800 text-xs font-bold flex items-center gap-1.5 transition-all"
+            >
+              <Eye className="w-3.5 h-3.5 text-neutral-600" />
+              <span>Preview</span>
+            </button>
+
+            <a
+              href={`/blog/${slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-2 rounded-xl bg-white border border-neutral-300 hover:bg-neutral-50 text-neutral-700 text-xs font-bold flex items-center gap-1.5"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Live</span>
+            </a>
+
+            <button
+              type="submit"
+              className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-2 shadow-sm"
+            >
+              <Save className="w-4 h-4" />
+              <span>Save Changes</span>
+            </button>
           </div>
         </div>
-
-        <div className="flex items-center gap-3">
-          <a
-            href={`/blog/${slug}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-4 py-2 rounded-xl bg-white border border-neutral-300 hover:bg-neutral-50 text-neutral-700 text-xs font-bold flex items-center gap-1.5"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            <span>View Live</span>
-          </a>
-
-          <button
-            type="submit"
-            className="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-2 shadow-sm"
-          >
-            <Save className="w-4 h-4" />
-            <span>Update Changes</span>
-          </button>
-        </div>
-      </div>
 
       {/* Product Binding Header Box */}
       <div className="bg-brand-50/80 border border-brand-200 p-5 rounded-2xl space-y-3">
@@ -772,19 +827,38 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
 
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-soft space-y-4">
-            <h3 className="font-bold text-neutral-900 text-sm border-b border-neutral-100 pb-2">Status & Image</h3>
+            <h3 className="font-bold text-neutral-900 text-sm border-b border-neutral-100 pb-2">Publication Status &amp; Image</h3>
             <div>
-              <label className="block text-xs font-bold text-neutral-700 mb-1">Status</label>
+              <label className="block text-xs font-bold text-neutral-700 mb-1">Workflow Status</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
                 className="w-full px-3.5 py-2 rounded-xl border border-neutral-300 text-xs font-bold outline-none bg-white"
               >
-                <option value="PUBLISHED">Published</option>
-                <option value="DRAFT">Draft</option>
-                <option value="SCHEDULED">Scheduled</option>
+                <option value="IDEA">IDEA (Concept)</option>
+                <option value="RESEARCHING">RESEARCHING (Gathering facts)</option>
+                <option value="DRAFT">DRAFT (Writing in progress)</option>
+                <option value="REVIEW">REVIEW (Needs editorial check)</option>
+                <option value="APPROVED">APPROVED (Verified & Ready)</option>
+                <option value="PUBLISHED">PUBLISHED (Live)</option>
+                <option value="SCHEDULED">SCHEDULED (Auto-publish)</option>
               </select>
             </div>
+
+            {status === 'SCHEDULED' && (
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-1">
+                <label className="block text-[11px] font-bold text-blue-900 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                  Scheduled Publish Date &amp; Time
+                </label>
+                <input
+                  type="datetime-local"
+                  value={scheduledAt}
+                  onChange={(e) => setScheduledAt(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-lg border border-blue-300 text-xs bg-white"
+                />
+              </div>
+            )}
 
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1">Featured Image URL / Upload</label>
@@ -796,6 +870,15 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
                   className="w-full px-3 py-1.5 rounded-xl border border-neutral-300 text-xs"
                 />
                 <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowMediaPicker(true)}
+                    className="px-3 py-1.5 bg-brand-50 border border-brand-300 text-brand-700 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:bg-brand-100 transition-colors"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>Media Library</span>
+                  </button>
+
                   <input
                     type="file"
                     accept="image/*"
@@ -811,6 +894,13 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
                     <span>{uploadingImage ? 'Uploading...' : 'Upload Image'}</span>
                   </label>
                 </div>
+
+                <MediaPickerModal
+                  isOpen={showMediaPicker}
+                  onClose={() => setShowMediaPicker(false)}
+                  onSelect={(url) => setFeaturedImage(url)}
+                  title="Select Blog Featured Image"
+                />
 
                 {featuredImage && (
                   <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 mt-2">
@@ -881,5 +971,54 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
         </div>
       </div>
     </form>
+
+    <BlogQualityCheckModal
+      isOpen={showQualityModal}
+      onClose={() => setShowQualityModal(false)}
+      blogData={{
+        title,
+        slug,
+        metaTitle,
+        metaDescription,
+        content,
+        featuredImage,
+        amazonUrl,
+        affiliateUrl,
+        faqs,
+        qualityChecklist,
+      }}
+      onUpdateChecklist={(key, val) =>
+        setQualityChecklist((prev) => ({ ...prev, [key]: val }))
+      }
+      onApproveAndPublish={() => {
+        setStatus('PUBLISHED');
+        setShowQualityModal(false);
+      }}
+    />
+
+    <DraftPreviewModal
+      isOpen={showPreviewModal}
+      onClose={() => setShowPreviewModal(false)}
+      blog={{
+        title,
+        slug,
+        metaTitle,
+        metaDescription,
+        featuredImage,
+        content,
+        conclusion,
+        amazonUrl,
+        affiliateUrl,
+        pros,
+        cons,
+        faqs,
+        specs,
+      }}
+      onPublish={() => {
+        setStatus('PUBLISHED');
+        setShowPreviewModal(false);
+      }}
+    />
+  </>
   );
 }

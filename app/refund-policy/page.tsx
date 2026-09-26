@@ -4,8 +4,8 @@ import { ShoppingBag, ShieldCheck, ExternalLink, HelpCircle } from 'lucide-react
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Refund Policy & Merchant Purchases - TechPulse Reviews',
-  description: 'Learn how product refunds, customer returns, and merchant warranty claims work for products purchased via TechPulse affiliate links.',
+  title: 'Refund Policy & Merchant Purchases - BlogWeb904 Reviews',
+  description: 'Learn how product refunds, customer returns, and merchant warranty claims work for products purchased via BlogWeb904 affiliate links.',
   alternates: {
     canonical: '/refund-policy',
   },
@@ -41,7 +41,7 @@ export default function RefundPolicyPage() {
             <span>Important Notice Regarding Purchases</span>
           </div>
           <p className="text-neutral-700 dark:text-neutral-300 text-sm">
-            TechPulse is an independent review, comparison, and product research publication. We do not sell products directly, collect payment details, or fulfill orders. All purchases made through our referral links are transacted directly on <strong>Amazon</strong> or other authorized merchant storefronts.
+            BlogWeb904 is an independent review, comparison, and product research publication. We do not sell products directly, collect payment details, or fulfill orders. All purchases made through our referral links are transacted directly on <strong>Amazon</strong> or other authorized merchant storefronts.
           </p>
         </div>
 
@@ -50,7 +50,7 @@ export default function RefundPolicyPage() {
             1. Amazon 30-Day Return Policy
           </h2>
           <p>
-            When you purchase an item via a link on TechPulse, your order is backed by the respective Amazon marketplace return and refund policy (typically offering a 30-day window for returns, replacements, or full refunds on eligible items).
+            When you purchase an item via a link on BlogWeb904, your order is backed by the respective Amazon marketplace return and refund policy (typically offering a 30-day window for returns, replacements, or full refunds on eligible items).
           </p>
           <p>
             To initiate a return or request a refund for an item you bought on Amazon:
@@ -78,7 +78,7 @@ export default function RefundPolicyPage() {
             <span>Need Further Assistance?</span>
           </h2>
           <p>
-            If you have questions about a review or buying guide published on TechPulse, feel free to contact our editorial team via our{' '}
+            If you have questions about a review or buying guide published on BlogWeb904, feel free to contact our editorial team via our{' '}
             <Link href="/contact" className="text-brand-600 dark:text-brand-400 font-bold underline">
               Contact Page
             </Link>. For questions regarding an active Amazon order or shipment, please contact Amazon Customer Service directly.

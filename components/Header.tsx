@@ -23,7 +23,7 @@ export default function Header() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [siteName, setSiteName] = useState('TechPulse');
+  const [siteName, setSiteName] = useState('BlogWeb904');
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
 
@@ -278,6 +278,24 @@ export default function Header() {
             </Link>
 
             <Link
+              href="/quiz"
+              className={`relative py-1 transition-colors hover:text-brand-600 dark:hover:text-brand-400 font-bold text-brand-600 dark:text-brand-400 ${
+                isActive('/quiz') ? 'underline underline-offset-4' : ''
+              }`}
+            >
+              Quiz
+            </Link>
+
+            <Link
+              href="/trust"
+              className={`relative py-1 transition-colors hover:text-brand-600 dark:hover:text-brand-400 ${
+                isActive('/trust') ? 'text-brand-600 dark:text-brand-400 font-bold' : ''
+              }`}
+            >
+              Trust
+            </Link>
+
+            <Link
               href="/about"
               className={`relative py-1 transition-colors hover:text-brand-600 dark:hover:text-brand-400 ${
                 isActive('/about') ? 'text-brand-600 dark:text-brand-400 font-bold' : ''
@@ -377,6 +395,27 @@ export default function Header() {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Amazon Deals
+            </Link>
+            <Link
+              href="/quiz"
+              className={`block px-3 py-2 rounded-xl text-sm font-bold text-brand-600 dark:text-brand-400 hover:bg-neutral-100 dark:hover:bg-neutral-800`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              ✨ Interactive Buying Quiz
+            </Link>
+            <Link
+              href="/trust"
+              className={`block px-3 py-2 rounded-xl text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-neutral-100 dark:hover:bg-neutral-800`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              🛡️ Editorial Trust Center
+            </Link>
+            <Link
+              href="/account"
+              className={`block px-3 py-2 rounded-xl text-sm font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              📌 Saved Products & Alerts
             </Link>
             <Link
               href="/about"

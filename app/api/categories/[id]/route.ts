@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { isAuthorizedAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,13 +29,21 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized: Admin privileges required.' }, { status: 401 });
+  }
+
   try {
     const { id } = params;
     const body = await request.json();
     const { name, slug, description, icon, image, parentId } = body;
 
-    if (!name || !slug) {
-      return NextResponse.json({ error: 'Name and Slug are required' }, { status: 400 });
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
+    }
+
+    if (!slug || typeof slug !== 'string' || slug.trim().length === 0) {
+      return NextResponse.json({ error: 'Category slug is required' }, { status: 400 });
     }
 
     // Check category exists
@@ -48,7 +57,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     let validParentId: string | null = null;
-    if (parentId && parentId.trim() !== '') {
+    if (parentId && typeof parentId === 'string' && parentId.trim() !== '') {
       if (parentId === id) {
         return NextResponse.json({ error: 'A category cannot be its own parent' }, { status: 400 });
       }
@@ -71,10 +80,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       where: { id },
       data: {
         name: name.trim(),
-        slug: slug.trim(),
-        description: description !== undefined ? (description ? description.trim() : null) : existing.description,
-        icon: icon !== undefined ? (icon ? icon.trim() : null) : existing.icon,
-        image: image !== undefined ? (image ? image.trim() : null) : existing.image,
+        slug: slug.trim().toLowerCase(),
+        description: description !== undefined ? (description ? String(description).trim() : null) : existing.description,
+        icon: icon !== undefined ? (icon ? String(icon).trim() : null) : existing.icon,
+        image: image !== undefined ? (image ? String(image).trim() : null) : existing.image,
         parentId: validParentId,
       },
       include: {
@@ -90,13 +99,17 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   } catch (error: any) {
     console.error('Error updating category:', error);
     if (error.code === 'P2002') {
-      return NextResponse.json({ error: 'A category with this name or slug already exists' }, { status: 400 });
+      return NextResponse.json({ error: 'A category with this name or slug already exists' }, { status: 409 });
     }
     return NextResponse.json({ error: 'Failed to update category' }, { status: 500 });
   }
 }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized: Admin privileges required.' }, { status: 401 });
+  }
+
   try {
     const { id } = params;
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { isAuthorizedAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,25 +16,36 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized: Admin privileges required.' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { name, slug, description, logo } = body;
 
-    if (!name || !slug) {
-      return NextResponse.json({ error: 'Name and slug are required' }, { status: 400 });
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return NextResponse.json({ error: 'Brand name is required' }, { status: 400 });
+    }
+
+    if (!slug || typeof slug !== 'string' || slug.trim().length === 0) {
+      return NextResponse.json({ error: 'Brand slug is required' }, { status: 400 });
     }
 
     const brand = await db.brand.create({
       data: {
-        name,
-        slug,
-        description: description || '',
-        logo: logo || '',
+        name: name.trim(),
+        slug: slug.trim().toLowerCase(),
+        description: description ? String(description).trim() : '',
+        logo: logo ? String(logo).trim() : '',
       },
     });
 
     return NextResponse.json(brand, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.code === 'P2002') {
+      return NextResponse.json({ error: 'A brand with this name or slug already exists.' }, { status: 409 });
+    }
     return NextResponse.json({ error: 'Failed to create brand' }, { status: 500 });
   }
 }

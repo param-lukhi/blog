@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { isAuthorizedAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const [
       products,
@@ -16,6 +21,7 @@ export async function GET() {
       brands,
       deals,
       comparisons,
+      research,
     ] = await Promise.all([
       db.product.count(),
       db.blog.count(),
@@ -27,6 +33,7 @@ export async function GET() {
       db.brand.count(),
       db.deal.count(),
       db.comparison.count(),
+      db.productResearch.count(),
     ]);
 
     return NextResponse.json({
@@ -40,6 +47,7 @@ export async function GET() {
       brands,
       deals,
       comparisons,
+      research,
     });
   } catch (error) {
     console.error('Error fetching admin counts:', error);

@@ -9,8 +9,8 @@ import { Package, Sparkles, PlusCircle, ArrowRight } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Best Tech Products, Buying Guides & Recommendations - TechPulse',
-  description: 'Browse our complete catalog of researched tech products, smartphones, laptops, audio gear, and appliances with Amazon marketplace pricing.',
+  title: 'Best Tech Products, Buying Guides & Recommendations - BlogWeb904',
+  description: 'Browse our complete catalog of researched tech products, smartphones, laptops, audio gear, and multi-store price comparisons.',
 };
 
 export default async function ProductsPage({

@@ -68,10 +68,10 @@ export default function Footer() {
           <div className="space-y-4 lg:col-span-2">
             <Link href="/" className="flex items-center gap-2.5 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 via-brand-600 to-brand-700 flex items-center justify-center text-white font-extrabold text-lg shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform duration-300">
-                T
+                B
               </div>
               <span className="text-xl font-extrabold text-white tracking-tight">
-                Tech<span className="text-brand-500">Pulse</span>
+                BlogWeb<span className="text-brand-500">904</span>
               </span>
             </Link>
             <p className="text-neutral-400 text-xs leading-relaxed max-w-sm">
@@ -180,6 +180,9 @@ export default function Footer() {
               Company & Legal
             </h3>
             <ul className="space-y-2 text-xs">
+              <li><Link href="/quiz" className="hover:text-white hover:translate-x-0.5 inline-block transition-all text-brand-400 font-bold">✨ Interactive Buying Quiz</Link></li>
+              <li><Link href="/trust" className="hover:text-white hover:translate-x-0.5 inline-block transition-all text-emerald-400 font-bold">🛡️ Editorial Trust Center</Link></li>
+              <li><Link href="/account" className="hover:text-white hover:translate-x-0.5 inline-block transition-all">📌 Saved Products & Alerts</Link></li>
               <li><Link href="/about" className="hover:text-white hover:translate-x-0.5 inline-block transition-all">About Us</Link></li>
               <li><Link href="/contact" className="hover:text-white hover:translate-x-0.5 inline-block transition-all">Contact Us</Link></li>
               <li><Link href="/privacy" className="hover:text-white hover:translate-x-0.5 inline-block transition-all">Privacy Policy</Link></li>
@@ -194,13 +197,13 @@ export default function Footer() {
         {/* Amazon Affiliate Disclosure Banner */}
         <div className="p-5 rounded-2xl bg-neutral-900/80 border border-neutral-800/80 text-xs text-neutral-300/90 leading-relaxed mb-8 shadow-inner backdrop-blur-xs relative overflow-hidden hover:border-neutral-700/80 transition-colors">
           <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amazon-orange to-brand-500" />
-          <strong className="text-white font-bold">Amazon Affiliate Disclosure:</strong> TechPulse is a participant in the Amazon Services LLC Associates Program and regional Amazon affiliate programs worldwide. As an Amazon Associate, we earn from qualifying purchases. Product prices, availability, and promotions are accurate as of the date/time indicated and are subject to change.
+          <strong className="text-white font-bold">Amazon Affiliate Disclosure:</strong> BlogWeb904 is a participant in the Amazon Services LLC Associates Program and regional Amazon affiliate programs worldwide. As an Amazon Associate, we earn from qualifying purchases. Product prices, availability, and promotions are accurate as of the date/time indicated and are subject to change.
         </div>
 
         {/* Bottom Bar: Copyright */}
         <div className="pt-6 border-t border-neutral-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
           <div>
-            © {new Date().getFullYear()} TechPulse Reviews. All rights reserved.
+            © {new Date().getFullYear()} BlogWeb904. All rights reserved.
           </div>
         </div>
       </div>

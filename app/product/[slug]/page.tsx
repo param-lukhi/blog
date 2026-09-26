@@ -2,6 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { db } from '@/lib/db';
+import PriceComparisonTable from '@/components/PriceComparisonTable';
 import AmazonButton from '@/components/AmazonButton';
 import RegionalPrice from '@/components/RegionalPrice';
 import ProsCons from '@/components/ProsCons';
@@ -12,6 +13,7 @@ import PriceHistoryChart from '@/components/PriceHistoryChart';
 import SocialShare from '@/components/SocialShare';
 import AffiliateDisclosureNotice from '@/components/AffiliateDisclosureNotice';
 import ProductAlternatives from '@/components/ProductAlternatives';
+import ProductCommunityReviews from '@/components/ProductCommunityReviews';
 import AdBanner from '@/components/AdBanner';
 import { safeJsonParse } from '@/lib/utils';
 import { CheckCircle2, ChevronRight, ShieldCheck, Tag } from 'lucide-react';
@@ -27,8 +29,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
   const pageUrl = `${siteUrl}/product/${product.slug}`;
-  const title = `${product.name} - Price, Specs & Alternatives | TechPulse`;
-  const description = `Full technical specifications, feature breakdown, and Amazon pricing for ${product.name} by ${product.brand}.`;
+  const title = `${product.name} - Price, Specs & Alternatives | BlogWeb904`;
+  const description = `Full technical specifications, feature breakdown, and multi-store pricing comparison for ${product.name} by ${product.brand}.`;
 
   return {
     title,
@@ -53,7 +55,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
   const product = await db.product.findUnique({
     where: { slug: params.slug },
-    include: { category: true, blogs: { where: { status: 'PUBLISHED' } } },
+    include: {
+      category: true,
+      prices: {
+        orderBy: { price: 'asc' },
+      },
+      blogs: { where: { status: 'PUBLISHED' } },
+    },
   });
 
   if (!product) notFound();
@@ -200,6 +208,33 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
         </div>
       </div>
 
+      {/* Multi-Store Live Price Comparison */}
+      <div className="mb-12">
+        <PriceComparisonTable
+          productName={product.name}
+          prices={
+            product.prices && product.prices.length > 0
+              ? product.prices
+              : product.price
+              ? [
+                  {
+                    storeName: 'Amazon',
+                    storeSlug: 'amazon',
+                    price: parseFloat(product.price.replace(/[^0-9.]/g, '')) || null,
+                    originalPrice: null,
+                    inStock: true,
+                    offerText: 'Prime Free Delivery',
+                    productUrl: product.amazonUrl,
+                    affiliateUrl: product.affiliateUrl || product.amazonUrl,
+                    lastCheckedAt: product.updatedAt,
+                  },
+                ]
+              : []
+          }
+          defaultCurrency="INR"
+        />
+      </div>
+
       {/* Subtle Affiliate Disclosure */}
       <AffiliateDisclosureNotice compact className="mb-12" />
 
@@ -240,6 +275,16 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
           <ProsCons pros={pros} cons={cons} />
         </div>
       )}
+
+      {/* Community Ratings & User Reviews */}
+      <ProductCommunityReviews
+        productId={product.id}
+        productSlug={product.slug}
+        productName={product.name}
+        productPrice={product.price}
+        productBrand={product.brand}
+        productImage={mainImage}
+      />
 
       {/* Smart Alternatives */}
       {relatedProducts.length > 0 && (

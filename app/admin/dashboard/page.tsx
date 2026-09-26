@@ -6,7 +6,7 @@ import {
   Users, Eye, MousePointerClick, TrendingUp, TrendingDown,
   FileText, ShoppingBag, Zap, ArrowUpRight, BarChart2, DollarSign,
   ShoppingCart, Clock, Percent, UserCheck, MessageSquare, Globe,
-  Search, Shield, CheckSquare, Plus, GripVertical, AlertCircle, RefreshCw
+  Search, Shield, CheckSquare, Plus, GripVertical, AlertCircle, RefreshCw, Sparkles
 } from 'lucide-react';
 
 interface DashboardMetrics {
@@ -19,6 +19,12 @@ interface DashboardMetrics {
   ctr: string;
   totalProducts: number;
   publishedBlogs: number;
+  draftBlogs: number;
+  reviewBlogs: number;
+  approvedBlogs: number;
+  scheduledBlogs: number;
+  researchQueueCount: number;
+  stalePricesCount: number;
   totalCategories: number;
   topBlogs: { id: string; title: string; slug: string; views: number }[];
   topProducts: { id: string; name: string; slug: string; price: string; brand: string }[];
@@ -31,7 +37,7 @@ export default function AdminDashboardPage() {
 
   // Widget Order state for drag & drop
   const [widgetOrder, setWidgetOrder] = useState<string[]>([
-    'topProducts', 'topBlogs', 'trafficSources', 'earnings',
+    'dailyOperations', 'topProducts', 'topBlogs', 'trafficSources', 'earnings',
     'recentActivity', 'tasks'
   ]);
   const [draggedWidget, setDraggedWidget] = useState<string | null>(null);
@@ -59,6 +65,12 @@ export default function AdminDashboardPage() {
           ctr: data.ctr || '0.0%',
           totalProducts: data.totalProducts || 0,
           publishedBlogs: data.publishedBlogs || 0,
+          draftBlogs: data.draftBlogs || 0,
+          reviewBlogs: data.reviewBlogs || 0,
+          approvedBlogs: data.approvedBlogs || 0,
+          scheduledBlogs: data.scheduledBlogs || 0,
+          researchQueueCount: data.researchQueueCount || 0,
+          stalePricesCount: data.stalePricesCount || 0,
           totalCategories: data.totalCategories || 0,
           topBlogs: data.topBlogs || [],
           topProducts: data.topProducts || [],
@@ -163,24 +175,73 @@ export default function AdminDashboardPage() {
             Dashboard Overview
           </h1>
           <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-            Real-time database metrics & content status.
+            Real-time editorial lifecycle, multi-store price freshness, and publishing pipeline.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <Link
-            href="/admin/products"
-            className="px-4 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
+            href="/admin/research"
+            className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-500/20 transition-all hover:scale-105 active:scale-95"
           >
-            <span>Products</span>
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Research Queue</span>
           </Link>
 
           <Link
             href="/admin/blogs/new"
-            className="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
+            className="px-3.5 py-2 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
           >
-            <Plus className="w-4 h-4" />
-            <span>Create Article</span>
+            <Plus className="w-3.5 h-3.5" />
+            <span>New Blog Draft</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Phase 3 Editorial Workflow Status Pipeline */}
+      <div className="bg-gradient-to-r from-neutral-900 via-neutral-900 to-blue-950 text-white p-5 rounded-3xl border border-neutral-800 shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-800/80 pb-3">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-extrabold uppercase tracking-wider text-blue-300">
+              Editorial Pipeline &amp; Content Lifecycle
+            </span>
+          </div>
+          <span className="text-[11px] text-neutral-400 font-mono">
+            RESEARCH → VERIFY → DRAFT → REVIEW → APPROVE → PUBLISH
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+          <Link href="/admin/research" className="bg-neutral-800/60 hover:bg-neutral-800 p-3 rounded-2xl border border-neutral-700/50 transition-all block">
+            <div className="text-[10px] font-bold text-amber-400 uppercase">Research Queue</div>
+            <div className="text-xl font-extrabold text-white mt-0.5">{stats?.researchQueueCount ?? 0}</div>
+            <div className="text-[10px] text-neutral-400">Open Ideas</div>
+          </Link>
+          <Link href="/admin/blogs?status=DRAFT" className="bg-neutral-800/60 hover:bg-neutral-800 p-3 rounded-2xl border border-neutral-700/50 transition-all block">
+            <div className="text-[10px] font-bold text-cyan-400 uppercase">Drafts</div>
+            <div className="text-xl font-extrabold text-white mt-0.5">{stats?.draftBlogs ?? 0}</div>
+            <div className="text-[10px] text-neutral-400">In Progress</div>
+          </Link>
+          <Link href="/admin/blogs?status=REVIEW" className="bg-neutral-800/60 hover:bg-neutral-800 p-3 rounded-2xl border border-neutral-700/50 transition-all block">
+            <div className="text-[10px] font-bold text-orange-400 uppercase">Needs Review</div>
+            <div className="text-xl font-extrabold text-white mt-0.5">{stats?.reviewBlogs ?? 0}</div>
+            <div className="text-[10px] text-neutral-400">Editorial Check</div>
+          </Link>
+          <Link href="/admin/blogs?status=APPROVED" className="bg-neutral-800/60 hover:bg-neutral-800 p-3 rounded-2xl border border-neutral-700/50 transition-all block">
+            <div className="text-[10px] font-bold text-purple-400 uppercase">Approved</div>
+            <div className="text-xl font-extrabold text-white mt-0.5">{stats?.approvedBlogs ?? 0}</div>
+            <div className="text-[10px] text-neutral-400">Ready to Publish</div>
+          </Link>
+          <Link href="/admin/blogs?status=SCHEDULED" className="bg-neutral-800/60 hover:bg-neutral-800 p-3 rounded-2xl border border-neutral-700/50 transition-all block">
+            <div className="text-[10px] font-bold text-blue-400 uppercase">Scheduled</div>
+            <div className="text-xl font-extrabold text-white mt-0.5">{stats?.scheduledBlogs ?? 0}</div>
+            <div className="text-[10px] text-neutral-400">Automated Queue</div>
+          </Link>
+          <Link href="/admin/blogs?status=PUBLISHED" className="bg-neutral-800/60 hover:bg-neutral-800 p-3 rounded-2xl border border-neutral-700/50 transition-all block">
+            <div className="text-[10px] font-bold text-emerald-400 uppercase">Published</div>
+            <div className="text-xl font-extrabold text-white mt-0.5">{stats?.publishedBlogs ?? 0}</div>
+            <div className="text-[10px] text-neutral-400">Live Articles</div>
           </Link>
         </div>
       </div>
@@ -217,6 +278,81 @@ export default function AdminDashboardPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {widgetOrder.map((widgetId) => {
+            if (widgetId === 'dailyOperations') {
+              return (
+                <div
+                  key={widgetId}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, widgetId)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, widgetId)}
+                  className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200/80 dark:border-neutral-800 p-6 shadow-soft space-y-4 relative group lg:col-span-2"
+                >
+                  <div className="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-3">
+                    <div className="flex items-center gap-2">
+                      <GripVertical className="w-4 h-4 text-neutral-400 cursor-grab" />
+                      <h3 className="font-extrabold text-neutral-900 dark:text-white text-sm flex items-center gap-2">
+                        <CheckSquare className="w-4 h-4 text-brand-600" /> Daily Content Operations Hub (TODAY)
+                      </h3>
+                    </div>
+                    <span className="text-[11px] font-mono text-neutral-400">
+                      Editorial Workflow &amp; Monetization Gate
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3 text-xs">
+                    <Link href="/admin/research" className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700 hover:border-brand-500 transition-all block">
+                      <div className="text-[10px] font-bold text-neutral-400 uppercase">Suggestions</div>
+                      <div className="text-lg font-extrabold text-brand-600 mt-0.5">3 Ready</div>
+                      <div className="text-[10px] text-neutral-400">Target Keywords</div>
+                    </Link>
+
+                    <Link href="/admin/research" className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700 hover:border-brand-500 transition-all block">
+                      <div className="text-[10px] font-bold text-amber-500 uppercase">Research Queue</div>
+                      <div className="text-lg font-extrabold text-neutral-900 dark:text-white mt-0.5">{stats?.researchQueueCount ?? 0}</div>
+                      <div className="text-[10px] text-neutral-400">Fact Layer</div>
+                    </Link>
+
+                    <Link href="/admin/blogs?status=DRAFT" className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700 hover:border-brand-500 transition-all block">
+                      <div className="text-[10px] font-bold text-cyan-500 uppercase">Drafts</div>
+                      <div className="text-lg font-extrabold text-neutral-900 dark:text-white mt-0.5">{stats?.draftBlogs ?? 0}</div>
+                      <div className="text-[10px] text-neutral-400">In Progress</div>
+                    </Link>
+
+                    <Link href="/admin/blogs?status=REVIEW" className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700 hover:border-brand-500 transition-all block">
+                      <div className="text-[10px] font-bold text-orange-500 uppercase">Needs Review</div>
+                      <div className="text-lg font-extrabold text-orange-600 mt-0.5">{stats?.reviewBlogs ?? 0}</div>
+                      <div className="text-[10px] text-neutral-400">Human Quality</div>
+                    </Link>
+
+                    <Link href="/admin/blogs?status=APPROVED" className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700 hover:border-brand-500 transition-all block">
+                      <div className="text-[10px] font-bold text-purple-500 uppercase">Approved</div>
+                      <div className="text-lg font-extrabold text-purple-600 mt-0.5">{stats?.approvedBlogs ?? 0}</div>
+                      <div className="text-[10px] text-neutral-400">Ready to Publish</div>
+                    </Link>
+
+                    <Link href="/admin/blogs?status=SCHEDULED" className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700 hover:border-brand-500 transition-all block">
+                      <div className="text-[10px] font-bold text-blue-500 uppercase">Scheduled</div>
+                      <div className="text-lg font-extrabold text-blue-600 mt-0.5">{stats?.scheduledBlogs ?? 0}</div>
+                      <div className="text-[10px] text-neutral-400">Cron Queue</div>
+                    </Link>
+
+                    <Link href="/admin/prices" className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700 hover:border-brand-500 transition-all block">
+                      <div className="text-[10px] font-bold text-rose-500 uppercase">Prices to Update</div>
+                      <div className="text-lg font-extrabold text-rose-600 mt-0.5">{stats?.stalePricesCount ?? 0}</div>
+                      <div className="text-[10px] text-neutral-400">Stale &gt; 7 Days</div>
+                    </Link>
+
+                    <Link href="/admin/seo" className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700 hover:border-brand-500 transition-all block">
+                      <div className="text-[10px] font-bold text-emerald-500 uppercase">SEO Health</div>
+                      <div className="text-lg font-extrabold text-emerald-600 mt-0.5">Audit</div>
+                      <div className="text-[10px] text-neutral-400">View Checklist</div>
+                    </Link>
+                  </div>
+                </div>
+              );
+            }
+
             if (widgetId === 'topProducts') {
               return (
                 <div

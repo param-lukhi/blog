@@ -196,7 +196,58 @@ export default function AdminSettingsPage() {
         </div>
       </div>
 
-      {/* 3. Hero Banner Content */}
+      {/* 3. Affiliate Disclosure & Editorial Controls (PART 7) */}
+      <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-soft space-y-4">
+        <h2 className="font-extrabold text-neutral-900 text-sm flex items-center gap-2 border-b border-neutral-100 pb-2">
+          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          <span>Affiliate Disclosure & Compliance (FTC / Amazon Compliance)</span>
+        </h2>
+
+        <div className="space-y-3 text-xs font-bold">
+          <div>
+            <label className="block text-neutral-700 mb-1">Global Affiliate Disclosure Banner Text</label>
+            <textarea
+              rows={2}
+              value={settings.affiliate_disclosure_text || 'Disclosure: This article may contain affiliate links. If you purchase through a qualifying link, we may earn a commission at no additional cost to you.'}
+              onChange={(e) => handleChange('affiliate_disclosure_text', e.target.value)}
+              className="w-full px-3.5 py-2 rounded-xl border border-neutral-300 outline-none focus:border-brand-500 font-normal"
+            />
+            <p className="text-[11px] text-neutral-400 font-normal mt-0.5">
+              Renders prominently above product review content and before buying comparison tables.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-neutral-700 mb-1">Price Freshness Alert Threshold (Days)</label>
+              <input
+                type="number"
+                value={settings.price_stale_days || '7'}
+                onChange={(e) => handleChange('price_stale_days', e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 outline-none focus:border-brand-500"
+              />
+              <p className="text-[11px] text-neutral-400 font-normal mt-0.5">
+                Prices unverified after this duration flag &apos;Needs Verification&apos; in Price Dashboard.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-neutral-700 mb-1">Exchange Rate Calculation Mode</label>
+              <input
+                type="text"
+                disabled
+                value="Fixed Verified Baseline (INR 83.5 / USD 1.0 / GBP 0.79 / EUR 0.92)"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 bg-neutral-100 text-neutral-500 font-normal cursor-not-allowed"
+              />
+              <p className="text-[11px] text-neutral-400 font-normal mt-0.5">
+                Preserves original database prices with non-destructive display projection.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Hero Banner Content */}
       <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-soft space-y-4">
         <h2 className="font-extrabold text-neutral-900 text-sm border-b border-neutral-100 pb-2">
           Homepage Hero Banner Content

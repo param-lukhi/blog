@@ -16,8 +16,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: 'TechPulse - Research-Based Tech Reviews & Unbiased Buying Guides',
-  description: 'In-depth research-based product reviews, hardware comparisons, and buying guides to help consumers make smart tech purchasing decisions.',
+  title: 'BlogWeb904 - Research-Based Tech Reviews & Unbiased Buying Guides',
+  description: 'In-depth research-based product reviews, hardware comparisons, multi-store price comparisons, and buying guides to help consumers make smart purchasing decisions.',
   alternates: {
     canonical: '/',
   },
@@ -356,7 +356,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 7. Why Readers Trust TechPulse (Editorial Standard) */}
+      {/* 7. Why Readers Trust BlogWeb904 (Editorial Standard) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white dark:bg-[#121826] rounded-3xl p-8 sm:p-12 border border-neutral-200/90 dark:border-neutral-800 space-y-8 shadow-xs">
           <div className="text-center max-w-xl mx-auto space-y-1.5">
@@ -364,7 +364,7 @@ export default async function HomePage() {
               Our Editorial Standard
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white">
-              Why Readers Rely On TechPulse
+              Why Readers Rely On BlogWeb904
             </h2>
             <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
               We focus on clarity, hardware benchmark accuracy, and independent evaluation.

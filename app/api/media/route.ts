@@ -1,14 +1,19 @@
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 import { db } from '@/lib/db';
+import { isAuthorizedAdmin } from '@/lib/auth';
+import { validateMediaFile, processMediaUpload } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized: Admin privileges required.' }, { status: 401 });
+  }
+
   try {
     const media = await db.media.findMany({
       orderBy: { createdAt: 'desc' },
+      take: 100,
     });
     return NextResponse.json(media);
   } catch (error) {
@@ -17,92 +22,79 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized: Admin privileges required.' }, { status: 401 });
+  }
+
   try {
     const contentType = req.headers.get('content-type') || '';
 
+    // 1. Multipart Form Data (File Upload)
     if (contentType.includes('multipart/form-data')) {
       const formData = await req.formData();
       const file = formData.get('file') as File | null;
 
       if (!file) {
-        return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+        return NextResponse.json({ error: 'No file uploaded.' }, { status: 400 });
+      }
+
+      // Validate file type & size
+      const validation = validateMediaFile({
+        size: file.size,
+        type: file.type || 'image/png',
+        name: file.name || 'image.png',
+      });
+
+      if (!validation.valid) {
+        return NextResponse.json({ error: validation.error }, { status: 400 });
       }
 
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
       const mimeType = file.type || 'image/png';
-      const base64DataUri = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
-      let publicUrl = base64DataUri;
+      // Process upload via cloud storage or secure local write (never raw Base64 in database)
+      const uploadResult = await processMediaUpload(buffer, file.name, mimeType, file.size);
 
-      // Try writing to local disk (works in local dev, will catch and fallback to data URI on read-only environments like Vercel)
-      try {
-        const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-        await mkdir(uploadsDir, { recursive: true });
-
-        const sanitizeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const uniqueFilename = `${Date.now()}_${sanitizeName}`;
-        const filePath = path.join(uploadsDir, uniqueFilename);
-
-        await writeFile(filePath, buffer);
-        publicUrl = `/uploads/${uniqueFilename}`;
-      } catch (fsErr) {
-        // Read-only filesystem (e.g. Vercel Serverless) - publicUrl remains base64DataUri
-        console.log('Using Data URI for serverless media storage (read-only filesystem detected).');
-      }
-
-      let newMedia: any = null;
-      try {
-        newMedia = await db.media.create({
-          data: {
-            filename: file.name,
-            url: publicUrl,
-            size: file.size,
-            mimeType: mimeType,
-          },
-        });
-      } catch (dbErr) {
-        console.warn('Media DB record log skipped:', dbErr);
-        newMedia = {
-          filename: file.name,
-          url: publicUrl,
-          size: file.size,
-          mimeType: mimeType,
-        };
-      }
-
-      return NextResponse.json(newMedia, { status: 201 });
-    } else {
-      const body = await req.json();
-      const { filename, url, size, mimeType } = body;
-
-      if (!filename || !url) {
-        return NextResponse.json({ error: 'Filename and URL are required' }, { status: 400 });
-      }
-
-      let newMedia: any = null;
-      try {
-        newMedia = await db.media.create({
-          data: {
-            filename,
-            url,
-            size: size || 102400,
-            mimeType: mimeType || 'image/webp',
-          },
-        });
-      } catch (dbErr) {
-        newMedia = {
-          filename,
-          url,
-          size: size || 102400,
-          mimeType: mimeType || 'image/webp',
-        };
-      }
+      const newMedia = await db.media.create({
+        data: {
+          filename: uploadResult.filename,
+          url: uploadResult.url,
+          size: uploadResult.size,
+          mimeType: uploadResult.mimeType,
+        },
+      });
 
       return NextResponse.json(newMedia, { status: 201 });
     }
+
+    // 2. JSON Payload (External Image URL Reference)
+    const body = await req.json();
+    const { filename, url, size, mimeType } = body;
+
+    if (!filename || !url || typeof url !== 'string') {
+      return NextResponse.json({ error: 'Filename and valid URL are required' }, { status: 400 });
+    }
+
+    if (!url.startsWith('https://') && !url.startsWith('/uploads/')) {
+      return NextResponse.json({ error: 'Image URL must be a valid https link or internal upload' }, { status: 400 });
+    }
+
+    const newMedia = await db.media.create({
+      data: {
+        filename: String(filename).trim(),
+        url: String(url).trim(),
+        size: size ? Number(size) : 102400,
+        mimeType: mimeType ? String(mimeType).trim() : 'image/webp',
+      },
+    });
+
+    return NextResponse.json(newMedia, { status: 201 });
   } catch (error: any) {
     console.error('Media upload error:', error);
-    return NextResponse.json({ error: error?.message || 'Failed to save media asset' }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || 'Failed to process media asset' },
+      { status: 500 }
+    );
   }
 }

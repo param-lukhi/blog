@@ -1,0 +1,21 @@
+{
+  "name": "BlogWeb904 — Tech Product Research & Price Comparison",
+  "short_name": "BlogWeb904",
+  "description": "Verified product research, price comparisons, and buying guides across regional marketplaces.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

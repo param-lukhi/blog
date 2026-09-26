@@ -21,62 +21,132 @@ model Category {
   blogs         Blog[]
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
+
+  @@index([slug])
+  @@index([parentId])
 }
 
 model Product {
-  id             String       @id @default(cuid())
+  id             String         @id @default(cuid())
   name           String
-  slug           String       @unique
+  slug           String         @unique
   brand          String
   price          String
-  images         String       // JSON string of image URLs
+  images         String         // JSON string of image URLs
   amazonUrl      String
   affiliateUrl   String
   categoryId     String
-  category       Category     @relation(fields: [categoryId], references: [id])
-  specifications String       // JSON string of key-value specs
-  features       String       // JSON string of feature bullet points
-  pros           String       // JSON string of pros list
-  cons           String       // JSON string of cons list
-  marketplaces   String?      // JSON string of regional prices & affiliate links
-  isFeatured     Boolean      @default(false)
-  isTrending     Boolean      @default(false)
-  isDeal         Boolean      @default(false)
-  status         String       @default("PUBLISHED") // DRAFT, PUBLISHED, HIDDEN, ARCHIVED
+  category       Category       @relation(fields: [categoryId], references: [id])
+  specifications String         // JSON string of key-value specs
+  features       String         // JSON string of feature bullet points
+  pros           String         // JSON string of pros list
+  cons           String         // JSON string of cons list
+  marketplaces   String?        // JSON string of regional prices & affiliate links
+  isFeatured     Boolean        @default(false)
+  isTrending     Boolean        @default(false)
+  isDeal         Boolean        @default(false)
+  status         String         @default("PUBLISHED") // DRAFT, PUBLISHED, HIDDEN, ARCHIVED
+  prices         ProductPrice[] // Normalized multi-store comparison prices
+  priceAlerts    PriceAlert[]   // User & Admin price drop alerts
+  reviews        ProductReview[] // Community ratings & reviews
   blogs          Blog[]
   deals          Deal[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([slug])
+  @@index([categoryId, status])
+  @@index([brand])
+}
+
+model ProductPrice {
+  id            String         @id @default(cuid())
+  productId     String
+  product       Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  storeName     String         // e.g. "Amazon India", "Flipkart", "Croma", "Brand Store"
+  storeSlug     String         // e.g. "amazon", "flipkart", "croma", "brand-store"
+  price         Float?         // Live/Current Checked Price
+  originalPrice Float?         // MRP / Original Price
+  currency      String         @default("INR")
+  discount      Float?         // Discount percentage (e.g. 15 for 15% off)
+  inStock       Boolean        @default(true)
+  couponCode    String?
+  offerText     String?        // Bank offers / promotion details
+  productUrl    String?        // Landing page on store
+  affiliateUrl  String?        // Tagged affiliate URL
+  history       PriceHistory[] // Historical price check timeline
+  lastCheckedAt DateTime       @default(now())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([productId])
+  @@index([storeSlug])
+  @@index([productId, storeSlug])
+  @@index([lastCheckedAt])
+}
+
+model PriceHistory {
+  id             String       @id @default(cuid())
+  productPriceId String
+  productPrice   ProductPrice @relation(fields: [productPriceId], references: [id], onDelete: Cascade)
+  price          Float?
+  originalPrice  Float?
+  currency       String       @default("INR")
+  inStock        Boolean      @default(true)
+  checkedAt      DateTime     @default(now())
+
+  @@index([productPriceId])
+  @@index([checkedAt])
+}
+
+model Store {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  slug         String   @unique
+  domain       String?
+  logo         String?
+  affiliateTag String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isActive])
 }
 
 model Blog {
-  id              String    @id @default(cuid())
-  title           String
-  slug            String    @unique
-  metaTitle       String?
-  metaDescription String?
-  featuredImage   String
-  content         String    // Rich HTML / Markdown content
-  specifications  String?   // JSON string
-  features        String?   // JSON string
-  pros            String?   // JSON string
-  cons            String?   // JSON string
-  faqs            String?   // JSON string of [{question, answer}]
-  conclusion      String?
-  amazonUrl       String
-  affiliateUrl    String?
-  marketplaces    String?   // JSON string of regional prices & affiliate links
-  status          String    @default("PUBLISHED") // DRAFT, PUBLISHED, HIDDEN, SCHEDULED
-  scheduledAt     DateTime?
-  categoryId      String
-  category        Category  @relation(fields: [categoryId], references: [id])
-  productId       String?
-  product         Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
-  tags            String    // JSON string or comma-separated
-  views           Int       @default(0)
-  comments        Comment[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id               String    @id @default(cuid())
+  title            String
+  slug             String    @unique
+  metaTitle        String?
+  metaDescription  String?
+  featuredImage    String
+  content          String    // Rich HTML / Markdown content
+  specifications   String?   // JSON string
+  features         String?   // JSON string
+  pros             String?   // JSON string
+  cons             String?   // JSON string
+  faqs             String?   // JSON string of [{question, answer}]
+  conclusion       String?
+  amazonUrl        String
+  affiliateUrl     String?
+  marketplaces     String?   // JSON string of regional prices & affiliate links
+  status           String    @default("PUBLISHED") // IDEA, RESEARCHING, RESEARCHED, DRAFT, REVIEW, APPROVED, PUBLISHED, SCHEDULED, UPDATE_REQUIRED, ARCHIVED
+  qualityChecklist String?   // JSON string of editorial validation checklist
+  scheduledAt      DateTime?
+  categoryId       String
+  category         Category  @relation(fields: [categoryId], references: [id])
+  productId        String?
+  product          Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  tags             String    // JSON string or comma-separated
+  views            Int       @default(0)
+  comments         Comment[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([categoryId, status])
+  @@index([status, createdAt])
 }
 
 model User {
@@ -100,13 +170,19 @@ model Comment {
   blog      Blog?    @relation(fields: [blogId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([blogId])
+  @@index([status])
 }
 
 model NewsletterSubscriber {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  status    String   @default("SUBSCRIBED") // SUBSCRIBED, UNSUBSCRIBED
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  email       String   @unique
+  preferences String   @default("reviews,drops,comparisons,digest")
+  status      String   @default("SUBSCRIBED") // SUBSCRIBED, UNSUBSCRIBED
+  token       String   @unique @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
 }
 
 model Brand {
@@ -120,19 +196,22 @@ model Brand {
 }
 
 model Deal {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   title         String
   discount      String
   originalPrice String
   dealPrice     String
   dealUrl       String
-  badge         String?  // Hot, Limited, Exclusive
+  badge         String?   // Hot, Limited, Exclusive
   productId     String?
-  product       Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  product       Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
   expiresAt     DateTime?
-  status        String   @default("PUBLISHED") // PUBLISHED, DRAFT, EXPIRED
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  status        String    @default("PUBLISHED") // PUBLISHED, DRAFT, EXPIRED
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([productId])
+  @@index([status])
 }
 
 model Comparison {
@@ -146,6 +225,8 @@ model Comparison {
   status     String   @default("PUBLISHED")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  @@index([slug])
 }
 
 model AffiliateLink {
@@ -181,6 +262,9 @@ model Analytics {
   userAgent  String?
   ipHash     String?
   createdAt  DateTime @default(now())
+
+  @@index([eventType])
+  @@index([createdAt])
 }
 
 model Setting {
@@ -197,4 +281,447 @@ model Media {
   size      Int
   mimeType  String
   createdAt DateTime @default(now())
+
+  @@index([createdAt])
 }
+
+model ProductResearch {
+  id               String   @id @default(cuid())
+  name             String
+  brand            String?
+  model            String?
+  category         String?
+  productUrl       String?
+  imageUrl         String?
+  targetAudience   String?
+  searchIntent     String?  // Commercial, Informational, Transactional
+  articleAngle     String?  // e.g., "Sony WH-1000XM5 vs alternatives"
+  researchNotes    String?  // In-depth research summary & notes
+  keyFeatures      String?  // JSON string of features
+  specifications   String?  // JSON string of specs
+  limitations      String?  // JSON string of known issues/tradeoffs
+  pros             String?  // JSON string
+  cons             String?  // JSON string
+  officialSources  String?  // JSON string of [{title, url, type, accessedAt, notes}]
+  factVerification String?  // JSON string of {dimensions: "VERIFIED", battery: "NEEDS_REVIEW", ...}
+  status           String   @default("IDEA") // IDEA, RESEARCHING, RESEARCHED, DRAFT, REVIEW, APPROVED, PUBLISHED, ARCHIVED
+  productId        String?  // Bound product ID if converted
+  authorId         String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userName  String   @default("Admin")
+  userEmail String?
+  action    String   // LOGIN, LOGOUT, CREATE, UPDATE, DELETE, PUBLISH, APPROVE, VERIFY_PRICE, etc.
+  entity    String   // PRODUCT, BLOG, PRICE, STORE, MEDIA, USER, RESEARCH, SETTING
+  entityId  String?
+  summary   String
+  metadata  String?  // JSON details if needed
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+model PriceSyncLog {
+  id              String    @id @default(cuid())
+  runId           String
+  storeSlug       String
+  storeName       String?
+  status          String    @default("RUNNING") // RUNNING, COMPLETED, PARTIAL, FAILED
+  productsChecked Int       @default(0)
+  productsUpdated Int       @default(0)
+  productsFailed  Int       @default(0)
+  errors          String?   // JSON string of errors
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+
+  @@index([runId])
+  @@index([storeSlug])
+  @@index([status])
+  @@index([startedAt])
+}
+
+model PriceAlert {
+  id           String    @id @default(cuid())
+  email        String
+  productId    String
+  product      Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  storeSlug    String    @default("amazon")
+  targetPrice  Float
+  currentPrice Float?
+  status       String    @default("ACTIVE") // ACTIVE, TRIGGERED, CANCELLED
+  token        String    @unique @default(cuid()) // For secure 1-click unsubscribe
+  isSubscribed Boolean   @default(true)
+  notifiedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([productId])
+  @@index([status])
+  @@index([email])
+}
+
+model AffiliateConversion {
+  id                    String    @id @default(cuid())
+  storeSlug             String    // amazon, flipkart, croma, brand-store
+  externalTransactionId String?   @unique // Network transaction / order ID for deduplication
+  productId             String?
+  blogId                String?
+  clickId               String?
+  amount                Float?    // Total order value
+  commission            Float     // Publisher payout
+  currency              String    @default("INR")
+  status                String    @default("PENDING") // PENDING, CONFIRMED, REJECTED, CANCELLED
+  convertedAt           DateTime  @default(now())
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([status])
+  @@index([storeSlug])
+  @@index([productId])
+  @@index([blogId])
+  @@index([externalTransactionId])
+  @@index([convertedAt])
+}
+
+model ProductReview {
+  id              String         @id @default(cuid())
+  productId       String
+  product         Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  authorName      String
+  email           String?
+  userEmailHash   String?        // SHA-256 hash for anti-spam & privacy protection
+  rating          Int            // 1 to 5 stars
+  title           String
+  content         String
+  status          String         @default("PENDING") // PENDING, APPROVED, REJECTED, HIDDEN
+  isVerifiedBuyer Boolean        @default(false)
+  moderatedAt     DateTime?
+  moderatedBy     String?
+  reports         ReviewReport[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([productId, status])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ReviewReport {
+  id             String        @id @default(cuid())
+  reviewId       String
+  review         ProductReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reason         String        // SPAM, ABUSE, MISLEADING, OFF_TOPIC, OTHER
+  details        String?
+  status         String        @default("OPEN") // OPEN, REVIEWING, RESOLVED, DISMISSED
+  reporterIpHash String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([reviewId])
+  @@index([status])
+}
+
+model NewsletterDigest {
+  id             String    @id @default(cuid())
+  title          String
+  subject        String
+  previewText    String?
+  contentHtml    String    // Rendered HTML/Markdown template
+  status         String    @default("DRAFT") // DRAFT, REVIEWED, SENT, CANCELLED
+  metrics        String?   // Snapshot JSON of included blogs/prices/analytics
+  recipientCount Int       @default(0)
+  sentAt         DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model JobLog {
+  id               String    @id @default(cuid())
+  jobName          String    // PRICE_SYNC, CONTENT_FRESHNESS, SEO_SCAN, NEWSLETTER_DIGEST, SEARCH_CONSOLE_SYNC, AFFILIATE_SYNC, SYSTEM_HEALTH
+  runId            String
+  status           String    @default("RUNNING") // RUNNING, COMPLETED, PARTIAL, FAILED
+  startedAt        DateTime  @default(now())
+  completedAt      DateTime?
+  durationMs       Int?
+  recordsProcessed Int       @default(0)
+  recordsUpdated   Int       @default(0)
+  errorCount       Int       @default(0)
+  errors           String?   // JSON string of errors
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([jobName])
+  @@index([runId])
+  @@index([status])
+  @@index([startedAt])
+}
+
+model EmailDeliveryLog {
+  id             String   @id @default(cuid())
+  newsletterId   String?
+  provider       String   // resend, sendgrid, mock
+  recipientEmail String?  // Partially redacted for privacy
+  status         String   // SENT, FAILED, BOUNCED, SKIPPED
+  error          String?
+  sentAt         DateTime @default(now())
+
+  @@index([status])
+  @@index([sentAt])
+}
+
+model SeoIssue {
+  id          String    @id @default(cuid())
+  entityType  String    // BLOG, PRODUCT, CATEGORY, SYSTEM
+  entityId    String?
+  entityUrl   String?
+  issueType   String    // MISSING_TITLE, MISSING_DESC, MISSING_H1, MISSING_ALT, THIN_CONTENT, BROKEN_LINK, MISSING_DISCLOSURE, DUPLICATE_SLUG
+  severity    String    // CRITICAL, WARNING, INFO
+  status      String    @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED, IGNORED
+  message     String
+  detectedAt  DateTime  @default(now())
+  resolvedAt  DateTime?
+
+  @@index([severity])
+  @@index([status])
+  @@index([issueType])
+  @@index([detectedAt])
+}
+
+model SystemErrorLog {
+  id          String   @id @default(cuid())
+  severity    String   // INFO, WARNING, ERROR, CRITICAL
+  source      String   // API, CRON, DB, EMAIL, AFFILIATE, PRICE_SYNC, AUTH
+  message     String
+  stack       String?
+  status      String   @default("OPEN") // OPEN, ACKNOWLEDGED, RESOLVED, IGNORED
+  requestPath String?
+  runId       String?
+  createdAt   DateTime @default(now())
+
+  @@index([severity])
+  @@index([source])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model SearchPerformance {
+  id          String   @id @default(cuid())
+  date        DateTime
+  query       String
+  page        String
+  clicks      Int      @default(0)
+  impressions Int      @default(0)
+  ctr         Float    @default(0)
+  position    Float    @default(0)
+  country     String?  @default("global")
+  device      String?  @default("desktop")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([date, query, page, country, device])
+  @@index([query])
+  @@index([page])
+  @@index([date])
+}
+
+model ContentOpportunity {
+  id                     String    @id @default(cuid())
+  topic                  String
+  opportunityType        String    // NEW_ARTICLE, UPDATE_ARTICLE, COMPARISON, PRODUCT_REVIEW, BUYING_GUIDE, FAQ, INTERNAL_LINK
+  reason                 String
+  evidence               String
+  relatedExistingContent String?
+  suggestedSearchIntent  String?   // INFORMATIONAL, COMMERCIAL, TRANSACTIONAL, NAVIGATIONAL
+  priority               String    @default("MEDIUM") // HIGH, MEDIUM, LOW
+  status                 String    @default("DISCOVERED") // DISCOVERED, PLANNED, IN_PROGRESS, COMPLETED, DISMISSED
+  assignedDate           DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@index([opportunityType])
+  @@index([priority])
+  @@index([status])
+}
+
+model InternalLinkSuggestion {
+  id              String   @id @default(cuid())
+  sourceUrl       String
+  sourceTitle     String?
+  targetUrl       String
+  targetTitle     String?
+  suggestedAnchor String
+  reason          String
+  status          String   @default("PENDING") // PENDING, APPROVED, APPLIED, REJECTED
+  createdAt       DateTime @default(now())
+
+  @@index([sourceUrl])
+  @@index([targetUrl])
+  @@index([status])
+}
+
+model FactCheckClaim {
+  id          String    @id @default(cuid())
+  contentId   String?
+  claimText   String
+  sourceUrl   String?
+  sourceType  String?   // OFFICIAL_MANUFACTURER, OFFICIAL_STORE, RETAILER, GOVERNMENT, REPUTABLE_PUBLICATION, OTHER
+  status      String    @default("UNVERIFIED") // UNVERIFIED, VERIFIED, CONFLICTING, OUTDATED
+  notes       String?
+  verifiedBy  String?
+  verifiedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([status])
+  @@index([contentId])
+}
+
+model GrowthExperiment {
+  id            String    @id @default(cuid())
+  name          String
+  hypothesis    String
+  targetMetric  String    // CTR, AFFILIATE_CLICKS, NEWSLETTER_SIGNUPS, BOUNCE_RATE
+  variants      String    // JSON string of variant configs
+  status        String    @default("DRAFT") // DRAFT, RUNNING, PAUSED, CONCLUDED, DISABLED
+  startDate     DateTime?
+  endDate       DateTime?
+  results       String?   // JSON string of metrics
+  winnerVariant String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status])
+}
+
+model AiUsageLog {
+  id               String   @id @default(cuid())
+  provider         String   // OPENAI, ANTHROPIC, GEMINI, LOCAL
+  model            String
+  feature          String   // CONTENT_BRIEF, SEO_OPTIMIZER, TITLE_GEN, RESEARCH_ASSIST
+  requestCount     Int      @default(1)
+  promptTokens     Int?
+  completionTokens Int?
+  totalTokens      Int?
+  estimatedCost    Float?
+  currency         String   @default("USD")
+  createdAt        DateTime @default(now())
+
+  @@index([provider])
+  @@index([feature])
+  @@index([createdAt])
+}
+
+model PublishingTarget {
+  id          String   @id @default(cuid())
+  period      String   @unique @default("DAILY") // DAILY, WEEKLY, MONTHLY
+  targetCount Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProductionQueueItem {
+  id              String    @id @default(cuid())
+  topic           String
+  contentType     String    @default("PRODUCT_REVIEW") // PRODUCT_REVIEW, BUYING_GUIDE, COMPARISON, INFORMATIONAL
+  productId       String?
+  searchIntent    String?   // INFORMATIONAL, COMMERCIAL, TRANSACTIONAL, NAVIGATIONAL, COMPARISON
+  sourceStatus    String    @default("PENDING") // PENDING, PARTIAL, VERIFIED
+  researchStatus  String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  draftStatus     String    @default("NOT_STARTED") // NOT_STARTED, DRAFTING, COMPLETED
+  seoStatus       String    @default("PENDING") // PENDING, PASSED, WARNING
+  affiliateStatus String    @default("PENDING") // PENDING, VERIFIED, NOT_AVAILABLE
+  status          String    @default("IDEA") // IDEA, RESEARCHING, RESEARCHED, DRAFT, REVIEW, SEO_REVIEW, AFFILIATE_REVIEW, APPROVED, SCHEDULED, PUBLISHED, UPDATE_REQUIRED, ARCHIVED
+  priority        String    @default("MEDIUM") // HIGH, MEDIUM, LOW
+  dueDate         DateTime?
+  assignedTo      String?
+  blogId          String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status])
+  @@index([priority])
+  @@index([contentType])
+}
+
+model ResearchSnapshot {
+  id                 String    @id @default(cuid())
+  queueItemId        String?
+  blogId             String?
+  sources            String    // JSON string of sources [{name, url, tier, status}]
+  verifiedFacts      String    // JSON string of verified specs
+  unverifiedFacts    String?   // JSON string
+  conflictingFacts   String?   // JSON string
+  priceCheckDate     DateTime?
+  availabilityStatus String?   // IN_STOCK, OUT_OF_STOCK, PRE_ORDER
+  createdAt          DateTime  @default(now())
+
+  @@index([blogId])
+  @@index([queueItemId])
+}
+
+model ContentVersion {
+  id              String   @id @default(cuid())
+  blogId          String
+  versionNumber   Int
+  title           String
+  content         String
+  metaTitle       String?
+  metaDescription String?
+  changeSummary   String?
+  changedBy       String?
+  createdAt       DateTime @default(now())
+
+  @@index([blogId])
+  @@index([versionNumber])
+}
+
+model IndexingStatus {
+  id              String    @id @default(cuid())
+  url             String    @unique
+  canonical       String?
+  inSitemap       Boolean   @default(true)
+  robotsAllowed   Boolean   @default(true)
+  gscState        String    @default("UNKNOWN") // INDEXED, NOT_INDEXED, CRAWLED_NOT_INDEXED, UNKNOWN
+  lastInspectedAt DateTime?
+  lastVerifiedAt  DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([gscState])
+}
+
+model Incident {
+  id             String    @id @default(cuid())
+  title          String
+  severity       String    @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  status         String    @default("OPEN")   // OPEN, INVESTIGATING, RESOLVED, CLOSED
+  affectedSystem String    // DATABASE, SEARCH_CONSOLE, AFFILIATE, EMAIL, CRON, API, SYSTEM
+  rootCause      String?
+  resolution     String?
+  startedAt      DateTime  @default(now())
+  resolvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([severity])
+  @@index([affectedSystem])
+}
+
+
+
+
+
+

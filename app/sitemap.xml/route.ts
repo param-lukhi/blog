@@ -9,14 +9,19 @@ export async function GET(request: Request) {
   const dynamicBaseUrl = host ? `${proto}://${host}` : null;
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || dynamicBaseUrl || 'https://blogweb904.vercel.app').replace(/\/$/, '');
 
-  // 1. Fetch live published blogs, products, and categories
-  const [blogs, products, categories] = await Promise.all([
+  // 1. Fetch live published blogs, products, comparisons, and categories
+  const [blogs, products, comparisons, categories] = await Promise.all([
     db.blog.findMany({
       where: { status: 'PUBLISHED' },
       select: { slug: true, updatedAt: true },
       orderBy: { updatedAt: 'desc' },
     }),
     db.product.findMany({
+      where: { status: 'PUBLISHED' },
+      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: 'desc' },
+    }),
+    db.comparison.findMany({
       where: { status: 'PUBLISHED' },
       select: { slug: true, updatedAt: true },
       orderBy: { updatedAt: 'desc' },
@@ -94,6 +99,18 @@ export async function GET(request: Request) {
       urlEntries.push(`  <url>
     <loc>${baseUrl}/product/${p.slug}</loc>
     <lastmod>${formatDate(p.updatedAt)}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`);
+    }
+  });
+
+  // Published Comparisons
+  comparisons.forEach((c) => {
+    if (c.slug) {
+      urlEntries.push(`  <url>
+    <loc>${baseUrl}/comparisons/${c.slug}</loc>
+    <lastmod>${formatDate(c.updatedAt)}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>`);

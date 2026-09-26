@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { isAuthorizedAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized: Admin privileges required.' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { title, location, image, targetUrl, active } = body;
@@ -25,10 +30,10 @@ export async function POST(request: Request) {
 
     const ad = await db.advertisement.create({
       data: {
-        title,
+        title: String(title).trim(),
         location: location || 'HEADER',
-        image,
-        targetUrl,
+        image: String(image).trim(),
+        targetUrl: String(targetUrl).trim(),
         active: active !== undefined ? Boolean(active) : true,
       },
     });

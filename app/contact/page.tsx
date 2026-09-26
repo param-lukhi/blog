@@ -51,7 +51,7 @@ export default function ContactPage() {
           Get in Touch
         </span>
         <h1 className="text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
-          Contact TechPulse
+          Contact BlogWeb904
         </h1>
         <p className="text-neutral-600 dark:text-neutral-300 text-base max-w-xl mx-auto leading-relaxed">
           Have feedback on a review, a question about a product comparison, or an editorial inquiry? Send our team a message below.

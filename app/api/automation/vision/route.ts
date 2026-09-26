@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 import { analyzeProductImage } from '@/lib/product-research';
+import { isAuthorizedAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized: Admin privileges required.' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { imageUrl, productQuery } = body;

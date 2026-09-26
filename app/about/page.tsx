@@ -4,8 +4,8 @@ import { ShieldCheck, Search, Scale, FileText, CheckCircle2, HelpCircle, User, A
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'About TechPulse - Editorial Mission, Author Profile & Research Methodology',
-  description: 'Meet the team behind TechPulse. Learn how we research tech specifications, evaluate buyer feedback, and create unbiased buying guides.',
+  title: 'About BlogWeb904 - Editorial Mission, Author Profile & Research Methodology',
+  description: 'Meet the team behind BlogWeb904. Learn how we research tech specifications, evaluate buyer feedback, and create unbiased buying guides.',
   alternates: {
     canonical: '/about',
   },
@@ -49,7 +49,7 @@ export default function AboutPage() {
           <span>Editorial Independence & Mission</span>
         </span>
         <h1 className="text-3xl sm:text-5xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
-          About TechPulse Reviews
+          About BlogWeb904 Reviews
         </h1>
         <p className="text-base sm:text-lg text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto leading-relaxed">
           We research product specifications, market pricing, user sentiment, and hardware features to help everyday shoppers make informed, confident buying decisions.
@@ -82,7 +82,7 @@ export default function AboutPage() {
             Our Editorial Approach &amp; Commitment
           </h3>
           <p className="text-xs sm:text-sm leading-relaxed">
-            &ldquo;As someone who loves consumer technology, I started TechPulse to solve a common problem: product reviews on the web are often filled with sponsored bias, exaggerated claims, or generic marketing copy. Our editorial process is straightforward: we perform deep research, analyze verified user feedback across thousands of owners, evaluate real-world trade-offs, and lay out the facts clearly.&rdquo;
+            &ldquo;As someone who loves consumer technology, I started BlogWeb904 to solve a common problem: product reviews on the web are often filled with sponsored bias, exaggerated claims, or generic marketing copy. Our editorial process is straightforward: we perform deep research, analyze verified user feedback across thousands of owners, evaluate real-world trade-offs, and lay out the facts clearly.&rdquo;
           </p>
           <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-brand-600 dark:text-brand-400 font-bold">
             <Link href="/contact" className="hover:underline flex items-center gap-1">
