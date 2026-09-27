@@ -9,7 +9,7 @@ import {
   GitCompare, Tag, Sparkles, MessageSquare, Users, Mail, Link2,
   Tv, ShieldCheck, Database, HelpCircle, ChevronLeft, ChevronRight,
   Compass, History, Server, ShieldAlert, TrendingUp, FlaskConical,
-  DollarSign, Search, Send
+  DollarSign, Search, Send, Rocket
 } from 'lucide-react';
 
 interface AdminSidebarProps {
