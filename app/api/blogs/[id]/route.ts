@@ -84,6 +84,18 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       details: { title: updatedBlog.title, status: updatedBlog.status },
     });
 
+    if (updateData.status) {
+      await db.productResearch.updateMany({
+        where: { blogId: updatedBlog.id },
+        data: { status: updatedBlog.status },
+      }).catch(() => {});
+
+      await db.productionQueueItem.updateMany({
+        where: { blogId: updatedBlog.id },
+        data: { status: updatedBlog.status },
+      }).catch(() => {});
+    }
+
     revalidatePath('/');
     revalidatePath('/blog');
     revalidatePath(`/blog/${updatedBlog.slug}`);
@@ -144,6 +156,18 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       entityId: updatedBlog.id,
       details: { title: updatedBlog.title, status: updatedBlog.status },
     });
+
+    if (updateData.status) {
+      await db.productResearch.updateMany({
+        where: { blogId: updatedBlog.id },
+        data: { status: updatedBlog.status },
+      }).catch(() => {});
+
+      await db.productionQueueItem.updateMany({
+        where: { blogId: updatedBlog.id },
+        data: { status: updatedBlog.status },
+      }).catch(() => {});
+    }
 
     revalidatePath('/');
     revalidatePath('/blog');

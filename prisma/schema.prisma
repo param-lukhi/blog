@@ -306,12 +306,14 @@ model ProductResearch {
   factVerification String?  // JSON string of {dimensions: "VERIFIED", battery: "NEEDS_REVIEW", ...}
   status           String   @default("IDEA") // IDEA, RESEARCHING, RESEARCHED, DRAFT, REVIEW, APPROVED, PUBLISHED, ARCHIVED
   productId        String?  // Bound product ID if converted
+  blogId           String?  // Bound blog ID when article draft is generated
   authorId         String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   @@index([status])
   @@index([createdAt])
+  @@index([blogId])
 }
 
 model ActivityLog {

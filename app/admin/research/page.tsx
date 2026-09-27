@@ -55,6 +55,7 @@ interface ProductResearch {
   verifiedFacts?: string | null;
   authorId?: string | null;
   productId: string | null;
+  blogId?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -87,6 +88,23 @@ export default function ProductResearchPage() {
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
   const [dailySuggestions, setDailySuggestions] = useState<Suggestion[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
+  // One-Click Article Workflow State
+  const [workflowModal, setWorkflowModal] = useState<{
+    isOpen: boolean;
+    item: ProductResearch | null;
+    running: boolean;
+    steps: { step: string; label: string; status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'SKIPPED'; detail?: string }[];
+    result: any | null;
+    error: string | null;
+  }>({
+    isOpen: false,
+    item: null,
+    running: false,
+    steps: [],
+    result: null,
+    error: null,
+  });
 
   // Form State
   const [formData, setFormData] = useState({
@@ -308,6 +326,67 @@ export default function ProductResearchPage() {
     }
   };
 
+  const handleStartArticleWorkflow = async (item: ProductResearch) => {
+    const initialSteps: { step: string; label: string; status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'SKIPPED'; detail?: string }[] = [
+      { step: 'validation', label: 'Preparing research...', status: 'RUNNING', detail: 'Loading verified research item and sources...' },
+      { step: 'duplicate_check', label: 'Checking existing articles...', status: 'PENDING', detail: 'Checking idempotency and duplicate slugs...' },
+      { step: 'content_brief', label: 'Preparing content brief...', status: 'PENDING', detail: 'Synthesizing verified specifications and article angle...' },
+      { step: 'draft_generation', label: 'Generating article...', status: 'PENDING', detail: 'Drafting structured article with verified sections...' },
+      { step: 'seo_links', label: 'Preparing SEO...', status: 'PENDING', detail: 'Structuring meta titles, descriptions, and internal links...' },
+      { step: 'quality_gate', label: 'Running quality checks...', status: 'PENDING', detail: 'Evaluating fact verification against quality gate...' },
+      { step: 'review_queue', label: 'Final status: REVIEW', status: 'PENDING', detail: 'Registering in Review Queue for human approval...' },
+    ];
+
+    setWorkflowModal({
+      isOpen: true,
+      item,
+      running: true,
+      steps: initialSteps,
+      result: null,
+      error: null,
+    });
+
+    try {
+      const res = await fetch(`/api/research/${item.id}/draft`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setWorkflowModal(prev => ({
+          ...prev,
+          running: false,
+          error: data.error || 'Article generation failed. Research data was preserved. Please retry.',
+          steps: data.steps || prev.steps.map(s => s.status === 'RUNNING' ? { ...s, status: 'FAILED' } : s),
+        }));
+        return;
+      }
+
+      setWorkflowModal(prev => ({
+        ...prev,
+        running: false,
+        result: data,
+        steps: data.steps || [
+          { step: 'validation', label: 'Research loaded', status: 'COMPLETED', detail: '✓ Research loaded' },
+          { step: 'duplicate_check', label: 'Idempotency verified', status: 'COMPLETED', detail: '✓ Duplicate protection passed' },
+          { step: 'content_brief', label: 'Content brief ready', status: 'COMPLETED', detail: '✓ Content brief ready' },
+          { step: 'draft_generation', label: 'Draft generated', status: 'COMPLETED', detail: '✓ Draft generated' },
+          { step: 'seo_links', label: 'SEO prepared', status: 'COMPLETED', detail: '✓ SEO prepared' },
+          { step: 'quality_gate', label: 'Quality check complete', status: 'COMPLETED', detail: '✓ Quality check complete' },
+          { step: 'review_queue', label: 'Final status: REVIEW', status: 'COMPLETED', detail: '✓ Ready for Human Review' },
+        ],
+      }));
+      fetchResearch();
+    } catch (err: any) {
+      setWorkflowModal(prev => ({
+        ...prev,
+        running: false,
+        error: `Article generation failed. Research data was preserved. Please retry. (${err?.message || 'Network Error'})`,
+      }));
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'IDEA':
@@ -484,24 +563,83 @@ export default function ProductResearchPage() {
                         {getStatusBadge(item.status)}
                       </td>
                       <td className="py-4 px-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center justify-end gap-2 flex-wrap sm:flex-nowrap">
+                          {/* Lifecycle Primary Action Button (Section 18) */}
+                          {item.status === 'IDEA' && (
+                            <button
+                              onClick={() => handleOpenEditModal(item)}
+                              className="px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-bold text-xs flex items-center gap-1 transition shrink-0"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                              <span>Start Research</span>
+                            </button>
+                          )}
+                          {item.status === 'RESEARCHING' && (
+                            <button
+                              onClick={() => handleOpenEditModal(item)}
+                              className="px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-bold text-xs flex items-center gap-1 transition shrink-0"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                              <span>Continue Research</span>
+                            </button>
+                          )}
+                          {item.status === 'RESEARCHED' && (
+                            <button
+                              onClick={() => handleStartArticleWorkflow(item)}
+                              className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm shadow-blue-500/20 transition hover:scale-105 active:scale-95 shrink-0"
+                            >
+                              <Sparkles className="w-3.5 h-3.5" />
+                              <span>Create Article Draft</span>
+                            </button>
+                          )}
+                          {item.status === 'DRAFT' && (
+                            <Link
+                              href={item.blogId ? `/admin/blogs/${item.blogId}` : '/admin/blogs'}
+                              className="px-3 py-1.5 rounded-lg bg-cyan-50 dark:bg-cyan-950/50 hover:bg-cyan-100 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 font-bold text-xs flex items-center gap-1 transition shrink-0"
+                            >
+                              <FileText className="w-3 h-3" />
+                              <span>Open Draft</span>
+                            </Link>
+                          )}
+                          {item.status === 'REVIEW' && (
+                            <Link
+                              href={item.blogId ? `/admin/blogs/${item.blogId}` : '/admin/content/publishing'}
+                              className="px-3 py-1.5 rounded-lg bg-orange-50 dark:bg-orange-950/50 hover:bg-orange-100 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800 font-bold text-xs flex items-center gap-1 transition shrink-0"
+                            >
+                              <Eye className="w-3 h-3" />
+                              <span>Open Review</span>
+                            </Link>
+                          )}
+                          {item.status === 'APPROVED' && (
+                            <Link
+                              href={item.blogId ? `/admin/blogs/${item.blogId}` : '/admin/blogs'}
+                              className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold text-xs flex items-center gap-1 transition shrink-0"
+                            >
+                              <ShieldCheck className="w-3 h-3" />
+                              <span>View Approved Article</span>
+                            </Link>
+                          )}
+                          {item.status === 'PUBLISHED' && (
+                            <Link
+                              href={item.blogId ? `/admin/blogs/${item.blogId}` : '/admin/blogs'}
+                              className="px-3 py-1.5 rounded-lg bg-green-50 dark:bg-green-950/50 hover:bg-green-100 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 font-bold text-xs flex items-center gap-1 transition shrink-0"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              <span>View Published Article</span>
+                            </Link>
+                          )}
+
+                          {/* Utility actions */}
                           <button
                             onClick={() => handleOpenEditModal(item)}
-                            className="p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
+                            className="p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 shrink-0"
                             title="Edit & Verify Research"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
-                          <Link
-                            href={`/admin/blogs/new?researchId=${item.id}&title=${encodeURIComponent(displayName)}`}
-                            className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 text-blue-600 dark:text-blue-400"
-                            title="Draft Blog Article"
-                          >
-                            <FileText className="w-3.5 h-3.5" />
-                          </Link>
                           <button
                             onClick={() => handleDelete(item.id)}
-                            className="p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400"
+                            className="p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 shrink-0"
                             title="Delete"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -516,6 +654,102 @@ export default function ProductResearchPage() {
           </div>
         )}
       </div>
+
+      {/* Article Workflow Progress Modal */}
+      {workflowModal.isOpen && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#121826] w-full max-w-xl rounded-3xl p-6 sm:p-8 border border-neutral-200 dark:border-neutral-800 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-4">
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                  Article Production Pipeline
+                </span>
+                <h3 className="text-lg font-extrabold text-neutral-900 dark:text-white mt-0.5">
+                  {workflowModal.item?.name}
+                </h3>
+              </div>
+              {!workflowModal.running && (
+                <button
+                  onClick={() => setWorkflowModal(prev => ({ ...prev, isOpen: false }))}
+                  className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Error Banner */}
+            {workflowModal.error && (
+              <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-700 dark:text-rose-300 space-y-1">
+                <div className="font-bold flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-500" />
+                  <span>Workflow Error</span>
+                </div>
+                <p>{workflowModal.error}</p>
+              </div>
+            )}
+
+            {/* Step-by-Step Progress List */}
+            <div className="space-y-3">
+              {workflowModal.steps.map((step, idx) => (
+                <div
+                  key={step.step || idx}
+                  className={`p-3 rounded-xl border text-xs flex items-start gap-3 transition-colors ${
+                    step.status === 'COMPLETED'
+                      ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-200'
+                      : step.status === 'RUNNING'
+                      ? 'bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/40 text-blue-900 dark:text-blue-200 animate-pulse'
+                      : step.status === 'FAILED'
+                      ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-200'
+                      : 'bg-neutral-50 dark:bg-neutral-900/40 border-neutral-200 dark:border-neutral-800 text-neutral-500'
+                  }`}
+                >
+                  <div className="mt-0.5 shrink-0">
+                    {step.status === 'COMPLETED' ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    ) : step.status === 'RUNNING' ? (
+                      <RefreshCw className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-spin" />
+                    ) : step.status === 'FAILED' ? (
+                      <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                    ) : (
+                      <Clock className="w-4 h-4 text-neutral-400" />
+                    )}
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="font-bold">{step.label}</div>
+                    {step.detail && (
+                      <div className="text-[11px] opacity-80">{step.detail}</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Success Action Footer */}
+            {workflowModal.result && (
+              <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="text-xs text-neutral-500">
+                  Status: <strong className="text-orange-600 dark:text-orange-400 font-bold">REVIEW</strong> (Human Review Required)
+                </div>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <Link
+                    href={`/admin/blogs/${workflowModal.result.blogId}`}
+                    className="w-full sm:w-auto px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs text-center shadow-md shadow-blue-500/20"
+                  >
+                    Open in Review Queue →
+                  </Link>
+                  <button
+                    onClick={() => setWorkflowModal(prev => ({ ...prev, isOpen: false }))}
+                    className="px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-800 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Daily Suggestions Modal */}
       {isSuggestionsOpen && (
