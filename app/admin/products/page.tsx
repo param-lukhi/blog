@@ -26,7 +26,7 @@ export default function AdminProductsPage() {
     setError(null);
     try {
       const [prodRes, catRes] = await Promise.all([
-        fetch('/api/products'),
+        fetch('/api/products?status=ALL'),
         fetch('/api/categories'),
       ]);
 

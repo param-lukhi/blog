@@ -44,7 +44,7 @@ export async function GET(request: Request) {
 
     const products = await db.product.findMany({
       where,
-      include: { category: true },
+      include: { category: true, prices: true },
       orderBy: { createdAt: 'desc' },
       take: limit,
     });
