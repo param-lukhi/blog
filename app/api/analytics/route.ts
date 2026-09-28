@@ -1,12 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { isAuthorizedAdmin } from '@/lib/auth';
+import { requireAdminAuth } from '@/lib/adminAuth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-  if (!isAuthorizedAdmin()) {
-    return NextResponse.json({ error: 'Unauthorized: Admin privileges required.' }, { status: 401 });
+export async function GET(req: NextRequest) {
+  const auth = await requireAdminAuth(req);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.message || 'Unauthorized: Admin privileges required.' }, { status: auth.status });
   }
 
   try {
@@ -63,10 +64,7 @@ export async function GET() {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const stalePricesCount = await db.productPrice.count({
       where: {
-        OR: [
-          { lastCheckedAt: { lt: sevenDaysAgo } },
-          { lastCheckedAt: null as any },
-        ],
+        lastCheckedAt: { lt: sevenDaysAgo },
       },
     });
 
