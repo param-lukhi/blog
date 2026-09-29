@@ -1,16 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import RichTextEditor from '@/components/RichTextEditor';
-import MediaPickerModal from '@/components/admin/MediaPickerModal';
-import BlogQualityCheckModal from '@/components/admin/BlogQualityCheckModal';
-import DraftPreviewModal from '@/components/admin/DraftPreviewModal';
 import { slugify, safeJsonParse } from '@/lib/utils';
-import { evaluateBlogQuality } from '@/lib/qualityCheck';
-import { Save, ArrowLeft, Plus, Trash, Zap, ShoppingBag, Sparkles, Image as ImageIcon, Upload, TrendingDown, Star, RefreshCw, ShieldCheck, Eye, Calendar } from 'lucide-react';
-
-export const dynamic = 'force-dynamic';
+import { Save, ArrowLeft, Plus, Trash, Zap, ShoppingBag, Sparkles, Image as ImageIcon, Upload, TrendingDown, Star, RefreshCw } from 'lucide-react';
 
 interface ProductItem {
   id: string;
@@ -27,26 +21,11 @@ interface ProductItem {
   cons?: string;
 }
 
-function NewBlogFormContent() {
+export default function NewBlogPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [categories, setCategories] = useState<{ id: string; name: string; parentId?: string | null; parent?: { name: string } | null }[]>([]);
   const [productsList, setProductsList] = useState<ProductItem[]>([]);
   const [productId, setProductId] = useState('');
-
-  // Modals state
-  const [showQualityModal, setShowQualityModal] = useState(false);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [qualityChecklist, setQualityChecklist] = useState<Record<string, boolean>>({
-    noFakeClaims: true,
-    researchComplete: true,
-    factsVerified: true,
-    sourcesAdded: true,
-    priceChecked: true,
-    disclosureChecked: true,
-    authorAssigned: true,
-  });
-  const [scheduledAt, setScheduledAt] = useState('');
 
   // Form State
   const [title, setTitle] = useState('');
@@ -56,7 +35,6 @@ function NewBlogFormContent() {
   const [categoryId, setCategoryId] = useState('');
   const [featuredImage, setFeaturedImage] = useState('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&auto=format&fit=crop&q=80');
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [content, setContent] = useState('');
   const [amazonUrl, setAmazonUrl] = useState('');
   const [affiliateUrl, setAffiliateUrl] = useState('');
@@ -275,8 +253,6 @@ function NewBlogFormContent() {
       affiliateUrl: affiliateUrl || amazonUrl,
       conclusion,
       status,
-      qualityChecklist,
-      scheduledAt: status === 'SCHEDULED' && scheduledAt ? new Date(scheduledAt).toISOString() : null,
       specifications: specObj,
       pros: pros.filter(Boolean),
       cons: cons.filter(Boolean),
@@ -297,66 +273,32 @@ function NewBlogFormContent() {
     }
   };
 
-  const currentQuality = evaluateBlogQuality({
-    title,
-    slug: slug || slugify(title),
-    metaTitle,
-    metaDescription,
-    content,
-    featuredImage,
-    amazonUrl,
-    affiliateUrl,
-    faqs,
-    qualityChecklist,
-  });
-
   return (
-    <>
-      <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl pb-16">
-        {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 pb-4">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="p-2 rounded-xl bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-            <div>
-              <h1 className="text-2xl font-extrabold text-neutral-900">Create New Product Blog</h1>
-              <p className="text-xs text-neutral-500">Structured editorial workflow: Research → Verify → Draft → Quality Check → Approve → Publish.</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              type="button"
-              onClick={() => setShowQualityModal(true)}
-              className="px-3.5 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 text-neutral-800 text-xs font-bold flex items-center gap-1.5 transition-all"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-              <span>Quality: {currentQuality.score}%</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowPreviewModal(true)}
-              className="px-3.5 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 text-neutral-800 text-xs font-bold flex items-center gap-1.5 transition-all"
-            >
-              <Eye className="w-3.5 h-3.5 text-neutral-600" />
-              <span>Preview</span>
-            </button>
-
-            <button
-              type="submit"
-              className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-2 shadow-sm"
-            >
-              <Save className="w-4 h-4" />
-              <span>Save Post</span>
-            </button>
+    <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl pb-16">
+      {/* Header Bar */}
+      <div className="flex items-center justify-between border-b border-neutral-200 pb-4">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="p-2 rounded-xl bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <div>
+            <h1 className="text-2xl font-extrabold text-neutral-900">Create New Product Blog</h1>
+            <p className="text-xs text-neutral-500">Link blog to the exact product so readers see the matching product details.</p>
           </div>
         </div>
+
+        <button
+          type="submit"
+          className="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-2 shadow-sm"
+        >
+          <Save className="w-4 h-4" />
+          <span>Save Blog Post</span>
+        </button>
+      </div>
 
       {/* Product Binding Header Box */}
       <div className="bg-brand-50/80 border border-brand-200 p-5 rounded-2xl space-y-3">
@@ -850,36 +792,17 @@ function NewBlogFormContent() {
             <h3 className="font-bold text-neutral-900 text-sm border-b border-neutral-100 pb-2">Publication Status</h3>
             
             <div>
-              <label className="block text-xs font-bold text-neutral-700 mb-1">Workflow Status</label>
+              <label className="block text-xs font-bold text-neutral-700 mb-1">Status</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
                 className="w-full px-3.5 py-2 rounded-xl border border-neutral-300 text-xs font-bold outline-none bg-white"
               >
-                <option value="IDEA">IDEA (Concept)</option>
-                <option value="RESEARCHING">RESEARCHING (Gathering facts)</option>
-                <option value="DRAFT">DRAFT (Writing in progress)</option>
-                <option value="REVIEW">REVIEW (Needs editorial check)</option>
-                <option value="APPROVED">APPROVED (Verified & Ready)</option>
-                <option value="PUBLISHED">PUBLISHED (Live)</option>
-                <option value="SCHEDULED">SCHEDULED (Auto-publish)</option>
+                <option value="PUBLISHED">Published</option>
+                <option value="DRAFT">Draft</option>
+                <option value="SCHEDULED">Scheduled</option>
               </select>
             </div>
-
-            {status === 'SCHEDULED' && (
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-1">
-                <label className="block text-[11px] font-bold text-blue-900 flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-blue-600" />
-                  Scheduled Publish Date &amp; Time (Explicit Timezone)
-                </label>
-                <input
-                  type="datetime-local"
-                  value={scheduledAt}
-                  onChange={(e) => setScheduledAt(e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-lg border border-blue-300 text-xs bg-white"
-                />
-              </div>
-            )}
 
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1">Featured Image URL / Upload</label>
@@ -892,15 +815,6 @@ function NewBlogFormContent() {
                 />
                 
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowMediaPicker(true)}
-                    className="px-3 py-1.5 bg-brand-50 border border-brand-300 text-brand-700 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:bg-brand-100 transition-colors"
-                  >
-                    <ImageIcon className="w-3.5 h-3.5" />
-                    <span>Media Library</span>
-                  </button>
-
                   <input
                     type="file"
                     accept="image/*"
@@ -916,13 +830,6 @@ function NewBlogFormContent() {
                     <span>{uploadingImage ? 'Uploading...' : 'Upload Image'}</span>
                   </label>
                 </div>
-
-                <MediaPickerModal
-                  isOpen={showMediaPicker}
-                  onClose={() => setShowMediaPicker(false)}
-                  onSelect={(url) => setFeaturedImage(url)}
-                  title="Select Blog Featured Image"
-                />
 
                 {featuredImage && (
                   <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 mt-2">
@@ -1009,63 +916,6 @@ function NewBlogFormContent() {
         </div>
       </div>
     </form>
-
-    <BlogQualityCheckModal
-      isOpen={showQualityModal}
-      onClose={() => setShowQualityModal(false)}
-      blogData={{
-        title,
-        slug: slug || slugify(title),
-        metaTitle,
-        metaDescription,
-        content,
-        featuredImage,
-        amazonUrl,
-        affiliateUrl,
-        faqs,
-        qualityChecklist,
-      }}
-      onUpdateChecklist={(key, val) =>
-        setQualityChecklist((prev) => ({ ...prev, [key]: val }))
-      }
-      onApproveAndPublish={() => {
-        setStatus('PUBLISHED');
-        setShowQualityModal(false);
-      }}
-    />
-
-    <DraftPreviewModal
-      isOpen={showPreviewModal}
-      onClose={() => setShowPreviewModal(false)}
-      blog={{
-        title,
-        slug: slug || slugify(title),
-        metaTitle,
-        metaDescription,
-        featuredImage,
-        content,
-        conclusion,
-        amazonUrl,
-        affiliateUrl,
-        pros,
-        cons,
-        faqs,
-        specs,
-      }}
-      onPublish={() => {
-        setStatus('PUBLISHED');
-        setShowPreviewModal(false);
-      }}
-    />
-  </>
-  );
-}
-
-export default function NewBlogPage() {
-  return (
-    <Suspense fallback={<div className="p-8 text-neutral-500 font-medium">Loading blog editor...</div>}>
-      <NewBlogFormContent />
-    </Suspense>
   );
 }
 

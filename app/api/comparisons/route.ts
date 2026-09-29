@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
-import { isAuthorizedAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,10 +29,6 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!isAuthorizedAdmin()) {
-    return NextResponse.json({ error: 'Unauthorized: Admin privileges required.' }, { status: 401 });
-  }
-
   try {
     const body = await request.json();
     const { title, slug, summary, product1Id, product2Id, winnerId } = body;
@@ -44,9 +39,9 @@ export async function POST(request: Request) {
 
     const comparison = await db.comparison.create({
       data: {
-        title: String(title).trim(),
-        slug: String(slug).trim().toLowerCase(),
-        summary: summary ? String(summary).trim() : '',
+        title,
+        slug,
+        summary: summary || '',
         product1Id,
         product2Id,
         winnerId: winnerId || product1Id,
@@ -54,15 +49,10 @@ export async function POST(request: Request) {
       },
     });
 
-    try {
-      revalidatePath('/comparisons');
-    } catch (_) {}
+    revalidatePath('/comparisons');
 
     return NextResponse.json(comparison, { status: 201 });
-  } catch (error: any) {
-    if (error.code === 'P2002') {
-      return NextResponse.json({ error: 'A comparison with this slug already exists.' }, { status: 409 });
-    }
+  } catch (error) {
     return NextResponse.json({ error: 'Failed to create comparison' }, { status: 500 });
   }
 }

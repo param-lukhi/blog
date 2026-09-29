@@ -1,15 +1,10 @@
 import { NextResponse } from 'next/server';
 import { searchProductMatches } from '@/lib/product-research';
 import { getMarketplaceAdapter } from '@/lib/marketplaces';
-import { isAuthorizedAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
-  if (!isAuthorizedAdmin()) {
-    return NextResponse.json({ error: 'Unauthorized: Admin privileges required.' }, { status: 401 });
-  }
-
   try {
     const body = await request.json();
     const { query, url } = body;
@@ -21,7 +16,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const searchTerm = String(query || url).trim();
+    const searchTerm = query || url;
     const adapter = getMarketplaceAdapter(searchTerm);
     const matches = await adapter.searchProducts(searchTerm, 3);
 

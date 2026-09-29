@@ -43,14 +43,14 @@ export function generateArticleSchema(a: ArticleSchemaProps) {
     dateModified: a.dateModified || a.datePublished,
     author: {
       '@type': 'Person',
-      name: a.authorName || 'BlogWeb904 Editorial Team',
+      name: a.authorName || 'TechPulse Editorial Team',
     },
     publisher: {
       '@type': 'Organization',
-      name: a.publisherName || 'BlogWeb904 Reviews',
+      name: a.publisherName || 'TechPulse Reviews',
       logo: {
         '@type': 'ImageObject',
-        url: a.publisherLogo || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app'}/logo.png`,
+        url: a.publisherLogo || 'https://techpulsereviews.com/logo.png',
       },
     },
   };
@@ -127,7 +127,7 @@ export function generateReviewSchema(r: ReviewSchemaProps) {
     image: r.image,
     author: {
       '@type': 'Person',
-      name: r.author || 'BlogWeb904 Editorial Team',
+      name: r.author || 'TechPulse Editorial Team',
     },
     datePublished: r.datePublished || new Date().toISOString(),
     itemReviewed: {
@@ -174,12 +174,12 @@ export function generateOrganizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'BlogWeb904',
+    name: 'TechPulse',
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
     sameAs: [
-      'https://twitter.com/blogweb904',
-      'https://facebook.com/blogweb904',
+      'https://twitter.com/techpulse',
+      'https://facebook.com/techpulse',
     ],
   };
 }

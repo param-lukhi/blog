@@ -9,12 +9,12 @@ const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
 export const metadata: Metadata = {
   title: {
-    default: 'BlogWeb904 - Research-Based Product Reviews & Price Comparisons',
-    template: '%s | BlogWeb904',
+    default: 'TechPulse - Research-Based Product Reviews & Buying Guides',
+    template: '%s | TechPulse Reviews',
   },
-  description: 'In-depth research-based product reviews, multi-store price comparisons, technical specifications, and tech buying guides to help you make smarter purchasing decisions.',
-  keywords: ['tech reviews', 'product price comparisons', 'smartphone comparisons', 'laptop guides', 'audio reviews', 'gadget deals'],
-  authors: [{ name: 'BlogWeb904 Editorial Team' }],
+  description: 'In-depth research-based product reviews, specifications, side-by-side comparisons, and buying guides to help you make smarter purchasing decisions.',
+  keywords: ['tech reviews', 'product buying guides', 'smartphone comparisons', 'laptop guides', 'audio reviews', 'gadget deals'],
+  authors: [{ name: 'TechPulse Editorial Team' }],
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app'),
   verification: siteVerification
     ? {
@@ -22,15 +22,15 @@ export const metadata: Metadata = {
       }
     : undefined,
   openGraph: {
-    title: 'BlogWeb904 - Research-Based Product Reviews & Price Comparisons',
-    description: 'In-depth research-based product reviews, multi-store price comparisons, and buying guides.',
+    title: 'TechPulse - Research-Based Product Reviews & Buying Guides',
+    description: 'In-depth research-based product reviews, specifications, and buying guides.',
     type: 'website',
-    siteName: 'BlogWeb904',
+    siteName: 'TechPulse',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'BlogWeb904 - Research-Based Product Reviews & Price Comparisons',
-    description: 'In-depth research-based product reviews, multi-store price comparisons, and buying guides.',
+    title: 'TechPulse - Research-Based Product Reviews & Buying Guides',
+    description: 'In-depth research-based product reviews, specifications, and buying guides.',
   },
 };
 

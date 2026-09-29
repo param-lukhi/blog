@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
-import { isAuthorizedAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,10 +17,6 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!isAuthorizedAdmin()) {
-    return NextResponse.json({ error: 'Unauthorized: Admin privileges required.' }, { status: 401 });
-  }
-
   try {
     const body = await request.json();
     const { title, discount, originalPrice, dealPrice, dealUrl, badge, productId, status } = body;
@@ -32,21 +27,19 @@ export async function POST(request: Request) {
 
     const deal = await db.deal.create({
       data: {
-        title: String(title).trim(),
-        discount: discount ? String(discount).trim() : '',
-        originalPrice: originalPrice ? String(originalPrice).trim() : String(dealPrice).trim(),
-        dealPrice: String(dealPrice).trim(),
-        dealUrl: String(dealUrl).trim(),
-        badge: badge ? String(badge).trim() : 'HOT',
+        title,
+        discount: discount || '',
+        originalPrice: originalPrice || dealPrice,
+        dealPrice,
+        dealUrl,
+        badge: badge || 'HOT',
         productId: productId || null,
         status: status || 'PUBLISHED',
       },
     });
 
-    try {
-      revalidatePath('/deals');
-      revalidatePath('/');
-    } catch (_) {}
+    revalidatePath('/deals');
+    revalidatePath('/');
 
     return NextResponse.json(deal, { status: 201 });
   } catch (error) {

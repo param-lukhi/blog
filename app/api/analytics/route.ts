@@ -1,19 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdminAuth } from '@/lib/adminAuth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: NextRequest) {
-  const auth = await requireAdminAuth(req);
-  if (!auth.authorized) {
-    return NextResponse.json({ error: auth.message || 'Unauthorized: Admin privileges required.' }, { status: auth.status });
-  }
-
+export async function GET() {
   try {
     // 1. Total Page Views from Analytics table
     const totalPageViews = await db.analytics.count({
-      where: { eventType: 'PAGE_VIEW' },
+      where: { eventType: 'PAGE_VIEW' }
     });
 
     const now = new Date();
@@ -23,50 +17,38 @@ export async function GET(req: NextRequest) {
     const todayVisitors = await db.analytics.count({
       where: {
         eventType: 'PAGE_VIEW',
-        createdAt: { gte: startOfToday },
-      },
+        createdAt: { gte: startOfToday }
+      }
     });
 
     const monthlyVisitors = await db.analytics.count({
       where: {
         eventType: 'PAGE_VIEW',
-        createdAt: { gte: startOfMonth },
-      },
+        createdAt: { gte: startOfMonth }
+      }
     });
 
     const blogViewsCount = await db.analytics.count({
-      where: { eventType: 'PAGE_VIEW', targetType: 'BLOG' },
+      where: { eventType: 'PAGE_VIEW', targetType: 'BLOG' }
     });
 
     const productViewsCount = await db.analytics.count({
-      where: { eventType: 'PAGE_VIEW', targetType: 'PRODUCT' },
+      where: { eventType: 'PAGE_VIEW', targetType: 'PRODUCT' }
     });
 
     const totalAffiliateClicks = await db.analytics.count({
-      where: { eventType: 'AFFILIATE_CLICK' },
+      where: { eventType: 'AFFILIATE_CLICK' }
     });
 
-    const ctr = totalPageViews > 0 ? ((totalAffiliateClicks / totalPageViews) * 100).toFixed(1) : '0.0';
+    const ctr = totalPageViews > 0 
+      ? ((totalAffiliateClicks / totalPageViews) * 100).toFixed(1) 
+      : '0.0';
 
     // 2. Real Counts from Database
     const totalProductsCount = await db.product.count();
     const publishedBlogsCount = await db.blog.count({ where: { status: 'PUBLISHED' } });
-    const draftBlogsCount = await db.blog.count({ where: { status: 'DRAFT' } });
-    const reviewBlogsCount = await db.blog.count({ where: { status: 'REVIEW' } });
-    const approvedBlogsCount = await db.blog.count({ where: { status: 'APPROVED' } });
-    const scheduledBlogsCount = await db.blog.count({ where: { status: 'SCHEDULED' } });
     const totalCategoriesCount = await db.category.count();
     const totalMediaCount = await db.media.count();
-    const researchQueueCount = await db.productResearch.count({ where: { status: { in: ['IDEA', 'RESEARCHING', 'RESEARCHED'] } } });
-    
-    // Price freshness check (stale > 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const stalePricesCount = await db.productPrice.count({
-      where: {
-        lastCheckedAt: { lt: sevenDaysAgo },
-      },
-    });
 
     // 3. Fetch all blogs with category & product info
     const blogs = await db.blog.findMany({
@@ -121,14 +103,14 @@ export async function GET(req: NextRequest) {
     const topBlogs = await db.blog.findMany({
       take: 5,
       orderBy: { views: 'desc' },
-      select: { id: true, title: true, slug: true, views: true },
+      select: { id: true, title: true, slug: true, views: true }
     });
 
     // 7. Top Products from Database
     const topProducts = await db.product.findMany({
       take: 5,
       orderBy: { createdAt: 'desc' },
-      select: { id: true, name: true, slug: true, price: true, brand: true },
+      select: { id: true, name: true, slug: true, price: true, brand: true }
     });
 
     return NextResponse.json({
@@ -141,12 +123,6 @@ export async function GET(req: NextRequest) {
       ctr: `${ctr}%`,
       totalProducts: totalProductsCount,
       publishedBlogs: publishedBlogsCount,
-      draftBlogs: draftBlogsCount,
-      reviewBlogs: reviewBlogsCount,
-      approvedBlogs: approvedBlogsCount,
-      scheduledBlogs: scheduledBlogsCount,
-      researchQueueCount: researchQueueCount,
-      stalePricesCount: stalePricesCount,
       totalCategories: totalCategoriesCount,
       totalMedia: totalMediaCount,
       topBlogs,
