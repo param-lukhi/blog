@@ -23,7 +23,16 @@ export default async function ProductsPage({
 
   const whereClause: any = { status: 'PUBLISHED' };
   if (categoryFilter) {
-    whereClause.category = { slug: categoryFilter };
+    const matchedCategory = await db.category.findUnique({
+      where: { slug: categoryFilter },
+      include: { subcategories: { select: { id: true } } },
+    });
+    if (matchedCategory) {
+      const catIds = [matchedCategory.id, ...matchedCategory.subcategories.map((s) => s.id)];
+      whereClause.categoryId = { in: catIds };
+    } else {
+      whereClause.category = { slug: categoryFilter };
+    }
   }
   if (searchQuery) {
     whereClause.OR = [
@@ -39,6 +48,7 @@ export default async function ProductsPage({
   });
 
   const categories = await db.category.findMany({
+    where: { parentId: null },
     orderBy: { name: 'asc' },
   });
 

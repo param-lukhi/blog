@@ -8,8 +8,9 @@ import FaqAccordion from '@/components/FaqAccordion';
 import {
   Sparkles, ArrowRight, ShieldCheck, Zap, Award, Flame,
   Scale, CheckCircle2, BookOpen, Layers, Search, PlusCircle,
-  TrendingUp, Compass, Star, ExternalLink, Cpu
+  TrendingUp, Compass, Star, ExternalLink, Cpu, Tag, Wallet
 } from 'lucide-react';
+import { safeJsonParse } from '@/lib/utils';
 import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +25,15 @@ export const metadata: Metadata = {
 };
 
 async function getData() {
-  const categories = await db.category.findMany({ take: 16, orderBy: { name: 'asc' } });
+  const categories = await db.category.findMany({
+    where: { parentId: null },
+    include: {
+      subcategories: { select: { id: true, name: true, slug: true } },
+      _count: { select: { subcategories: true, products: true, blogs: true } },
+    },
+    orderBy: { name: 'asc' },
+    take: 16,
+  });
   const featuredProducts = await db.product.findMany({
     where: { status: 'PUBLISHED', isFeatured: true },
     include: { category: true },
@@ -71,6 +80,19 @@ export default async function HomePage() {
   const heroButtonText = settings.hero_button_text || 'Explore Reviews';
 
   const popularKeywords = ['Laptops', 'Smartphones', 'Noise Canceling', 'Smart Watches', 'OLED TVs', 'Gaming Gear'];
+
+  const priceCategories: string[] = safeJsonParse(settings.price_categories, [
+    'Best Products Under ₹1,000',
+    'Best Products Under ₹2,000',
+    'Best Products Under ₹5,000',
+    'Best Products Under ₹10,000',
+    'Best Products Under ₹20,000',
+    'Best Products Under ₹50,000',
+    'Premium Products'
+  ]);
+  const contentCategories: string[] = safeJsonParse(settings.content_categories, [
+    'Product Reviews', 'Product Comparisons', 'Buying Guides', 'Best Products', 'Deals & Offers', "Beginner's Guides"
+  ]);
 
   const homeFaqs = [
     {
@@ -321,6 +343,38 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* 5b. Trending Hardware Right Now */}
+      {trendingProducts.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                Popular In Tech
+              </span>
+              <h2 className="text-2xl font-extrabold text-neutral-900 dark:text-white mt-0.5">
+                Trending Hardware &amp; Devices
+              </h2>
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">
+                Frequently researched products with verified benchmark comparisons.
+              </p>
+            </div>
+            <Link
+              href="/products"
+              className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+            >
+              <span>Explore All</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {trendingProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* 6. Today's Amazon Deals Section */}
       {dealProducts.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -350,6 +404,41 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {dealProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 6b. Price-Based Buying Guides */}
+      {priceCategories.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white dark:bg-[#121826] rounded-3xl p-6 sm:p-8 border border-neutral-200/90 dark:border-neutral-800 shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                  <Wallet className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-neutral-900 dark:text-white">
+                    Shop By Budget (Affiliate Curations)
+                  </h3>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                    Find top-tested products matching your exact spending bracket.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2.5 pt-2">
+              {priceCategories.map((priceTier, idx) => (
+                <Link
+                  key={idx}
+                  href={`/search?q=${encodeURIComponent(priceTier)}`}
+                  className="px-4 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-neutral-700 dark:text-neutral-300 hover:text-emerald-700 dark:hover:text-emerald-300 text-xs font-bold border border-neutral-200/80 dark:border-neutral-800 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all hover:scale-105 active:scale-95"
+                >
+                  💰 {priceTier}
+                </Link>
               ))}
             </div>
           </div>
