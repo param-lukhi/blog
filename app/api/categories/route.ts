@@ -3,10 +3,10 @@ import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+export async function GET(request?: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const rootOnly = searchParams.get('rootOnly') === 'true';
+    const url = request?.url ? new URL(request.url) : null;
+    const rootOnly = url?.searchParams.get('rootOnly') === 'true';
 
     const where = rootOnly ? { parentId: null } : {};
 
