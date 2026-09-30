@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { isAuthorizedAdmin } from '@/lib/auth';
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const updated = await db.advertisement.update({
@@ -15,6 +20,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     await db.advertisement.delete({ where: { id: params.id } });
     return NextResponse.json({ success: true });

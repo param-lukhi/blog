@@ -22,6 +22,13 @@ export async function GET(request: Request) {
       orderBy: { updatedAt: 'desc' },
     }),
     db.category.findMany({
+      where: {
+        OR: [
+          { products: { some: { status: 'PUBLISHED' } } },
+          { blogs: { some: { status: 'PUBLISHED' } } },
+          { subcategories: { some: { OR: [{ products: { some: { status: 'PUBLISHED' } } }, { blogs: { some: { status: 'PUBLISHED' } } }] } } },
+        ],
+      },
       select: { slug: true, updatedAt: true },
       orderBy: { name: 'asc' },
     }),

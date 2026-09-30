@@ -70,12 +70,6 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
     notFound();
   }
 
-  // Increment view counter in background
-  db.blog.update({
-    where: { id: blog.id },
-    data: { views: { increment: 1 } },
-  }).catch(() => {});
-
   const linkedProduct = blog.product;
 
   // Related articles from same category

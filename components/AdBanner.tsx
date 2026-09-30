@@ -28,8 +28,8 @@ export default function AdBanner({
     }
   }, [clientId]);
 
-  // If no AdSense ID is configured, do not render intrusive blank frames
-  if (!clientId) {
+  // If no AdSense ID or no valid slot is configured, do not render intrusive blank frames
+  if (!clientId || !slot || slot === '1234567890') {
     return null;
   }
 

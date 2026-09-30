@@ -20,6 +20,12 @@ interface Product {
   specifications: string;
   pros: string;
   cons: string;
+  categoryId?: string;
+  category?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
 }
 
 export default function ComparisonsPage() {
@@ -35,8 +41,15 @@ export default function ComparisonsPage() {
         if (Array.isArray(data) && data.length > 0) {
           setProducts(data);
           setP1Id(data[0].id);
-          if (data.length > 1) setP2Id(data[1].id);
-          else setP2Id(data[0].id);
+          // Try to find a second product in the same category
+          const sameCat = data.find((p: Product) => p.id !== data[0].id && p.categoryId === data[0].categoryId);
+          if (sameCat) {
+            setP2Id(sameCat.id);
+          } else if (data.length > 1) {
+            setP2Id(data[1].id);
+          } else {
+            setP2Id(data[0].id);
+          }
         }
       })
       .finally(() => setLoading(false));
@@ -148,7 +161,7 @@ export default function ComparisonsPage() {
             >
               {products.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} ({p.price})
+                  {p.name} {p.category?.name ? `[${p.category.name}]` : ''} ({p.price})
                 </option>
               ))}
             </select>
@@ -165,15 +178,33 @@ export default function ComparisonsPage() {
             >
               {products.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} ({p.price})
+                  {p.name} {p.category?.name ? `[${p.category.name}]` : ''} ({p.price})
                 </option>
               ))}
             </select>
           </div>
         </div>
 
+        {/* Cross-Category Notice */}
+        {p1 && p2 && p1.id !== p2.id && p1.categoryId && p2.categoryId && p1.categoryId !== p2.categoryId && (
+          <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs font-medium">
+            <Scale className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
+            <span>
+              <strong>Cross-Category Comparison:</strong> You are comparing devices across different categories ({p1.category?.name || 'Device 1'} vs {p2.category?.name || 'Device 2'}). For direct 1-to-1 spec matching, select devices from the same category.
+            </span>
+          </div>
+        )}
+
+        {/* Same Product Selected State */}
+        {p1 && p2 && p1.id === p2.id && (
+          <div className="p-8 text-center bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200 dark:border-neutral-800 space-y-2">
+            <p className="font-extrabold text-neutral-900 dark:text-white text-base">You selected the same device for both sides.</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">Please choose a different product in Device 2 to see a side-by-side spec and feature comparison.</p>
+          </div>
+        )}
+
         {/* Comparison Content */}
-        {p1 && p2 ? (
+        {p1 && p2 && p1.id !== p2.id ? (
           <>
             {/* ========================================================= */}
             {/* MOBILE RESPONSIVE COMPARISON VIEW (< md / < 768px)         */}

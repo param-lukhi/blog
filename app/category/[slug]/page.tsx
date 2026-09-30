@@ -9,14 +9,35 @@ import { ChevronRight, Layers, Tag } from 'lucide-react';
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const category = await db.category.findUnique({
     where: { slug: params.slug },
-    include: { parent: true },
+    include: {
+      parent: true,
+      subcategories: { select: { id: true } },
+    },
   });
   if (!category) return {};
+
+  const subcategoryIds = category.subcategories.map((s) => s.id);
+  const targetCategoryIds = [category.id, ...subcategoryIds];
+
+  const [productCount, blogCount] = await Promise.all([
+    db.product.count({
+      where: { categoryId: { in: targetCategoryIds }, status: 'PUBLISHED' },
+    }),
+    db.blog.count({
+      where: { categoryId: { in: targetCategoryIds }, status: 'PUBLISHED' },
+    }),
+  ]);
+
+  const isEmpty = productCount === 0 && blogCount === 0;
+
   return {
     title: `Best ${category.name} Reviews & Buying Guides (2026)`,
     description:
       category.description ||
       `In-depth reviews, expert comparison, and Amazon buying guides for ${category.name}.`,
+    robots: isEmpty
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
   };
 }
 

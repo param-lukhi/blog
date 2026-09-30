@@ -50,9 +50,9 @@ export default function Footer() {
   ];
 
   const topReviews = [
-    { title: 'Apple iPhone 15 Pro Max Review', href: '/blog/apple-iphone-15-pro-max-review' },
-    { title: 'Sony WH-1000XM5 Noise Canceling', href: '/blog/sony-wh-1000xm5-noise-canceling-headphones' },
-    { title: 'MacBook Air M3 15" Deep Dive', href: '/blog/apple-macbook-air-m3-15-inch' },
+    { title: 'Samsung Galaxy S24 Ultra vs iPhone 15 Pro Max', href: '/blog/samsung-galaxy-s24-ultra-vs-iphone-15-pro-max-camera-display-spec-matrix' },
+    { title: 'Dreame X60 Ultra Complete Features & Analysis', href: '/blog/dreame-x60-ultra-complete-features-indian-homes' },
+    { title: 'Curated Tech Products Directory', href: '/products' },
   ];
 
   return (
@@ -117,16 +117,40 @@ export default function Footer() {
 
             {/* Social Icons */}
             <div className="flex items-center gap-2.5 pt-2">
-              <a href="#" className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800/80 text-neutral-400 hover:text-white hover:bg-brand-600/20 hover:border-brand-500/40 transition-all duration-300 hover:scale-105">
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TechPulse on Twitter (opens in new tab)"
+                className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800/80 text-neutral-400 hover:text-white hover:bg-brand-600/20 hover:border-brand-500/40 transition-all duration-300 hover:scale-105"
+              >
                 <Twitter className="w-4 h-4" />
               </a>
-              <a href="#" className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800/80 text-neutral-400 hover:text-white hover:bg-brand-600/20 hover:border-brand-500/40 transition-all duration-300 hover:scale-105">
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TechPulse on Facebook (opens in new tab)"
+                className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800/80 text-neutral-400 hover:text-white hover:bg-brand-600/20 hover:border-brand-500/40 transition-all duration-300 hover:scale-105"
+              >
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="#" className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800/80 text-neutral-400 hover:text-white hover:bg-brand-600/20 hover:border-brand-500/40 transition-all duration-300 hover:scale-105">
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TechPulse on Instagram (opens in new tab)"
+                className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800/80 text-neutral-400 hover:text-white hover:bg-brand-600/20 hover:border-brand-500/40 transition-all duration-300 hover:scale-105"
+              >
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href="#" className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800/80 text-neutral-400 hover:text-white hover:bg-brand-600/20 hover:border-brand-500/40 transition-all duration-300 hover:scale-105">
+              <a
+                href="https://youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TechPulse on YouTube (opens in new tab)"
+                className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800/80 text-neutral-400 hover:text-white hover:bg-brand-600/20 hover:border-brand-500/40 transition-all duration-300 hover:scale-105"
+              >
                 <Youtube className="w-4 h-4" />
               </a>
             </div>

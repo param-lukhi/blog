@@ -19,7 +19,11 @@ export default async function BlogListPage() {
     orderBy: { createdAt: 'desc' },
   });
 
+  // Only fetch categories that currently have published articles, or top root categories
   const categories = await db.category.findMany({
+    where: {
+      blogs: { some: { status: 'PUBLISHED' } },
+    },
     orderBy: { name: 'asc' },
   });
 
