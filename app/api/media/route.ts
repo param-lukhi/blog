@@ -11,7 +11,6 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/png',
   'image/webp',
   'image/gif',
-  'image/svg+xml',
 ]);
 
 const MAX_FILE_SIZE_BYTES = 4 * 1024 * 1024; // 4MB
@@ -51,7 +50,7 @@ export async function POST(req: Request) {
       const mimeType = file.type?.toLowerCase() || '';
       if (!ALLOWED_MIME_TYPES.has(mimeType)) {
         return NextResponse.json(
-          { error: 'Unsupported file type. Only JPEG, PNG, WebP, GIF, and SVG images are accepted.' },
+          { error: 'Unsupported file type. Only JPEG, PNG, WebP, and GIF images are accepted.' },
           { status: 400 }
         );
       }
