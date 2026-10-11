@@ -162,11 +162,6 @@ export function verifyAdminSessionToken(token: string | undefined | null): boole
   try {
     const secret = getSessionSecret();
 
-    // Check legacy env secret match only if ADMIN_SESSION_SECRET is explicitly set
-    if (process.env.ADMIN_SESSION_SECRET && token === process.env.ADMIN_SESSION_SECRET.trim()) {
-      return true;
-    }
-
     const decoded = fromBase64Url(token);
     const parts = decoded.split(':');
     if (parts.length !== 3) return false;
