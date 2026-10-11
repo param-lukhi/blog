@@ -7,29 +7,33 @@ import LayoutShell from '@/components/LayoutShell';
 const siteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
+const siteBaseUrl = process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+  ? process.env.NEXT_PUBLIC_SITE_URL
+  : 'https://blogweb904.vercel.app';
+
 export const metadata: Metadata = {
   title: {
-    default: 'TechPulse - Research-Based Product Reviews & Buying Guides',
-    template: '%s | TechPulse Reviews',
+    default: 'BlogWeb904 - Research-Based Product Reviews & Buying Guides',
+    template: '%s | BlogWeb904',
   },
   description: 'In-depth research-based product reviews, specifications, side-by-side comparisons, and buying guides to help you make smarter purchasing decisions.',
   keywords: ['tech reviews', 'product buying guides', 'smartphone comparisons', 'laptop guides', 'audio reviews', 'gadget deals'],
-  authors: [{ name: 'TechPulse Editorial Team' }],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app'),
+  authors: [{ name: 'BlogWeb904 Editorial Team' }],
+  metadataBase: new URL(siteBaseUrl),
   verification: siteVerification
     ? {
         google: siteVerification,
       }
     : undefined,
   openGraph: {
-    title: 'TechPulse - Research-Based Product Reviews & Buying Guides',
+    title: 'BlogWeb904 - Research-Based Product Reviews & Buying Guides',
     description: 'In-depth research-based product reviews, specifications, and buying guides.',
     type: 'website',
-    siteName: 'TechPulse',
+    siteName: 'BlogWeb904',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TechPulse - Research-Based Product Reviews & Buying Guides',
+    title: 'BlogWeb904 - Research-Based Product Reviews & Buying Guides',
     description: 'In-depth research-based product reviews, specifications, and buying guides.',
   },
 };

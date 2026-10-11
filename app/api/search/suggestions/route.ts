@@ -15,9 +15,10 @@ export async function GET(request: Request) {
     const [products, blogs, categories] = await Promise.all([
       db.product.findMany({
         where: {
+          status: 'PUBLISHED',
           OR: [
-            { name: { contains: query } },
-            { brand: { contains: query } },
+            { name: { contains: query, mode: 'insensitive' } },
+            { brand: { contains: query, mode: 'insensitive' } },
           ],
         },
         select: {
@@ -32,9 +33,10 @@ export async function GET(request: Request) {
       }),
       db.blog.findMany({
         where: {
+          status: 'PUBLISHED',
           OR: [
-            { title: { contains: query } },
-            { metaDescription: { contains: query } },
+            { title: { contains: query, mode: 'insensitive' } },
+            { metaDescription: { contains: query, mode: 'insensitive' } },
           ],
         },
         select: {
@@ -47,7 +49,11 @@ export async function GET(request: Request) {
       }),
       db.category.findMany({
         where: {
-          name: { contains: query },
+          name: { contains: query, mode: 'insensitive' },
+          OR: [
+            { products: { some: { status: 'PUBLISHED' } } },
+            { blogs: { some: { status: 'PUBLISHED' } } },
+          ],
         },
         select: {
           id: true,

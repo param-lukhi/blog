@@ -6,12 +6,21 @@ export async function GET(request: Request) {
   const host = request.headers.get('x-forwarded-host') || request.headers.get('host');
   const proto = request.headers.get('x-forwarded-proto') || 'https';
   const dynamicBaseUrl = host ? `${proto}://${host}` : null;
-  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || dynamicBaseUrl || 'https://blogweb904.vercel.app').replace(/\/$/, '');
+  const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const baseUrl = (
+    rawSiteUrl && !rawSiteUrl.includes('localhost')
+      ? rawSiteUrl
+      : dynamicBaseUrl && !dynamicBaseUrl.includes('localhost')
+      ? dynamicBaseUrl
+      : 'https://blogweb904.vercel.app'
+  ).replace(/\/$/, '');
 
   const content = `User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /search
+Disallow: /wishlist
 
 Sitemap: ${baseUrl}/sitemap.xml
 `;

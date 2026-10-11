@@ -1,9 +1,32 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import { createAdminSessionToken } from '@/lib/session';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    const clientIp = getClientIp(request);
+
+    // Rate limit: max 5 login attempts per 15 minutes per IP
+    const rateLimit = checkRateLimit(`login:${clientIp}`, {
+      windowMs: 15 * 60 * 1000,
+      max: 5,
+    });
+
+    if (!rateLimit.success) {
+      const waitMinutes = Math.ceil((rateLimit.reset - Date.now()) / 60000);
+      return NextResponse.json(
+        { error: `Too many login attempts. Please try again in ${waitMinutes} minute(s).` },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(Math.ceil((rateLimit.reset - Date.now()) / 1000)),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const emailInput = body.email || body.username || '';
     const passwordInput = body.password || '';
@@ -38,7 +61,7 @@ export async function POST(request: Request) {
       if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
         isPasswordValid = await bcrypt.compare(passwordInput, user.password);
       } else {
-        // Plain text fallback / migration
+        // Plain text fallback / migration to hashed password
         isPasswordValid = (user.password === passwordInput);
         if (isPasswordValid) {
           const hashedPassword = await bcrypt.hash(passwordInput, 10);
@@ -72,9 +95,10 @@ export async function POST(request: Request) {
       },
     });
 
-    // 4. Set secure HTTP-only session cookie
-    const sessionSecret = process.env.ADMIN_SESSION_SECRET || 'techpulse_secure_session_key_2026';
-    response.cookies.set('admin_session', sessionSecret, {
+    // 4. Generate cryptographically signed HMAC session token
+    const signedToken = createAdminSessionToken(normalizedEmail);
+
+    response.cookies.set('admin_session', signedToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

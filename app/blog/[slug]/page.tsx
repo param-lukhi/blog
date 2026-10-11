@@ -19,7 +19,8 @@ import ProductAlternatives from '@/components/ProductAlternatives';
 import BlogGallery from '@/components/BlogGallery';
 import AdBanner from '@/components/AdBanner';
 import { formatDate, estimateReadTime, safeJsonParse } from '@/lib/utils';
-import { Clock, ShieldCheck, Tag, ChevronRight, CheckCircle2, XCircle, RefreshCw, Sparkles, User } from 'lucide-react';
+import { isAuthorizedAdmin } from '@/lib/auth';
+import { Clock, ShieldCheck, Tag, ChevronRight, CheckCircle2, XCircle, RefreshCw, Sparkles, User, AlertTriangle } from 'lucide-react';
 import { generateArticleSchema, generateBreadcrumbSchema, generateFAQSchema, generateReviewSchema } from '@/lib/seo';
 import { parseMarkdownToHtml } from '@/lib/markdown';
 
@@ -31,9 +32,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   if (!blog) return {};
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
+  const siteUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+      ? process.env.NEXT_PUBLIC_SITE_URL
+      : 'https://blogweb904.vercel.app'
+  ).replace(/\/$/, '');
   const pageUrl = `${siteUrl}/blog/${blog.slug}`;
-  const title = blog.metaTitle || `${blog.title} | TechPulse`;
+  const title = blog.metaTitle || `${blog.title} | BlogWeb904`;
   const description = blog.metaDescription || `Read our comprehensive research-based review and buying guide for ${blog.title}.`;
 
   return {
@@ -42,6 +47,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     alternates: {
       canonical: pageUrl,
     },
+    robots: blog.status === 'PUBLISHED'
+      ? { index: true, follow: true }
+      : { index: false, follow: false },
     openGraph: {
       title,
       description,
@@ -60,13 +68,34 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
+export default async function BlogDetailPage({
+  params,
+  searchParams,
+}: {
+  params: { slug: string };
+  searchParams?: { preview?: string };
+}) {
+  const isAdmin = isAuthorizedAdmin();
+  const isPreview = searchParams?.preview === 'true' && isAdmin;
+
   const blog = await db.blog.findUnique({
     where: { slug: params.slug },
-    include: { category: true, product: true },
+    include: {
+      category: true,
+      product: true,
+      comments: {
+        where: { status: 'APPROVED' },
+        orderBy: { createdAt: 'desc' },
+      },
+    },
   });
 
-  if (!blog || blog.status !== 'PUBLISHED') {
+  if (!blog) {
+    notFound();
+  }
+
+  // Strict draft protection: only authenticated admin can preview non-published articles
+  if (blog.status !== 'PUBLISHED' && !isPreview) {
     notFound();
   }
 
@@ -127,7 +156,11 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
     blog.updatedAt &&
     blog.updatedAt.getTime() - blog.createdAt.getTime() > 24 * 60 * 60 * 1000;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
+  const siteUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+      ? process.env.NEXT_PUBLIC_SITE_URL
+      : 'https://blogweb904.vercel.app'
+  ).replace(/\/$/, '');
   const pageUrl = `${siteUrl}/blog/${blog.slug}`;
 
   // Structured Data Schemas
@@ -138,7 +171,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
     url: pageUrl,
     datePublished: blog.createdAt.toISOString(),
     dateModified: blog.updatedAt.toISOString(),
-    authorName: 'TechPulse Editorial Team',
+    authorName: 'BlogWeb904 Editorial Team',
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
@@ -165,6 +198,25 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
+      )}
+
+      {blog.status !== 'PUBLISHED' && (
+        <div className="mb-6 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="bg-amber-500/10 border border-amber-500/40 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-700 dark:text-amber-300">
+            <div className="flex items-center gap-2.5 text-xs font-bold">
+              <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+              <span>
+                <strong>Admin Preview Mode:</strong> This article is currently in <strong>{blog.status}</strong> status. It is private and hidden from public visitors and search engines.
+              </span>
+            </div>
+            <Link
+              href={`/admin/blogs/${blog.id}`}
+              className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shrink-0 transition-colors shadow-xs"
+            >
+              Back to Editor
+            </Link>
+          </div>
+        </div>
       )}
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -223,10 +275,10 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-neutral-200 dark:border-neutral-800 text-xs text-neutral-500 dark:text-neutral-400">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-600 to-brand-700 text-white font-bold flex items-center justify-center text-xs shadow-xs">
-                T
+                B
               </div>
               <div>
-                <span className="font-bold text-neutral-900 dark:text-white">TechPulse Editorial Research</span>
+                <span className="font-bold text-neutral-900 dark:text-white">BlogWeb904 Editorial Research</span>
                 <span className="block text-[11px] text-neutral-400">Specification & Market Analysis</span>
               </div>
             </div>
@@ -320,10 +372,10 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
         {/* AdSense Placement 1: After Intro / Summary */}
         <AdBanner slot="blog-top-ad" format="horizontal" />
 
-        {/* Evaluation Scores Breakdown */}
+        {/* Evaluation Scores Breakdown (only rendered if non-fabricated data exists) */}
         <ReviewScores scoresData={ratingScores || undefined} />
 
-        {/* Price History Chart */}
+        {/* Price History Chart (only rendered if non-fabricated data exists) */}
         <PriceHistoryChart currentPrice={blog.product?.price || '$1,199'} historyData={priceHistoryData || undefined} />
 
         {/* Key Specifications Table */}
@@ -364,46 +416,40 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
           <ProsCons pros={pros} cons={cons} />
         )}
 
-        {/* Who Should Buy vs Who Should Avoid */}
-        <section className="my-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/60 rounded-3xl p-6 space-y-3">
-            <h4 className="text-base font-extrabold text-emerald-900 dark:text-emerald-300 flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>Who Should Buy It?</span>
-            </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-neutral-800 dark:text-neutral-200">
-              <li className="flex items-start gap-2">
-                <span className="text-emerald-500 font-bold">•</span>
-                <span>Shoppers looking for top-tier performance in this price bracket.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-emerald-500 font-bold">•</span>
-                <span>Users who prioritize reliable build quality and key feature highlights.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-emerald-500 font-bold">•</span>
-                <span>Buyers seeking verified long-term customer satisfaction and brand warranty.</span>
-              </li>
-            </ul>
-          </div>
+        {/* Who Should Buy vs Who Should Avoid (Dynamic from pros/cons) */}
+        {(pros.length > 0 || cons.length > 0) && (
+          <section className="my-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/60 rounded-3xl p-6 space-y-3">
+              <h4 className="text-base font-extrabold text-emerald-900 dark:text-emerald-300 flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>Who Should Buy It?</span>
+              </h4>
+              <ul className="space-y-2 text-xs sm:text-sm text-neutral-800 dark:text-neutral-200">
+                {pros.map((proItem, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <span className="text-emerald-500 font-bold">•</span>
+                    <span>{proItem}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div className="bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 rounded-3xl p-6 space-y-3">
-            <h4 className="text-base font-extrabold text-rose-900 dark:text-rose-300 flex items-center gap-2">
-              <XCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
-              <span>Who Should Avoid It?</span>
-            </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-neutral-800 dark:text-neutral-200">
-              <li className="flex items-start gap-2">
-                <span className="text-rose-500 font-bold">•</span>
-                <span>Budget-constrained buyers who do not need pro-level premium specs.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-rose-500 font-bold">•</span>
-                <span>Users looking for alternative ecosystems or specific specialized ports.</span>
-              </li>
-            </ul>
-          </div>
-        </section>
+            <div className="bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 rounded-3xl p-6 space-y-3">
+              <h4 className="text-base font-extrabold text-rose-900 dark:text-rose-300 flex items-center gap-2">
+                <XCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
+                <span>Who Should Avoid It / Important Trade-offs</span>
+              </h4>
+              <ul className="space-y-2 text-xs sm:text-sm text-neutral-800 dark:text-neutral-200">
+                {cons.map((conItem, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <span className="text-rose-500 font-bold">•</span>
+                    <span>{conItem}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
 
         {/* AdSense Placement 2: Mid Content */}
         <AdBanner slot="blog-mid-ad" format="auto" />
@@ -456,7 +502,10 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
         <AuthorBio className="my-10" />
 
         {/* Comments Section */}
-        <CommentsSection />
+        <CommentsSection
+          blogId={blog.id}
+          initialComments={JSON.parse(JSON.stringify(blog.comments || []))}
+        />
 
         {/* Social Share & Tags */}
         <div className="pt-8 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4">

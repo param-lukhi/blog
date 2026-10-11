@@ -256,20 +256,23 @@ export default function AdminBlogsPage() {
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Link
-                            href={`/blog/${b.slug}`}
+                            href={`/blog/${b.slug}${b.status !== 'PUBLISHED' ? '?preview=true' : ''}`}
                             target="_blank"
+                            title={b.status !== 'PUBLISHED' ? 'Preview Draft in Public Layout' : 'View Published Blog'}
                             className="p-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-neutral-700 dark:text-neutral-300"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
                           </Link>
                           <Link
                             href={`/admin/blogs/${b.id}`}
+                            title="Edit Article"
                             className="p-1.5 rounded-lg bg-brand-50 text-brand-600 hover:bg-brand-100"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </Link>
                           <button
                             onClick={() => handleDelete(b.id, b.title)}
+                            title="Delete Article"
                             className="p-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100"
                           >
                             <Trash2 className="w-3.5 h-3.5" />

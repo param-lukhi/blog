@@ -80,12 +80,12 @@ export default function AdminSidebar({ isCollapsed = false, onToggleCollapse }: 
         <div className="flex items-center justify-between px-3 py-3 mb-4 border-b border-neutral-800">
           <Link href="/admin/dashboard" className="flex items-center gap-2.5 overflow-hidden">
             <div className="w-8 h-8 rounded-xl bg-brand-600 flex items-center justify-center text-white font-extrabold text-base shrink-0 shadow-sm">
-              T
+              B
             </div>
             {!isCollapsed && (
               <div className="truncate">
                 <div className="font-extrabold text-white text-sm tracking-tight leading-tight">
-                  TechPulse
+                  BlogWeb904
                 </div>
                 <div className="text-[10px] text-neutral-400 font-medium">
                   Admin Dashboard

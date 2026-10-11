@@ -6,8 +6,8 @@ import { Search } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Search Tech Reviews & Products - TechPulse',
-  description: 'Search our directory of tech reviews, product specifications, comparisons, and buying guides.',
+  title: 'Search Reviews & Products - BlogWeb904',
+  description: 'Search our directory of product reviews, specifications, comparisons, and buying guides.',
   robots: {
     index: false,
     follow: true,

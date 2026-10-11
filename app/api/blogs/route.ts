@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
-import { safeJsonParse } from '@/lib/utils';
+import { safeJsonParse, slugify } from '@/lib/utils';
 import { isAuthorizedAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-
   try {
     const { searchParams } = new URL(request.url);
     const categorySlug = searchParams.get('category');
@@ -15,10 +14,15 @@ export async function GET(request: Request) {
     const q = searchParams.get('q');
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
 
+    const isAdmin = isAuthorizedAdmin();
     const where: any = {};
-    if (statusParam && statusParam !== 'ALL') {
-      where.status = statusParam;
-    } else if (!statusParam) {
+
+    // Privacy & Security: Only authorized admins may view DRAFT, SCHEDULED, or HIDDEN articles
+    if (isAdmin) {
+      if (statusParam && statusParam !== 'ALL') {
+        where.status = statusParam;
+      }
+    } else {
       where.status = 'PUBLISHED';
     }
 
@@ -29,10 +33,10 @@ export async function GET(request: Request) {
 
     if (q) {
       where.OR = [
-        { title: { contains: q } },
-        { content: { contains: q } },
-        { metaDescription: { contains: q } },
-        { tags: { contains: q } },
+        { title: { contains: q, mode: 'insensitive' } },
+        { content: { contains: q, mode: 'insensitive' } },
+        { metaDescription: { contains: q, mode: 'insensitive' } },
+        { tags: { contains: q, mode: 'insensitive' } },
       ];
     }
 
@@ -55,7 +59,6 @@ export async function POST(request: Request) {
   }
 
   try {
-
     const body = await request.json();
     const {
       title,
@@ -78,8 +81,21 @@ export async function POST(request: Request) {
       status,
     } = body;
 
-    if (!title || !slug || !content || !categoryId || !amazonUrl) {
-      return NextResponse.json({ error: 'Missing required blog fields' }, { status: 400 });
+    if (!title || !content || !categoryId || !amazonUrl) {
+      return NextResponse.json({ error: 'Missing required blog fields (title, content, category, amazonUrl)' }, { status: 400 });
+    }
+
+    // Verify category exists
+    const categoryExists = await db.category.findUnique({ where: { id: categoryId } });
+    if (!categoryExists) {
+      return NextResponse.json({ error: 'Selected category does not exist' }, { status: 400 });
+    }
+
+    // Clean and deduplicate slug
+    let finalSlug = slugify(slug || title);
+    const existingBlog = await db.blog.findUnique({ where: { slug: finalSlug } });
+    if (existingBlog) {
+      finalSlug = `${finalSlug}-${Date.now().toString().slice(-4)}`;
     }
 
     const sanitizeJson = (val: any, fallback: any) => {
@@ -96,10 +112,10 @@ export async function POST(request: Request) {
 
     const blog = await db.blog.create({
       data: {
-        title,
-        slug,
-        metaTitle: metaTitle || title,
-        metaDescription: metaDescription || '',
+        title: title.trim(),
+        slug: finalSlug,
+        metaTitle: metaTitle?.trim() || title.trim(),
+        metaDescription: metaDescription?.trim() || '',
         featuredImage: featuredImage || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&auto=format&fit=crop&q=80',
         content,
         specifications: sanitizeJson(specifications, {}),
@@ -107,22 +123,23 @@ export async function POST(request: Request) {
         pros: sanitizeJson(pros, []),
         cons: sanitizeJson(cons, []),
         faqs: sanitizeJson(faqs, []),
-        conclusion: conclusion || '',
-        amazonUrl,
-        affiliateUrl: affiliateUrl || amazonUrl,
+        conclusion: conclusion?.trim() || '',
+        amazonUrl: amazonUrl.trim(),
+        affiliateUrl: (affiliateUrl || amazonUrl).trim(),
         categoryId,
         productId: productId || null,
         tags: sanitizeJson(tags, []),
-        status: status || 'PUBLISHED',
+        status: status === 'PUBLISHED' ? 'PUBLISHED' : 'DRAFT',
       },
     });
 
     revalidatePath('/');
     revalidatePath('/blog');
+    revalidatePath(`/blog/${blog.slug}`);
 
     return NextResponse.json(blog, { status: 201 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Failed to create blog' }, { status: 500 });
+  } catch (error: any) {
+    console.error('Create blog error:', error);
+    return NextResponse.json({ error: error?.message || 'Failed to create blog' }, { status: 500 });
   }
 }

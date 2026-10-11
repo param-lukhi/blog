@@ -47,7 +47,7 @@ export class FlipkartAdapter implements MarketplaceAdapter {
   buildAffiliateUrl(
     baseUrlOrId: string,
     userAffiliateUrl?: string,
-    defaultTag: string = 'techpulse'
+    defaultTag: string = 'blogweb904'
   ): string {
     if (userAffiliateUrl && userAffiliateUrl.trim().length > 0) {
       const clean = userAffiliateUrl.trim();
@@ -151,7 +151,7 @@ export class FlipkartAdapter implements MarketplaceAdapter {
     title: string,
     basePrice: string,
     userAffiliateUrl?: string,
-    tag: string = 'techpulse'
+    tag: string = 'blogweb904'
   ): Record<string, { country: string; currency: string; price: string; availability: string; marketplace: string; url: string }> {
     const url = this.buildAffiliateUrl(productId || title, userAffiliateUrl, tag);
     return {

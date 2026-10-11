@@ -25,13 +25,11 @@ export default function PriceHistoryChart({ currentPrice, historyData }: PriceHi
     }
   }
 
-  const defaultHistory: PricePoint[] = [
-    { date: 'May 2026', price: '$1,299' },
-    { date: 'Jun 2026', price: '$1,249' },
-    { date: 'Jul 2026', price: currentPrice || '$1,199' },
-  ];
+  if (!parsedHistory || parsedHistory.length === 0) {
+    return null;
+  }
 
-  const finalHistory = (parsedHistory && parsedHistory.length > 0) ? parsedHistory : defaultHistory;
+  const finalHistory = parsedHistory;
 
   return (
     <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm my-8 space-y-4">

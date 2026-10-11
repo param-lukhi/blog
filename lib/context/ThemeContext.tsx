@@ -16,7 +16,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const savedTheme = localStorage.getItem('techpulse_theme') as Theme;
+      const savedTheme = localStorage.getItem('blogweb904_theme') as Theme;
       if (savedTheme === 'dark' || savedTheme === 'light') {
         setTheme(savedTheme);
         if (savedTheme === 'dark') {
@@ -40,7 +40,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         document.documentElement.classList.remove('dark');
       }
       try {
-        localStorage.setItem('techpulse_theme', next);
+        localStorage.setItem('blogweb904_theme', next);
       } catch (e) {}
       return next;
     });

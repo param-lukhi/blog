@@ -9,8 +9,11 @@ import { Package, Sparkles, PlusCircle, ArrowRight } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Best Tech Products, Buying Guides & Recommendations - TechPulse',
+  title: 'Best Tech Products, Buying Guides & Recommendations - BlogWeb904',
   description: 'Browse our complete catalog of researched tech products, smartphones, laptops, audio gear, and appliances with Amazon marketplace pricing.',
+  alternates: {
+    canonical: 'https://blogweb904.vercel.app/products',
+  },
 };
 
 export default async function ProductsPage({
@@ -48,18 +51,20 @@ export default async function ProductsPage({
   });
 
   const categories = await db.category.findMany({
-    where: { parentId: null },
+    where: {
+      OR: [
+        { products: { some: { status: 'PUBLISHED' } } },
+        { blogs: { some: { status: 'PUBLISHED' } } },
+      ],
+    },
     orderBy: { name: 'asc' },
   });
 
-  const buyingGuides = [
-    { label: 'Audio & Earbuds', slug: 'earbuds', icon: '🎧' },
-    { label: 'Mobiles & Flagships', slug: 'mobiles', icon: '📱' },
-    { label: 'Laptops & Ultrabooks', slug: 'laptops', icon: '💻' },
-    { label: 'Smartwatches', slug: 'smart-watches', icon: '⌚' },
-    { label: '4K & OLED TVs', slug: 'tvs', icon: '📺' },
-    { label: 'Gaming Gear', slug: 'gaming', icon: '🎮' },
-  ];
+  const buyingGuides = categories.map((c) => ({
+    label: c.name,
+    slug: c.slug,
+    icon: c.icon || '🏷️',
+  }));
 
   return (
     <div className="min-h-screen bg-neutral-50/50 dark:bg-[#0b0f17] py-12 px-4 sm:px-6 lg:px-8">

@@ -39,72 +39,19 @@ export default function NewBlogPage() {
   const [amazonUrl, setAmazonUrl] = useState('');
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [conclusion, setConclusion] = useState('');
-  const [status, setStatus] = useState('PUBLISHED');
-  const [tagsStr, setTagsStr] = useState('Tech, Review, Deals');
+  const [status, setStatus] = useState('DRAFT');
+  const [tagsStr, setTagsStr] = useState('Tech, Review, Buying Guide');
 
   // Dynamic Array Fields
-  const [pros, setPros] = useState<string[]>(['Exceptional build quality', 'Long battery life']);
-  const [cons, setCons] = useState<string[]>(['Higher price tag']);
-  const [faqs, setFaqs] = useState<{ question: string; answer: string }[]>([
-    { question: 'Is this product worth buying in 2026?', answer: 'Yes, it delivers excellent performance and build quality.' }
-  ]);
-  const [specs, setSpecs] = useState<{ key: string; value: string }[]>([
-    { key: 'Warranty', value: '1 Year Manufacturer' },
-    { key: 'Connectivity', value: 'Bluetooth 5.3 / USB-C' }
-  ]);
-  const [ratingsState, setRatingsState] = useState<{ label: string; score: string }[]>([
-    { label: 'Performance Score', score: '9.6' },
-    { label: 'Display Score', score: '9.4' },
-    { label: 'Camera / Audio', score: '9.8' },
-    { label: 'Battery Score', score: '9.1' },
-    { label: 'Gaming Performance', score: '9.5' },
-    { label: 'AI & Value Rating', score: '9.2' },
-  ]);
-  const [priceHistoryState, setPriceHistoryState] = useState<{ date: string; price: string }[]>([
-    { date: 'May 2026', price: '$1,299' },
-    { date: 'Jun 2026', price: '$1,249' },
-    { date: 'Jul 2026', price: '$1,199' },
-  ]);
-
-  const loadRatingPreset = (preset: 'laptop' | 'phone' | 'audio' | 'tv' | 'reset') => {
-    if (preset === 'laptop' || preset === 'reset') {
-      setRatingsState([
-        { label: 'Performance Score', score: '9.6' },
-        { label: 'Display Score', score: '9.4' },
-        { label: 'Camera / Audio', score: '9.8' },
-        { label: 'Battery Score', score: '9.1' },
-        { label: 'Gaming Performance', score: '9.5' },
-        { label: 'AI & Value Rating', score: '9.2' },
-      ]);
-    } else if (preset === 'phone') {
-      setRatingsState([
-        { label: 'Camera Quality', score: '9.7' },
-        { label: 'Display & Touch', score: '9.5' },
-        { label: 'Battery & Charging', score: '9.2' },
-        { label: 'Processing Power', score: '9.6' },
-        { label: 'Build & Ergonomics', score: '9.4' },
-        { label: 'Price & Value', score: '9.1' },
-      ]);
-    } else if (preset === 'audio') {
-      setRatingsState([
-        { label: 'Sound Quality & Bass', score: '9.8' },
-        { label: 'Noise Cancellation (ANC)', score: '9.6' },
-        { label: 'Comfort & Fit', score: '9.4' },
-        { label: 'Battery Life', score: '9.5' },
-        { label: 'Build Quality', score: '9.3' },
-        { label: 'Value for Money', score: '9.2' },
-      ]);
-    } else if (preset === 'tv') {
-      setRatingsState([
-        { label: 'Picture Quality & Contrast', score: '9.6' },
-        { label: 'HDR & Brightness', score: '9.5' },
-        { label: 'Sound System', score: '8.8' },
-        { label: 'Gaming & Refresh Rate', score: '9.4' },
-        { label: 'Smart TV OS', score: '9.0' },
-        { label: 'Price & Value', score: '9.2' },
-      ]);
-    }
-  };
+  const [pros, setPros] = useState<string[]>([]);
+  const [cons, setCons] = useState<string[]>([]);
+  const [faqs, setFaqs] = useState<{ question: string; answer: string }[]>([]);
+  const [specs, setSpecs] = useState<{ key: string; value: string }[]>([]);
+  const [ratingsState, setRatingsState] = useState<{ label: string; score: string }[]>([]);
+  const [priceHistoryState, setPriceHistoryState] = useState<{ date: string; price: string }[]>([]);
+  const [featuredImageAlt, setFeaturedImageAlt] = useState('');
+  const [savingState, setSavingState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     fetch('/api/categories')
@@ -217,13 +164,27 @@ export default function NewBlogPage() {
     alert(`Successfully synced A-to-Z details from "${prod.name}"!`);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async (targetStatus?: string, openPreview?: boolean) => {
+    const currentStatus = targetStatus || status;
+    if (!title.trim()) {
+      setFeedbackMsg({ type: 'error', text: 'Please enter an article title.' });
+      return;
+    }
+    if (!categoryId) {
+      setFeedbackMsg({ type: 'error', text: 'Please select a category.' });
+      return;
+    }
+
+    setSavingState('saving');
+    setFeedbackMsg(null);
 
     const specObj: Record<string, any> = {};
     specs.forEach((s) => {
       if (s.key.trim() && !s.key.startsWith('_')) specObj[s.key.trim()] = s.value.trim();
     });
+    if (featuredImageAlt.trim()) {
+      specObj._imageAlt = featuredImageAlt.trim();
+    }
 
     const ratingScoresObj: Record<string, number> = {};
     ratingsState.forEach((r) => {
@@ -231,7 +192,9 @@ export default function NewBlogPage() {
         ratingScoresObj[r.label.trim()] = parseFloat(r.score) || 9.0;
       }
     });
-    specObj._ratingScores = JSON.stringify(ratingScoresObj);
+    if (Object.keys(ratingScoresObj).length > 0) {
+      specObj._ratingScores = JSON.stringify(ratingScoresObj);
+    }
 
     const priceHistoryArr = priceHistoryState.filter((p) => p.date.trim() && p.price.trim());
     if (priceHistoryArr.length > 0) {
@@ -239,10 +202,11 @@ export default function NewBlogPage() {
     }
 
     const tags = tagsStr.split(',').map((t) => t.trim()).filter(Boolean);
+    const targetSlug = slug || slugify(title);
 
     const payload = {
       title,
-      slug: slug || slugify(title),
+      slug: targetSlug,
       metaTitle: metaTitle || title,
       metaDescription,
       categoryId,
@@ -252,7 +216,7 @@ export default function NewBlogPage() {
       amazonUrl,
       affiliateUrl: affiliateUrl || amazonUrl,
       conclusion,
-      status,
+      status: currentStatus,
       specifications: specObj,
       pros: pros.filter(Boolean),
       cons: cons.filter(Boolean),
@@ -260,23 +224,58 @@ export default function NewBlogPage() {
       tags,
     };
 
-    const res = await fetch('/api/blogs', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const res = await fetch('/api/blogs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    if (res.ok) {
-      router.push('/admin/blogs');
-    } else {
-      alert('Failed to save blog post.');
+      if (res.ok) {
+        const data = await res.json();
+        setSavingState('saved');
+        setStatus(currentStatus);
+        setFeedbackMsg({
+          type: 'success',
+          text: currentStatus === 'PUBLISHED' ? 'Article published successfully!' : 'Draft saved successfully!'
+        });
+        if (openPreview) {
+          window.open(`/blog/${data.slug || targetSlug}?preview=true`, '_blank');
+        }
+        setTimeout(() => {
+          router.push('/admin/blogs');
+        }, 1200);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setSavingState('error');
+        setFeedbackMsg({ type: 'error', text: err.error || 'Failed to save blog post.' });
+      }
+    } catch (err: any) {
+      setSavingState('error');
+      setFeedbackMsg({ type: 'error', text: err.message || 'Network error while saving.' });
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSave(status);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl pb-16">
+      {/* Feedback Alert */}
+      {feedbackMsg && (
+        <div className={`p-4 rounded-2xl text-xs font-bold border ${
+          feedbackMsg.type === 'success'
+            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+            : 'bg-rose-50 text-rose-800 border-rose-200'
+        }`}>
+          {feedbackMsg.text}
+        </div>
+      )}
+
       {/* Header Bar */}
-      <div className="flex items-center justify-between border-b border-neutral-200 pb-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-neutral-200 pb-4">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -287,17 +286,42 @@ export default function NewBlogPage() {
           </button>
           <div>
             <h1 className="text-2xl font-extrabold text-neutral-900">Create New Product Blog</h1>
-            <p className="text-xs text-neutral-500">Link blog to the exact product so readers see the matching product details.</p>
+            <p className="text-xs text-neutral-500">Workflow: ChatGPT article → Fact-check → Save draft → Preview → Publish manually.</p>
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-2 shadow-sm"
-        >
-          <Save className="w-4 h-4" />
-          <span>Save Blog Post</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Save Draft */}
+          <button
+            type="button"
+            disabled={savingState === 'saving'}
+            onClick={() => handleSave('DRAFT')}
+            className="px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-bold transition-colors disabled:opacity-50"
+          >
+            {savingState === 'saving' ? 'Saving...' : 'Save Draft'}
+          </button>
+
+          {/* Preview in Public Layout */}
+          <button
+            type="button"
+            disabled={savingState === 'saving'}
+            onClick={() => handleSave('DRAFT', true)}
+            className="px-4 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition-colors disabled:opacity-50"
+          >
+            Save & Preview
+          </button>
+
+          {/* Publish Now */}
+          <button
+            type="button"
+            disabled={savingState === 'saving'}
+            onClick={() => handleSave('PUBLISHED')}
+            className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors disabled:opacity-50"
+          >
+            <Save className="w-4 h-4" />
+            <span>Publish Article</span>
+          </button>
+        </div>
       </div>
 
       {/* Product Binding Header Box */}
@@ -439,37 +463,11 @@ export default function NewBlogPage() {
               </div>
             </div>
 
-            {/* Quick Presets & Sync */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] font-bold text-amber-900">Presets:</span>
-              <button
-                type="button"
-                onClick={() => loadRatingPreset('laptop')}
-                className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200 text-[11px] font-bold transition-colors"
-              >
-                💻 Laptop/PC
-              </button>
-              <button
-                type="button"
-                onClick={() => loadRatingPreset('phone')}
-                className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200 text-[11px] font-bold transition-colors"
-              >
-                📱 Smartphone
-              </button>
-              <button
-                type="button"
-                onClick={() => loadRatingPreset('audio')}
-                className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200 text-[11px] font-bold transition-colors"
-              >
-                🎧 Audio/Headphones
-              </button>
-              <button
-                type="button"
-                onClick={() => loadRatingPreset('tv')}
-                className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200 text-[11px] font-bold transition-colors"
-              >
-                📺 TV/Display
-              </button>
+            {/* Genuine Benchmark Note & Sync */}
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <span className="text-[11px] text-amber-900 font-medium">
+                Note: Only enter verified testing criteria or leave empty. Never fabricate scores.
+              </span>
 
               {productId && (
                 <button
@@ -814,6 +812,17 @@ export default function NewBlogPage() {
                   className="w-full px-3 py-1.5 rounded-xl border border-neutral-300 text-xs"
                 />
                 
+                <div>
+                  <label className="block text-[11px] font-semibold text-neutral-600 mb-1">Featured Image Alt Text (SEO)</label>
+                  <input
+                    type="text"
+                    placeholder="Descriptive alt text for image..."
+                    value={featuredImageAlt}
+                    onChange={(e) => setFeaturedImageAlt(e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-xl border border-neutral-300 text-xs"
+                  />
+                </div>
+
                 <div className="flex items-center gap-2">
                   <input
                     type="file"

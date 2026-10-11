@@ -9,26 +9,26 @@ export interface MarketplaceConfig {
 }
 
 export const MARKETPLACES: Record<string, MarketplaceConfig> = {
-  IN: { code: 'IN', name: 'India', flag: '🇮🇳', currency: 'INR', symbol: '₹', domain: 'amazon.in', defaultTag: 'techpulsein-20' },
-  US: { code: 'US', name: 'United States', flag: '🇺🇸', currency: 'USD', symbol: '$', domain: 'amazon.com', defaultTag: 'techpulse-20' },
-  GB: { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', currency: 'GBP', symbol: '£', domain: 'amazon.co.uk', defaultTag: 'techpulseuk-20' },
-  CA: { code: 'CA', name: 'Canada', flag: '🇨🇦', currency: 'CAD', symbol: '$', domain: 'amazon.ca', defaultTag: 'techpulseca-20' },
-  AU: { code: 'AU', name: 'Australia', flag: '🇦🇺', currency: 'AUD', symbol: '$', domain: 'amazon.com.au', defaultTag: 'techpulseau-20' },
-  DE: { code: 'DE', name: 'Germany', flag: '🇩🇪', currency: 'EUR', symbol: '€', domain: 'amazon.de', defaultTag: 'techpulsede-20' },
-  FR: { code: 'FR', name: 'France', flag: '🇫🇷', currency: 'EUR', symbol: '€', domain: 'amazon.fr', defaultTag: 'techpulsefr-20' },
-  IT: { code: 'IT', name: 'Italy', flag: '🇮🇹', currency: 'EUR', symbol: '€', domain: 'amazon.it', defaultTag: 'techpulseit-20' },
-  ES: { code: 'ES', name: 'Spain', flag: '🇪🇸', currency: 'EUR', symbol: '€', domain: 'amazon.es', defaultTag: 'techpulsees-20' },
-  NL: { code: 'NL', name: 'Netherlands', flag: '🇳🇱', currency: 'EUR', symbol: '€', domain: 'amazon.nl', defaultTag: 'techpulsenl-20' },
-  BE: { code: 'BE', name: 'Belgium', flag: '🇧🇪', currency: 'EUR', symbol: '€', domain: 'amazon.com.be', defaultTag: 'techpulsebe-20' },
-  SE: { code: 'SE', name: 'Sweden', flag: '🇸🇪', currency: 'SEK', symbol: 'kr', domain: 'amazon.se', defaultTag: 'techpulsese-20' },
-  PL: { code: 'PL', name: 'Poland', flag: '🇵🇱', currency: 'PLN', symbol: 'zł', domain: 'amazon.pl', defaultTag: 'techpulsepl-20' },
-  JP: { code: 'JP', name: 'Japan', flag: '🇯🇵', currency: 'JPY', symbol: '¥', domain: 'amazon.co.jp', defaultTag: 'techpulsejp-20' },
-  SG: { code: 'SG', name: 'Singapore', flag: '🇸🇬', currency: 'SGD', symbol: '$', domain: 'amazon.sg', defaultTag: 'techpulsesg-20' },
-  AE: { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪', currency: 'AED', symbol: 'د.إ', domain: 'amazon.ae', defaultTag: 'techpulseae-20' },
-  SA: { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦', currency: 'SAR', symbol: '﷼', domain: 'amazon.sa', defaultTag: 'techpulsesa-20' },
-  BR: { code: 'BR', name: 'Brazil', flag: '🇧🇷', currency: 'BRL', symbol: 'R$', domain: 'amazon.com.br', defaultTag: 'techpulsebr-20' },
-  MX: { code: 'MX', name: 'Mexico', flag: '🇲🇽', currency: 'MXN', symbol: '$', domain: 'amazon.com.mx', defaultTag: 'techpulsemx-20' },
-  TR: { code: 'TR', name: 'Turkey', flag: '🇹🇷', currency: 'TRY', symbol: '₺', domain: 'amazon.com.tr', defaultTag: 'techpulsetr-20' },
+  IN: { code: 'IN', name: 'India', flag: '🇮🇳', currency: 'INR', symbol: '₹', domain: 'amazon.in', defaultTag: 'blogweb904in-20' },
+  US: { code: 'US', name: 'United States', flag: '🇺🇸', currency: 'USD', symbol: '$', domain: 'amazon.com', defaultTag: 'blogweb904-20' },
+  GB: { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', currency: 'GBP', symbol: '£', domain: 'amazon.co.uk', defaultTag: 'blogweb904uk-20' },
+  CA: { code: 'CA', name: 'Canada', flag: '🇨🇦', currency: 'CAD', symbol: '$', domain: 'amazon.ca', defaultTag: 'blogweb904ca-20' },
+  AU: { code: 'AU', name: 'Australia', flag: '🇦🇺', currency: 'AUD', symbol: '$', domain: 'amazon.com.au', defaultTag: 'blogweb904au-20' },
+  DE: { code: 'DE', name: 'Germany', flag: '🇩🇪', currency: 'EUR', symbol: '€', domain: 'amazon.de', defaultTag: 'blogweb904de-20' },
+  FR: { code: 'FR', name: 'France', flag: '🇫🇷', currency: 'EUR', symbol: '€', domain: 'amazon.fr', defaultTag: 'blogweb904fr-20' },
+  IT: { code: 'IT', name: 'Italy', flag: '🇮🇹', currency: 'EUR', symbol: '€', domain: 'amazon.it', defaultTag: 'blogweb904it-20' },
+  ES: { code: 'ES', name: 'Spain', flag: '🇪🇸', currency: 'EUR', symbol: '€', domain: 'amazon.es', defaultTag: 'blogweb904es-20' },
+  NL: { code: 'NL', name: 'Netherlands', flag: '🇳🇱', currency: 'EUR', symbol: '€', domain: 'amazon.nl', defaultTag: 'blogweb904nl-20' },
+  BE: { code: 'BE', name: 'Belgium', flag: '🇧🇪', currency: 'EUR', symbol: '€', domain: 'amazon.com.be', defaultTag: 'blogweb904be-20' },
+  SE: { code: 'SE', name: 'Sweden', flag: '🇸🇪', currency: 'SEK', symbol: 'kr', domain: 'amazon.se', defaultTag: 'blogweb904se-20' },
+  PL: { code: 'PL', name: 'Poland', flag: '🇵🇱', currency: 'PLN', symbol: 'zł', domain: 'amazon.pl', defaultTag: 'blogweb904pl-20' },
+  JP: { code: 'JP', name: 'Japan', flag: '🇯🇵', currency: 'JPY', symbol: '¥', domain: 'amazon.co.jp', defaultTag: 'blogweb904jp-20' },
+  SG: { code: 'SG', name: 'Singapore', flag: '🇸🇬', currency: 'SGD', symbol: '$', domain: 'amazon.sg', defaultTag: 'blogweb904sg-20' },
+  AE: { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪', currency: 'AED', symbol: 'د.إ', domain: 'amazon.ae', defaultTag: 'blogweb904ae-20' },
+  SA: { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦', currency: 'SAR', symbol: '﷼', domain: 'amazon.sa', defaultTag: 'blogweb904sa-20' },
+  BR: { code: 'BR', name: 'Brazil', flag: '🇧🇷', currency: 'BRL', symbol: 'R$', domain: 'amazon.com.br', defaultTag: 'blogweb904br-20' },
+  MX: { code: 'MX', name: 'Mexico', flag: '🇲🇽', currency: 'MXN', symbol: '$', domain: 'amazon.com.mx', defaultTag: 'blogweb904mx-20' },
+  TR: { code: 'TR', name: 'Turkey', flag: '🇹🇷', currency: 'TRY', symbol: '₺', domain: 'amazon.com.tr', defaultTag: 'blogweb904tr-20' },
 };
 
 export const MARKETPLACE_LIST = Object.values(MARKETPLACES);
@@ -170,7 +170,7 @@ export function resolveRegionalProduct(
  */
 export function generateRegionalAffiliateUrls(
   amazonUrl: string,
-  customTagPrefix: string = 'techpulse'
+  customTagPrefix: string = 'blogweb904'
 ): Record<string, MarketplaceEntry> {
   const asinMatch = amazonUrl.match(/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
   const asin = asinMatch ? asinMatch[1] : null;

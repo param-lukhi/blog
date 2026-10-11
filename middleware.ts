@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { verifyAdminSessionToken } from './lib/session';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionToken = request.cookies.get('admin_session')?.value;
-  const expectedSecret = process.env.ADMIN_SESSION_SECRET || 'techpulse_secure_session_key_2026';
   
-  const isAuthenticated = Boolean(
-    sessionToken && sessionToken === expectedSecret
-  );
+  const isAuthenticated = verifyAdminSessionToken(sessionToken);
 
   // Protect all /admin routes except /admin/login
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {

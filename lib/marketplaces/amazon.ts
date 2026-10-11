@@ -119,7 +119,7 @@ export class AmazonAdapter implements MarketplaceAdapter {
   buildAffiliateUrl(
     baseUrlOrId: string,
     userAffiliateUrl?: string,
-    defaultTag: string = 'techpulse-20'
+    defaultTag: string = 'blogweb904-20'
   ): string {
     if (userAffiliateUrl && userAffiliateUrl.trim().length > 0) {
       const cleanUserUrl = userAffiliateUrl.trim();
@@ -604,7 +604,7 @@ export class AmazonAdapter implements MarketplaceAdapter {
     title: string,
     basePrice: string,
     userAffiliateUrl?: string,
-    tag: string = 'techpulse-20'
+    tag: string = 'blogweb904-20'
   ): Record<string, { country: string; currency: string; price: string; availability: string; marketplace: string; url: string }> {
     const isINR = basePrice.includes('₹');
     let numericPrice = parseFloat(basePrice.replace(/[^0-9.]/g, '') || '199');

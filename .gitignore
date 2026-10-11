@@ -33,3 +33,7 @@ prisma/*.db-journal
 # OS files
 .DS_Store
 Thumbs.db
+
+# Archives
+*.zip
+sw.js

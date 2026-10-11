@@ -8,8 +8,26 @@ export async function GET(request: Request) {
   try {
     const url = request?.url ? new URL(request.url) : null;
     const rootOnly = url?.searchParams.get('rootOnly') === 'true';
+    const activeOnly = url?.searchParams.get('activeOnly') === 'true';
 
-    const where = rootOnly ? { parentId: null } : {};
+    const where: any = rootOnly ? { parentId: null } : {};
+
+    if (activeOnly) {
+      where.OR = [
+        { products: { some: { status: 'PUBLISHED' } } },
+        { blogs: { some: { status: 'PUBLISHED' } } },
+        {
+          subcategories: {
+            some: {
+              OR: [
+                { products: { some: { status: 'PUBLISHED' } } },
+                { blogs: { some: { status: 'PUBLISHED' } } },
+              ],
+            },
+          },
+        },
+      ];
+    }
 
     const categories = await db.category.findMany({
       where,

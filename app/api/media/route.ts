@@ -6,10 +6,21 @@ import { isAuthorizedAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
+const ALLOWED_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+]);
+
+const MAX_FILE_SIZE_BYTES = 4 * 1024 * 1024; // 4MB
+
 export async function GET() {
   try {
     const media = await db.media.findMany({
       orderBy: { createdAt: 'desc' },
+      take: 100,
     });
     return NextResponse.json(media);
   } catch (error) {
@@ -33,14 +44,25 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
       }
 
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        return NextResponse.json({ error: 'File size exceeds maximum limit of 4MB' }, { status: 400 });
+      }
+
+      const mimeType = file.type?.toLowerCase() || '';
+      if (!ALLOWED_MIME_TYPES.has(mimeType)) {
+        return NextResponse.json(
+          { error: 'Unsupported file type. Only JPEG, PNG, WebP, GIF, and SVG images are accepted.' },
+          { status: 400 }
+        );
+      }
+
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      const mimeType = file.type || 'image/png';
       const base64DataUri = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
       let publicUrl = base64DataUri;
 
-      // Try writing to local disk (works in local dev, will catch and fallback to data URI on read-only environments like Vercel)
+      // Try writing to local disk (works in local dev, falls back safely to data URI on serverless read-only disk)
       try {
         const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
         await mkdir(uploadsDir, { recursive: true });
@@ -52,7 +74,6 @@ export async function POST(req: Request) {
         await writeFile(filePath, buffer);
         publicUrl = `/uploads/${uniqueFilename}`;
       } catch (fsErr) {
-        // Read-only filesystem (e.g. Vercel Serverless) - publicUrl remains base64DataUri
         console.log('Using Data URI for serverless media storage (read-only filesystem detected).');
       }
 
@@ -60,15 +81,15 @@ export async function POST(req: Request) {
       try {
         newMedia = await db.media.create({
           data: {
-            filename: file.name,
+            filename: file.name.replace(/[^a-zA-Z0-9._-]/g, '_'),
             url: publicUrl,
             size: file.size,
             mimeType: mimeType,
           },
         });
       } catch (dbErr) {
-        console.warn('Media DB record log skipped:', dbErr);
         newMedia = {
+          id: `media_${Date.now()}`,
           filename: file.name,
           url: publicUrl,
           size: file.size,
@@ -85,18 +106,23 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Filename and URL are required' }, { status: 400 });
       }
 
+      if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+        return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
+      }
+
       let newMedia: any = null;
       try {
         newMedia = await db.media.create({
           data: {
-            filename,
-            url,
-            size: size || 102400,
+            filename: String(filename).replace(/[^a-zA-Z0-9._-]/g, '_'),
+            url: String(url),
+            size: Number(size) || 102400,
             mimeType: mimeType || 'image/webp',
           },
         });
       } catch (dbErr) {
         newMedia = {
+          id: `media_${Date.now()}`,
           filename,
           url,
           size: size || 102400,

@@ -8,8 +8,11 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata = {
-  title: 'Product Reviews, Buying Guides & Tech Articles - TechPulse',
+  title: 'Product Reviews, Buying Guides & Tech Articles - BlogWeb904',
   description: 'Explore in-depth product reviews, buying guides, specification breakdowns, and comparison guides for smartphones, laptops, audio gear, and gadgets.',
+  alternates: {
+    canonical: 'https://blogweb904.vercel.app/blog',
+  },
 };
 
 export default async function BlogListPage() {

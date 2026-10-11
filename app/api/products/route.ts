@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { isAuthorizedAdmin } from '@/lib/auth';
+import { slugify } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-
   try {
     const { searchParams } = new URL(request.url);
     const categorySlug = searchParams.get('category');
@@ -17,11 +17,14 @@ export async function GET(request: Request) {
     const q = searchParams.get('q');
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
 
+    const isAdmin = isAuthorizedAdmin();
     const where: any = {};
 
-    if (statusParam && statusParam !== 'ALL') {
-      where.status = statusParam;
-    } else if (!statusParam) {
+    if (isAdmin) {
+      if (statusParam && statusParam !== 'ALL') {
+        where.status = statusParam;
+      }
+    } else {
       where.status = 'PUBLISHED';
     }
 
@@ -36,9 +39,9 @@ export async function GET(request: Request) {
 
     if (q) {
       where.OR = [
-        { name: { contains: q } },
-        { brand: { contains: q } },
-        { specifications: { contains: q } },
+        { name: { contains: q, mode: 'insensitive' } },
+        { brand: { contains: q, mode: 'insensitive' } },
+        { specifications: { contains: q, mode: 'insensitive' } },
       ];
     }
 
@@ -83,19 +86,32 @@ export async function POST(request: Request) {
       status,
     } = body;
 
-    if (!name || !slug || !brand || !price || !amazonUrl || !categoryId) {
+    if (!name || !brand || !price || !amazonUrl || !categoryId) {
       return NextResponse.json({ error: 'Missing required product fields' }, { status: 400 });
+    }
+
+    // Verify category exists
+    const categoryExists = await db.category.findUnique({ where: { id: categoryId } });
+    if (!categoryExists) {
+      return NextResponse.json({ error: 'Selected category does not exist' }, { status: 400 });
+    }
+
+    // Deduplicate slug
+    let finalSlug = slugify(slug || name);
+    const existing = await db.product.findUnique({ where: { slug: finalSlug } });
+    if (existing) {
+      finalSlug = `${finalSlug}-${Date.now().toString().slice(-4)}`;
     }
 
     const product = await db.product.create({
       data: {
-        name,
-        slug,
-        brand,
-        price,
+        name: name.trim(),
+        slug: finalSlug,
+        brand: brand.trim(),
+        price: price.trim(),
         images: typeof images === 'string' ? images : JSON.stringify(images || []),
-        amazonUrl,
-        affiliateUrl: affiliateUrl || amazonUrl,
+        amazonUrl: amazonUrl.trim(),
+        affiliateUrl: (affiliateUrl || amazonUrl).trim(),
         marketplaces: typeof marketplaces === 'string' ? marketplaces : JSON.stringify(marketplaces || {}),
         categoryId,
         specifications: typeof specifications === 'string' ? specifications : JSON.stringify(specifications || {}),
@@ -105,7 +121,7 @@ export async function POST(request: Request) {
         isFeatured: Boolean(isFeatured),
         isTrending: Boolean(isTrending),
         isDeal: Boolean(isDeal),
-        status: status || 'PUBLISHED',
+        status: status === 'DRAFT' ? 'DRAFT' : 'PUBLISHED',
       },
     });
 
@@ -114,8 +130,8 @@ export async function POST(request: Request) {
     revalidatePath('/deals');
 
     return NextResponse.json(product, { status: 201 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
+  } catch (error: any) {
+    console.error('Create product error:', error);
+    return NextResponse.json({ error: error?.message || 'Failed to create product' }, { status: 500 });
   }
 }

@@ -17,6 +17,8 @@ import { safeJsonParse } from '@/lib/utils';
 import { CheckCircle2, ChevronRight, ShieldCheck, Tag } from 'lucide-react';
 import { generateProductSchema, generateBreadcrumbSchema } from '@/lib/seo';
 
+import { isAuthorizedAdmin } from '@/lib/auth';
+
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const product = await db.product.findUnique({
     where: { slug: params.slug },
@@ -25,9 +27,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   if (!product) return {};
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
+  const siteUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+      ? process.env.NEXT_PUBLIC_SITE_URL
+      : 'https://blogweb904.vercel.app'
+  ).replace(/\/$/, '');
   const pageUrl = `${siteUrl}/product/${product.slug}`;
-  const title = `${product.name} - Price, Specs & Alternatives | TechPulse`;
+  const title = `${product.name} - Price, Specs & Alternatives | BlogWeb904`;
   const description = `Full technical specifications, feature breakdown, and Amazon pricing for ${product.name} by ${product.brand}.`;
 
   return {
@@ -36,6 +42,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     alternates: {
       canonical: pageUrl,
     },
+    robots: product.status === 'PUBLISHED'
+      ? { index: true, follow: true }
+      : { index: false, follow: false },
     openGraph: {
       title,
       description,
@@ -50,15 +59,29 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
+export default async function ProductDetailPage({
+  params,
+  searchParams,
+}: {
+  params: { slug: string };
+  searchParams?: { preview?: string };
+}) {
+  const isAdmin = isAuthorizedAdmin();
+  const isPreview = searchParams?.preview === 'true' && isAdmin;
+
   const product = await db.product.findUnique({
     where: { slug: params.slug },
     include: { category: true, blogs: { where: { status: 'PUBLISHED' } } },
   });
 
   if (!product) notFound();
+  if (product.status !== 'PUBLISHED' && !isPreview) notFound();
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
+  const siteUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+      ? process.env.NEXT_PUBLIC_SITE_URL
+      : 'https://blogweb904.vercel.app'
+  ).replace(/\/$/, '');
   const pageUrl = `${siteUrl}/product/${product.slug}`;
 
   const images = safeJsonParse<string[]>(product.images, []);
@@ -239,6 +262,41 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
         <div className="my-12">
           <ProsCons pros={pros} cons={cons} />
         </div>
+      )}
+
+      {/* Who Should Buy vs Who Should Avoid */}
+      {(pros.length > 0 || cons.length > 0) && (
+        <section className="my-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/60 rounded-3xl p-6 space-y-3">
+            <h3 className="text-base font-extrabold text-emerald-900 dark:text-emerald-300 flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span>Who Should Buy the {product.name}?</span>
+            </h3>
+            <ul className="space-y-2 text-xs sm:text-sm text-neutral-800 dark:text-neutral-200">
+              {pros.map((p, idx) => (
+                <li key={idx} className="flex items-start gap-2">
+                  <span className="text-emerald-500 font-bold">•</span>
+                  <span>{p}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 rounded-3xl p-6 space-y-3">
+            <h3 className="text-base font-extrabold text-rose-900 dark:text-rose-300 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-rose-200 dark:bg-rose-900 flex items-center justify-center text-rose-700 dark:text-rose-300 text-xs font-bold shrink-0">✕</span>
+              <span>Who Should Avoid It / Important Trade-offs</span>
+            </h3>
+            <ul className="space-y-2 text-xs sm:text-sm text-neutral-800 dark:text-neutral-200">
+              {cons.map((c, idx) => (
+                <li key={idx} className="flex items-start gap-2">
+                  <span className="text-rose-500 font-bold">•</span>
+                  <span>{c}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
       )}
 
       {/* Smart Alternatives */}

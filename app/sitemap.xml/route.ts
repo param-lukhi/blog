@@ -7,9 +7,16 @@ export async function GET(request: Request) {
   const host = request.headers.get('x-forwarded-host') || request.headers.get('host');
   const proto = request.headers.get('x-forwarded-proto') || 'https';
   const dynamicBaseUrl = host ? `${proto}://${host}` : null;
-  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || dynamicBaseUrl || 'https://blogweb904.vercel.app').replace(/\/$/, '');
+  const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const baseUrl = (
+    rawSiteUrl && !rawSiteUrl.includes('localhost')
+      ? rawSiteUrl
+      : dynamicBaseUrl && !dynamicBaseUrl.includes('localhost')
+      ? dynamicBaseUrl
+      : 'https://blogweb904.vercel.app'
+  ).replace(/\/$/, '');
 
-  // 1. Fetch live published blogs, products, and categories
+  // 1. Fetch live published blogs, products, and categories (only categories with content)
   const [blogs, products, categories] = await Promise.all([
     db.blog.findMany({
       where: { status: 'PUBLISHED' },
@@ -39,14 +46,11 @@ export async function GET(request: Request) {
     { path: '', priority: '1.0', changefreq: 'daily' },
     { path: '/blog', priority: '0.9', changefreq: 'daily' },
     { path: '/products', priority: '0.9', changefreq: 'daily' },
-    { path: '/comparisons', priority: '0.8', changefreq: 'weekly' },
-    { path: '/deals', priority: '0.8', changefreq: 'daily' },
     { path: '/about', priority: '0.7', changefreq: 'monthly' },
     { path: '/contact', priority: '0.7', changefreq: 'monthly' },
     { path: '/privacy', priority: '0.6', changefreq: 'monthly' },
     { path: '/terms', priority: '0.6', changefreq: 'monthly' },
     { path: '/affiliate-disclosure', priority: '0.6', changefreq: 'monthly' },
-    { path: '/cookie-policy', priority: '0.5', changefreq: 'monthly' },
   ];
 
 

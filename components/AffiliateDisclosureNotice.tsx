@@ -31,7 +31,7 @@ export default function AffiliateDisclosureNotice({
         <Info className="w-4 h-4 text-brand-600 dark:text-brand-400 shrink-0 mt-0.5" />
         <div>
           <strong className="text-neutral-900 dark:text-white font-semibold">Affiliate & Pricing Disclosure:</strong>{' '}
-          TechPulse participates in affiliate programs including Amazon Services LLC Associates. If you purchase through our product links, we may earn an affiliate commission at no extra cost to you. Prices, discounts, and inventory are managed by merchants and may change. Read our full{' '}
+          BlogWeb904 participates in affiliate programs including Amazon Services LLC Associates. If you purchase through our product links, we may earn an affiliate commission at no extra cost to you. Prices, discounts, and inventory are managed by merchants and may change. Read our full{' '}
           <Link href="/affiliate-disclosure" className="text-brand-600 dark:text-brand-400 font-semibold underline hover:text-brand-700">
             Affiliate Disclosure
           </Link>.

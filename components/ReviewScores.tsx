@@ -15,14 +15,7 @@ interface ReviewScoresProps {
   scoresData?: string | Record<string, number | string> | ScoreItem[];
 }
 
-const DEFAULT_SCORES: ScoreItem[] = [
-  { label: 'Performance Score', score: 9.6, icon: <Zap className="w-4 h-4" />, color: 'bg-emerald-500' },
-  { label: 'Display Score', score: 9.4, icon: <Monitor className="w-4 h-4" />, color: 'bg-blue-500' },
-  { label: 'Camera / Audio', score: 9.8, icon: <Camera className="w-4 h-4" />, color: 'bg-purple-500' },
-  { label: 'Battery Score', score: 9.1, icon: <Battery className="w-4 h-4" />, color: 'bg-amber-500' },
-  { label: 'Gaming Performance', score: 9.5, icon: <Gamepad2 className="w-4 h-4" />, color: 'bg-indigo-500' },
-  { label: 'AI & Value Rating', score: 9.2, icon: <Cpu className="w-4 h-4" />, color: 'bg-rose-500' },
-];
+
 
 const COLOR_PALETTE = [
   'bg-emerald-500',
@@ -105,7 +98,7 @@ export default function ReviewScores({ scoresData }: ReviewScoresProps) {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-neutral-100 dark:border-neutral-800">
         <div>
           <span className="text-xs font-extrabold uppercase tracking-wider text-brand-600 dark:text-brand-400">
-            TechPulse Evaluation Breakdown
+            BlogWeb904 Evaluation Breakdown
           </span>
           <h3 className="text-xl font-bold text-neutral-900 dark:text-white mt-1">
             Feature Breakdown & Rating Analysis

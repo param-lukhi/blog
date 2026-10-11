@@ -9,10 +9,14 @@ import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Today\'s Best Tech Deals & Amazon Price Drops - TechPulse',
+  title: 'Today\'s Best Tech Deals & Amazon Price Drops - BlogWeb904',
   description: 'Handpicked Amazon tech deals, price drops, and verified discounts on smartphones, laptops, and audio gear.',
   alternates: {
-    canonical: '/deals',
+    canonical: 'https://blogweb904.vercel.app/deals',
+  },
+  robots: {
+    index: false,
+    follow: true,
   },
 };
 

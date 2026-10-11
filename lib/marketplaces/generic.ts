@@ -55,7 +55,7 @@ export class GenericProductAdapter implements MarketplaceAdapter {
   buildAffiliateUrl(
     baseUrlOrId: string,
     userAffiliateUrl?: string,
-    defaultTag: string = 'techpulse-20'
+    defaultTag: string = 'blogweb904-20'
   ): string {
     if (userAffiliateUrl && userAffiliateUrl.trim().length > 0) {
       return userAffiliateUrl.trim();
@@ -164,7 +164,7 @@ export class GenericProductAdapter implements MarketplaceAdapter {
     title: string,
     basePrice: string,
     userAffiliateUrl?: string,
-    tag: string = 'techpulse-20'
+    tag: string = 'blogweb904-20'
   ): Record<string, { country: string; currency: string; price: string; availability: string; marketplace: string; url: string }> {
     const url = this.buildAffiliateUrl(productId || title, userAffiliateUrl, tag);
     return {

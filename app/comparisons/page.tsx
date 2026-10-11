@@ -30,6 +30,7 @@ interface Product {
 
 export default function ComparisonsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
   const [p1Id, setP1Id] = useState<string>('');
   const [p2Id, setP2Id] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -40,23 +41,50 @@ export default function ComparisonsPage() {
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setProducts(data);
-          setP1Id(data[0].id);
-          // Try to find a second product in the same category
-          const sameCat = data.find((p: Product) => p.id !== data[0].id && p.categoryId === data[0].categoryId);
-          if (sameCat) {
-            setP2Id(sameCat.id);
-          } else if (data.length > 1) {
-            setP2Id(data[1].id);
-          } else {
-            setP2Id(data[0].id);
+          const firstCatId = data[0].categoryId || data[0].category?.id || '';
+          setSelectedCategoryId(firstCatId);
+          const catProds = data.filter((p: Product) => (p.categoryId || p.category?.id) === firstCatId);
+          if (catProds.length >= 2) {
+            setP1Id(catProds[0].id);
+            setP2Id(catProds[1].id);
+          } else if (catProds.length === 1) {
+            setP1Id(catProds[0].id);
+            setP2Id('');
           }
         }
       })
       .finally(() => setLoading(false));
   }, []);
 
-  const p1 = products.find((p) => p.id === p1Id);
-  const p2 = products.find((p) => p.id === p2Id);
+  const categories = Array.from(
+    new Map(
+      products
+        .filter((p) => p.category?.id)
+        .map((p) => [p.category!.id, p.category!])
+    ).values()
+  );
+
+  const handleCategoryChange = (catId: string) => {
+    setSelectedCategoryId(catId);
+    const catProds = products.filter((p) => (p.categoryId || p.category?.id) === catId);
+    if (catProds.length >= 2) {
+      setP1Id(catProds[0].id);
+      setP2Id(catProds[1].id);
+    } else if (catProds.length === 1) {
+      setP1Id(catProds[0].id);
+      setP2Id('');
+    } else {
+      setP1Id('');
+      setP2Id('');
+    }
+  };
+
+  const categoryProducts = products.filter(
+    (p) => (p.categoryId || p.category?.id) === selectedCategoryId
+  );
+
+  const p1 = categoryProducts.find((p) => p.id === p1Id);
+  const p2 = categoryProducts.find((p) => p.id === p2Id);
 
   const parseJson = (str: string | undefined, fallback: any = []) => {
     if (!str) return fallback;
@@ -148,55 +176,86 @@ export default function ComparisonsPage() {
           </p>
         </div>
 
-        {/* Product Selectors */}
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-center">
+        {/* Category & Product Selectors */}
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4">
           <div>
             <label className="block text-xs font-extrabold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
-              Select Device 1
+              Select Product Category
             </label>
-            <select
-              value={p1Id}
-              onChange={(e) => setP1Id(e.target.value)}
-              className="w-full p-2.5 sm:p-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white font-bold text-xs sm:text-sm outline-none border border-neutral-200 dark:border-neutral-700 focus:border-brand-500 transition-colors"
-            >
-              {products.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} {p.category?.name ? `[${p.category.name}]` : ''} ({p.price})
-                </option>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => handleCategoryChange(c.id)}
+                  className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
+                    selectedCategoryId === c.id
+                      ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20'
+                      : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                  }`}
+                >
+                  {c.name}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-extrabold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
-              Select Device 2
-            </label>
-            <select
-              value={p2Id}
-              onChange={(e) => setP2Id(e.target.value)}
-              className="w-full p-2.5 sm:p-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white font-bold text-xs sm:text-sm outline-none border border-neutral-200 dark:border-neutral-700 focus:border-brand-500 transition-colors"
-            >
-              {products.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} {p.category?.name ? `[${p.category.name}]` : ''} ({p.price})
-                </option>
-              ))}
-            </select>
-          </div>
+          {categoryProducts.length >= 2 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 pt-2 border-t border-neutral-100 dark:border-neutral-800">
+              <div>
+                <label className="block text-xs font-extrabold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
+                  Select Device 1
+                </label>
+                <select
+                  value={p1Id}
+                  onChange={(e) => setP1Id(e.target.value)}
+                  className="w-full p-2.5 sm:p-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white font-bold text-xs sm:text-sm outline-none border border-neutral-200 dark:border-neutral-700 focus:border-brand-500 transition-colors"
+                >
+                  {categoryProducts.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.price})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-extrabold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
+                  Select Device 2
+                </label>
+                <select
+                  value={p2Id}
+                  onChange={(e) => setP2Id(e.target.value)}
+                  className="w-full p-2.5 sm:p-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white font-bold text-xs sm:text-sm outline-none border border-neutral-200 dark:border-neutral-700 focus:border-brand-500 transition-colors"
+                >
+                  {categoryProducts.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.price})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Cross-Category Notice */}
-        {p1 && p2 && p1.id !== p2.id && p1.categoryId && p2.categoryId && p1.categoryId !== p2.categoryId && (
-          <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs font-medium">
-            <Scale className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
-            <span>
-              <strong>Cross-Category Comparison:</strong> You are comparing devices across different categories ({p1.category?.name || 'Device 1'} vs {p2.category?.name || 'Device 2'}). For direct 1-to-1 spec matching, select devices from the same category.
-            </span>
+        {/* Insufficient Products for Comparison Notice */}
+        {categoryProducts.length < 2 && (
+          <div className="p-8 sm:p-12 text-center bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200 dark:border-neutral-800 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto">
+              <Scale className="w-6 h-6" />
+            </div>
+            <h3 className="font-extrabold text-neutral-900 dark:text-white text-lg">
+              More products are needed in this category before a comparison can be created.
+            </h3>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 max-w-md mx-auto leading-relaxed">
+              Side-by-side spec matching requires at least two products in the same category ({categories.find(c => c.id === selectedCategoryId)?.name || 'Selected Category'}). We are actively researching and adding verified product models.
+            </p>
           </div>
         )}
 
         {/* Same Product Selected State */}
-        {p1 && p2 && p1.id === p2.id && (
+        {categoryProducts.length >= 2 && p1 && p2 && p1.id === p2.id && (
           <div className="p-8 text-center bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200 dark:border-neutral-800 space-y-2">
             <p className="font-extrabold text-neutral-900 dark:text-white text-base">You selected the same device for both sides.</p>
             <p className="text-xs text-neutral-500 dark:text-neutral-400">Please choose a different product in Device 2 to see a side-by-side spec and feature comparison.</p>
@@ -204,7 +263,7 @@ export default function ComparisonsPage() {
         )}
 
         {/* Comparison Content */}
-        {p1 && p2 && p1.id !== p2.id ? (
+        {categoryProducts.length >= 2 && p1 && p2 && p1.id !== p2.id ? (
           <>
             {/* ========================================================= */}
             {/* MOBILE RESPONSIVE COMPARISON VIEW (< md / < 768px)         */}

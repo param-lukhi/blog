@@ -69,20 +69,8 @@ export default function AdminProductsPage() {
   ]);
 
   // Review Scores State (0 to 10 ratings)
-  const [ratingsState, setRatingsState] = useState<{ label: string; score: string }[]>([
-    { label: 'Performance Score', score: '9.6' },
-    { label: 'Display Score', score: '9.4' },
-    { label: 'Camera / Audio', score: '9.8' },
-    { label: 'Battery Score', score: '9.1' },
-    { label: 'Gaming Performance', score: '9.5' },
-    { label: 'AI & Value Rating', score: '9.2' },
-  ]);
-
-  const [priceHistoryState, setPriceHistoryState] = useState<{ date: string; price: string }[]>([
-    { date: 'May 2026', price: '$1,299' },
-    { date: 'Jun 2026', price: '$1,249' },
-    { date: 'Jul 2026', price: '$1,199' },
-  ]);
+  const [ratingsState, setRatingsState] = useState<{ label: string; score: string }[]>([]);
+  const [priceHistoryState, setPriceHistoryState] = useState<{ date: string; price: string }[]>([]);
 
   // Active Modal Tab (General, Images, Ratings, Specs & Features, 20-Country Stores)
   const [modalTab, setModalTab] = useState<'general' | 'images' | 'ratings' | 'details' | 'marketplaces'>('general');
@@ -184,19 +172,8 @@ export default function AdminProductsPage() {
     ]);
     setProsList(['Superior audio clarity', 'Ergonomic light design']);
     setConsList(['Premium pricing']);
-    setRatingsState([
-      { label: 'Performance Score', score: '9.6' },
-      { label: 'Display Score', score: '9.4' },
-      { label: 'Camera / Audio', score: '9.8' },
-      { label: 'Battery Score', score: '9.1' },
-      { label: 'Gaming Performance', score: '9.5' },
-      { label: 'AI & Value Rating', score: '9.2' },
-    ]);
-    setPriceHistoryState([
-      { date: 'May 2026', price: '$1,299' },
-      { date: 'Jun 2026', price: '$1,249' },
-      { date: 'Jul 2026', price: '$1,199' },
-    ]);
+    setRatingsState([]);
+    setPriceHistoryState([]);
 
     const initial: Record<string, MarketplaceEntry> = {};
     MARKETPLACE_LIST.forEach((m) => {
@@ -232,29 +209,18 @@ export default function AdminProductsPage() {
         ? safeJsonParse<Record<string, number | string>>(parsedSpecsObj._ratingScores, {})
         : parsedSpecsObj._ratingScores;
       const rArr = Object.entries(rObj).map(([label, val]) => ({ label, score: String(val) }));
-      if (rArr.length > 0) setRatingsState(rArr);
+      setRatingsState(rArr);
     } else {
-      setRatingsState([
-        { label: 'Performance Score', score: '9.6' },
-        { label: 'Display Score', score: '9.4' },
-        { label: 'Camera / Audio', score: '9.8' },
-        { label: 'Battery Score', score: '9.1' },
-        { label: 'Gaming Performance', score: '9.5' },
-        { label: 'AI & Value Rating', score: '9.2' },
-      ]);
+      setRatingsState([]);
     }
 
     if (parsedSpecsObj._priceHistory) {
       const pArr = typeof parsedSpecsObj._priceHistory === 'string'
         ? safeJsonParse<{ date: string; price: string }[]>(parsedSpecsObj._priceHistory, [])
         : parsedSpecsObj._priceHistory;
-      if (Array.isArray(pArr) && pArr.length > 0) setPriceHistoryState(pArr);
+      setPriceHistoryState(Array.isArray(pArr) ? pArr : []);
     } else {
-      setPriceHistoryState([
-        { date: 'May 2026', price: '$1,299' },
-        { date: 'Jun 2026', price: '$1,249' },
-        { date: 'Jul 2026', price: '$1,199' },
-      ]);
+      setPriceHistoryState([]);
     }
 
     const cleanSpecsArr = Object.entries(parsedSpecsObj)
@@ -385,7 +351,9 @@ export default function AdminProductsPage() {
         ratingScoresObj[r.label.trim()] = parseFloat(r.score) || 9.0;
       }
     });
-    specObj._ratingScores = JSON.stringify(ratingScoresObj);
+    if (Object.keys(ratingScoresObj).length > 0) {
+      specObj._ratingScores = JSON.stringify(ratingScoresObj);
+    }
 
     const priceHistoryArr = priceHistoryState.filter((p) => p.date.trim() && p.price.trim());
     if (priceHistoryArr.length > 0) {

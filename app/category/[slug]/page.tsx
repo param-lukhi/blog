@@ -29,14 +29,22 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   ]);
 
   const isEmpty = productCount === 0 && blogCount === 0;
+  const siteUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+      ? process.env.NEXT_PUBLIC_SITE_URL
+      : 'https://blogweb904.vercel.app'
+  ).replace(/\/$/, '');
 
   return {
-    title: `Best ${category.name} Reviews & Buying Guides (2026)`,
+    title: `Best ${category.name} Reviews & Buying Guides | BlogWeb904`,
     description:
       category.description ||
       `In-depth reviews, expert comparison, and Amazon buying guides for ${category.name}.`,
+    alternates: {
+      canonical: `${siteUrl}/category/${category.slug}`,
+    },
     robots: isEmpty
-      ? { index: false, follow: true }
+      ? { index: false, follow: false }
       : { index: true, follow: true },
   };
 }

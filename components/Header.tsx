@@ -23,7 +23,7 @@ export default function Header() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [siteName, setSiteName] = useState('TechPulse');
+  const [siteName, setSiteName] = useState('BlogWeb904');
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
 
@@ -32,8 +32,8 @@ export default function Header() {
   };
 
   useEffect(() => {
-    // Fetch categories & site settings
-    fetch('/api/categories')
+    // Fetch only active categories with published content & site settings
+    fetch('/api/categories?activeOnly=true')
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setCategories(data);

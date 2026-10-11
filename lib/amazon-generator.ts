@@ -264,7 +264,7 @@ export async function identifyExactProduct(params: {
   affiliateTag?: string;
   targetCategory?: string;
 }): Promise<VerifiedProductData> {
-  const { url, query, imageUrl, affiliateTag = 'techpulse-20', targetCategory } = params;
+  const { url, query, imageUrl, affiliateTag = 'blogweb904-20', targetCategory } = params;
   const adapter = getMarketplaceAdapter(url || query || 'AMAZON');
 
   let exactTitle = query?.trim() || '';
@@ -865,7 +865,7 @@ When weighing the **${title}** against the broader **${categoryName}** market at
  * Builds Schema.org JSON-LD structured schemas.
  */
 function buildStructuredSchemas(data: VerifiedProductData, slug: string): StructuredSchemas {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techpulse.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blogweb904.vercel.app';
   const numericPrice = parseFloat(data.price.replace(/[^0-9.]/g, '') || '199');
 
   const productSchema = {
@@ -901,12 +901,12 @@ function buildStructuredSchemas(data: VerifiedProductData, slug: string): Struct
     dateModified: data.verifiedAt,
     author: {
       '@type': 'Organization',
-      name: 'TechPulse Editorial Team',
+      name: 'BlogWeb904 Editorial Team',
       url: siteUrl,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'TechPulse',
+      name: 'BlogWeb904',
       logo: {
         '@type': 'ImageObject',
         url: `${siteUrl}/logo.png`,
@@ -978,7 +978,7 @@ function buildSocialMediaKit(data: VerifiedProductData, slug: string): SocialMed
   const hashtags = [
     `#${data.brand.replace(/[^a-zA-Z0-9]/g, '')}`,
     `#${data.categoryName.replace(/[^a-zA-Z0-9]/g, '')}`,
-    '#TechPulse',
+    '#BlogWeb904',
     '#TechReview',
     '#Gadgets',
     '#ProductReview',
@@ -1012,7 +1012,7 @@ export async function generateFullProductAndBlog(params: {
   affiliateTag?: string;
   targetCategory?: string;
 }): Promise<GeneratedBlogDraft> {
-  const { url, query, imageUrl, affiliateTag = 'techpulse-20', targetCategory } = params;
+  const { url, query, imageUrl, affiliateTag = 'blogweb904-20', targetCategory } = params;
 
   // 1. Exact Product Identification & Research
   const verifiedData = await identifyExactProduct({

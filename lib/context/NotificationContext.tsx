@@ -57,7 +57,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('techpulse_notifications');
+      const saved = localStorage.getItem('blogweb904_notifications');
       if (saved) {
         setNotifications(JSON.parse(saved));
       }
@@ -69,7 +69,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const save = (items: NotificationItem[]) => {
     setNotifications(items);
     try {
-      localStorage.setItem('techpulse_notifications', JSON.stringify(items));
+      localStorage.setItem('blogweb904_notifications', JSON.stringify(items));
     } catch (e) {}
   };
 

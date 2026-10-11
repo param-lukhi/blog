@@ -29,7 +29,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('techpulse_wishlist');
+      const saved = localStorage.getItem('blogweb904_wishlist');
       if (saved) {
         setWishlist(JSON.parse(saved));
       }
@@ -43,7 +43,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isLoaded) {
       try {
-        localStorage.setItem('techpulse_wishlist', JSON.stringify(wishlist));
+        localStorage.setItem('blogweb904_wishlist', JSON.stringify(wishlist));
       } catch (e) {
         console.error('Failed to save wishlist', e);
       }

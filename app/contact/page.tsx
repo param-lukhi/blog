@@ -51,7 +51,7 @@ export default function ContactPage() {
           Get in Touch
         </span>
         <h1 className="text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
-          Contact TechPulse
+          Contact BlogWeb904
         </h1>
         <p className="text-neutral-600 dark:text-neutral-300 text-base max-w-xl mx-auto leading-relaxed">
           Have feedback on a review, a question about a product comparison, or an editorial inquiry? Send our team a message below.
@@ -73,7 +73,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <span className="text-xs text-neutral-400 block font-medium">Email Address</span>
-                  <span className="font-bold text-xs sm:text-sm">editorial@techpulsereviews.com</span>
+                  <span className="font-bold text-xs sm:text-sm">indiadealzz@gmail.com</span>
                 </div>
               </div>
 
@@ -97,7 +97,7 @@ export default function ContactPage() {
             </div>
             <h3 className="font-extrabold text-emerald-900 dark:text-emerald-300 text-xl">Message Received!</h3>
             <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed max-w-sm mx-auto">
-              Thank you for contacting TechPulse. Our editorial team will review your inquiry and follow up if needed.
+              Thank you for contacting BlogWeb904. Our editorial team will review your inquiry and follow up if needed.
             </p>
           </div>
         ) : (

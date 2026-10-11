@@ -17,22 +17,26 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: 'TechPulse - Research-Based Tech Reviews & Unbiased Buying Guides',
+  title: 'BlogWeb904 - Research-Based Product Reviews & Unbiased Buying Guides',
   description: 'In-depth research-based product reviews, hardware comparisons, and buying guides to help consumers make smart tech purchasing decisions.',
   alternates: {
-    canonical: '/',
+    canonical: 'https://blogweb904.vercel.app',
   },
 };
 
 async function getData() {
   const categories = await db.category.findMany({
-    where: { parentId: null },
+    where: {
+      OR: [
+        { products: { some: { status: 'PUBLISHED' } } },
+        { blogs: { some: { status: 'PUBLISHED' } } },
+      ],
+    },
     include: {
       subcategories: { select: { id: true, name: true, slug: true } },
       _count: { select: { subcategories: true, products: true, blogs: true } },
     },
     orderBy: { name: 'asc' },
-    take: 16,
   });
   const featuredProducts = await db.product.findMany({
     where: { status: 'PUBLISHED', isFeatured: true },
@@ -96,7 +100,7 @@ export default async function HomePage() {
 
   const homeFaqs = [
     {
-      question: 'How does TechPulse research and evaluate tech products?',
+      question: 'How does BlogWeb904 research and evaluate tech products?',
       answer: 'Our editorial team analyzes official technical specifications, benchmark data, verified buyer sentiment across thousands of owners, long-term build quality data, and price-to-performance metrics to formulate balanced, research-driven buying guides and reviews.',
     },
     {
@@ -104,11 +108,11 @@ export default async function HomePage() {
       answer: 'We research and track official Amazon catalog prices and regional marketplace promotions. Because merchant prices fluctuate regularly, always verify final pricing and warranty details directly on Amazon at checkout.',
     },
     {
-      question: 'Does TechPulse accept paid sponsorships for review scores?',
+      question: 'Does BlogWeb904 accept paid sponsorships for review scores?',
       answer: 'No. We maintain strict editorial independence. Brand sponsorships or affiliate relationships never dictate our ratings, product selection, or review conclusions.',
     },
     {
-      question: 'What is TechPulse’s policy on affiliate links?',
+      question: 'What is BlogWeb904’s policy on affiliate links?',
       answer: 'We may earn a small referral commission when you purchase through our links on Amazon at zero extra cost to you. Affiliate partnerships never influence our pros, cons, or product rankings.',
     },
   ];
@@ -142,21 +146,23 @@ export default async function HomePage() {
             {heroSubtitle}
           </p>
 
-          {/* Quick Search Chips */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
-            <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-              <TrendingUp className="w-3.5 h-3.5 text-blue-400" /> Popular:
-            </span>
-            {popularKeywords.map((kw) => (
-              <Link
-                key={kw}
-                href={`/search?q=${encodeURIComponent(kw)}`}
-                className="text-xs px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-neutral-200 hover:text-white border border-white/10 backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95"
-              >
-                {kw}
-              </Link>
-            ))}
-          </div>
+          {/* Quick Category Chips */}
+          {categories.length > 0 && (
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
+              <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5 text-blue-400" /> Featured Hubs:
+              </span>
+              {categories.map((cat) => (
+                <Link
+                  key={cat.id}
+                  href={`/category/${cat.slug}`}
+                  className="text-xs px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-neutral-200 hover:text-white border border-white/10 backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95"
+                >
+                  {cat.name}
+                </Link>
+              ))}
+            </div>
+          )}
 
           {/* CTA Buttons */}
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -410,40 +416,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 6b. Price-Based Buying Guides */}
-      {priceCategories.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white dark:bg-[#121826] rounded-3xl p-6 sm:p-8 border border-neutral-200/90 dark:border-neutral-800 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
-                  <Wallet className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-extrabold text-neutral-900 dark:text-white">
-                    Shop By Budget (Affiliate Curations)
-                  </h3>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                    Find top-tested products matching your exact spending bracket.
-                  </p>
-                </div>
-              </div>
-            </div>
 
-            <div className="flex flex-wrap gap-2.5 pt-2">
-              {priceCategories.map((priceTier, idx) => (
-                <Link
-                  key={idx}
-                  href={`/search?q=${encodeURIComponent(priceTier)}`}
-                  className="px-4 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-neutral-700 dark:text-neutral-300 hover:text-emerald-700 dark:hover:text-emerald-300 text-xs font-bold border border-neutral-200/80 dark:border-neutral-800 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all hover:scale-105 active:scale-95"
-                >
-                  💰 {priceTier}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* 7. Why Readers Trust TechPulse (Editorial Standard) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

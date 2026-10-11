@@ -23,7 +23,7 @@ export default function SearchBar() {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('techpulse_recent_searches');
+      const saved = localStorage.getItem('blogweb904_recent_searches');
       if (saved) setRecentSearches(JSON.parse(saved));
     } catch (e) {}
   }, []);
@@ -66,7 +66,7 @@ export default function SearchBar() {
     const updated = [term.trim(), ...filtered].slice(0, 5);
     setRecentSearches(updated);
     try {
-      localStorage.setItem('techpulse_recent_searches', JSON.stringify(updated));
+      localStorage.setItem('blogweb904_recent_searches', JSON.stringify(updated));
     } catch (e) {}
   };
 
@@ -83,7 +83,7 @@ export default function SearchBar() {
   const clearRecentSearches = () => {
     setRecentSearches([]);
     try {
-      localStorage.removeItem('techpulse_recent_searches');
+      localStorage.removeItem('blogweb904_recent_searches');
     } catch (e) {}
   };
 

@@ -1,10 +1,20 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { isAuthorizedAdmin } from '@/lib/auth';
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { status } = body;
+
+    const allowedStatuses = ['PENDING', 'APPROVED', 'SPAM'];
+    if (!status || !allowedStatuses.includes(status)) {
+      return NextResponse.json({ error: 'Invalid comment status' }, { status: 400 });
+    }
 
     const updated = await db.comment.update({
       where: { id: params.id },
@@ -18,6 +28,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  if (!isAuthorizedAdmin()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     await db.comment.delete({ where: { id: params.id } });
     return NextResponse.json({ success: true });
